@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -25,12 +26,26 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#2D2CAB',
+					foreground: 'white',
+					light: '#4F46E5',
+					dark: '#1E1B8B'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#29B6F6',
+					foreground: 'white',
+					light: '#4FC3F7',
+					dark: '#0277BD'
+				},
+				accent: {
+					DEFAULT: '#E3F2FD',
+					foreground: '#1565C0'
+				},
+				caremate: {
+					blue: '#2D2CAB',
+					cyan: '#29B6F6',
+					gray: '#DBDCDC',
+					black: '#233036'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -39,10 +54,6 @@ export default {
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
 					foreground: 'hsl(var(--muted-foreground))'
-				},
-				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -62,6 +73,14 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				}
+			},
+			fontFamily: {
+				'sans': ['Inter', 'system-ui', 'sans-serif'],
+				'avenir': ['Avenir Next', 'Avenir', 'system-ui', 'sans-serif']
+			},
+			backgroundImage: {
+				'caremate-gradient': 'linear-gradient(135deg, #2D2CAB 0%, #29B6F6 100%)',
+				'caremate-gradient-light': 'linear-gradient(135deg, #4F46E5 0%, #4FC3F7 100%)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +103,20 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-slow': {
+					'0%, 100%': {
+						opacity: '1'
+					},
+					'50%': {
+						opacity: '0.7'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
 			}
 		}
 	},
