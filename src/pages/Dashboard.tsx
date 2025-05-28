@@ -100,11 +100,13 @@ export function Dashboard() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-800">Residents</h2>
               <div className="flex gap-2">
-                <Input 
-                  placeholder="Search residents..." 
-                  className="w-64"
-                  icon={<Search className="w-4 h-4" />}
-                />
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
+                  <Input 
+                    placeholder="Search residents..." 
+                    className="w-64 pl-10"
+                  />
+                </div>
               </div>
             </div>
             <div className="space-y-3">
