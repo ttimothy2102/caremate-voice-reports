@@ -42,7 +42,7 @@ export function useCreateResident() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async (resident: Partial<Resident>) => {
+    mutationFn: async (resident: Omit<Resident, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('residents')
         .insert([resident])

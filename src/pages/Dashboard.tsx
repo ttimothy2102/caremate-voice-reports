@@ -41,7 +41,7 @@ function DashboardContent() {
     lastReport: careReports.find(r => r.resident_id === resident.id) 
       ? new Date(careReports.find(r => r.resident_id === resident.id)!.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
       : undefined,
-    vitalsStatus: Math.random() > 0.7 ? 'warning' : 'normal' as const,
+    vitalsStatus: (Math.random() > 0.7 ? 'warning' : 'normal') as 'normal' | 'warning' | 'critical',
     hasAlerts: Math.random() > 0.8
   }));
 
