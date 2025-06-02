@@ -267,45 +267,189 @@ export type Database = {
       residents: {
         Row: {
           admission_date: string | null
+          advance_directive: boolean | null
           age: number | null
+          aids: string[] | null
           allergies: string[] | null
+          billing_carrier: string | null
+          birth_date: string | null
+          blood_pressure: string | null
+          blood_sugar: string | null
+          bmi: string | null
+          care_aids: boolean | null
           care_level: string | null
+          cognition: string | null
+          communication: string | null
           created_at: string | null
+          decubitus_risk: boolean | null
+          diagnoses: string | null
+          doctor: string | null
+          doctor_address: string | null
+          doctor_phone: string | null
           emergency_contact: string | null
           emergency_phone: string | null
+          emergency_relation: string | null
+          fall_risk: boolean | null
+          first_name: string | null
+          gender: string | null
+          guardian_contact: string | null
+          guardian_scope: string | null
+          height: string | null
+          hobbies: string | null
           id: string
+          incontinence: string[] | null
+          insurance_type: string | null
+          language: string | null
+          last_name: string | null
+          legal_guardian: string | null
+          marital_status: string | null
           medical_conditions: string[] | null
+          medications: string | null
+          mobility: string | null
+          music_preferences: string | null
           name: string
+          nationality: string | null
+          nutrition: string | null
+          nutrition_plan: string | null
+          pet_connection: string | null
+          previous_address: string | null
+          profession: string | null
+          profile_image_url: string | null
+          psychological_state: string | null
+          pulse: string | null
+          religion: string | null
+          respiratory_rate: string | null
+          rituals: string | null
           room: string | null
+          room_equipment: string | null
+          sleep_behavior: string | null
+          temperature: string | null
           updated_at: string | null
+          weight: string | null
         }
         Insert: {
           admission_date?: string | null
+          advance_directive?: boolean | null
           age?: number | null
+          aids?: string[] | null
           allergies?: string[] | null
+          billing_carrier?: string | null
+          birth_date?: string | null
+          blood_pressure?: string | null
+          blood_sugar?: string | null
+          bmi?: string | null
+          care_aids?: boolean | null
           care_level?: string | null
+          cognition?: string | null
+          communication?: string | null
           created_at?: string | null
+          decubitus_risk?: boolean | null
+          diagnoses?: string | null
+          doctor?: string | null
+          doctor_address?: string | null
+          doctor_phone?: string | null
           emergency_contact?: string | null
           emergency_phone?: string | null
+          emergency_relation?: string | null
+          fall_risk?: boolean | null
+          first_name?: string | null
+          gender?: string | null
+          guardian_contact?: string | null
+          guardian_scope?: string | null
+          height?: string | null
+          hobbies?: string | null
           id?: string
+          incontinence?: string[] | null
+          insurance_type?: string | null
+          language?: string | null
+          last_name?: string | null
+          legal_guardian?: string | null
+          marital_status?: string | null
           medical_conditions?: string[] | null
+          medications?: string | null
+          mobility?: string | null
+          music_preferences?: string | null
           name: string
+          nationality?: string | null
+          nutrition?: string | null
+          nutrition_plan?: string | null
+          pet_connection?: string | null
+          previous_address?: string | null
+          profession?: string | null
+          profile_image_url?: string | null
+          psychological_state?: string | null
+          pulse?: string | null
+          religion?: string | null
+          respiratory_rate?: string | null
+          rituals?: string | null
           room?: string | null
+          room_equipment?: string | null
+          sleep_behavior?: string | null
+          temperature?: string | null
           updated_at?: string | null
+          weight?: string | null
         }
         Update: {
           admission_date?: string | null
+          advance_directive?: boolean | null
           age?: number | null
+          aids?: string[] | null
           allergies?: string[] | null
+          billing_carrier?: string | null
+          birth_date?: string | null
+          blood_pressure?: string | null
+          blood_sugar?: string | null
+          bmi?: string | null
+          care_aids?: boolean | null
           care_level?: string | null
+          cognition?: string | null
+          communication?: string | null
           created_at?: string | null
+          decubitus_risk?: boolean | null
+          diagnoses?: string | null
+          doctor?: string | null
+          doctor_address?: string | null
+          doctor_phone?: string | null
           emergency_contact?: string | null
           emergency_phone?: string | null
+          emergency_relation?: string | null
+          fall_risk?: boolean | null
+          first_name?: string | null
+          gender?: string | null
+          guardian_contact?: string | null
+          guardian_scope?: string | null
+          height?: string | null
+          hobbies?: string | null
           id?: string
+          incontinence?: string[] | null
+          insurance_type?: string | null
+          language?: string | null
+          last_name?: string | null
+          legal_guardian?: string | null
+          marital_status?: string | null
           medical_conditions?: string[] | null
+          medications?: string | null
+          mobility?: string | null
+          music_preferences?: string | null
           name?: string
+          nationality?: string | null
+          nutrition?: string | null
+          nutrition_plan?: string | null
+          pet_connection?: string | null
+          previous_address?: string | null
+          profession?: string | null
+          profile_image_url?: string | null
+          psychological_state?: string | null
+          pulse?: string | null
+          religion?: string | null
+          respiratory_rate?: string | null
+          rituals?: string | null
           room?: string | null
+          room_equipment?: string | null
+          sleep_behavior?: string | null
+          temperature?: string | null
           updated_at?: string | null
+          weight?: string | null
         }
         Relationships: []
       }

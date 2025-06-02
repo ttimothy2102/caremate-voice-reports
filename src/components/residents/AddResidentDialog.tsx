@@ -11,6 +11,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Save, X, User, Heart, FileText, Shield, Users, Home, FolderOpen } from 'lucide-react';
+import { useCreateResident } from '@/hooks/useResidents';
+import { toast } from '@/components/ui/use-toast';
 
 interface AddResidentDialogProps {
   isOpen: boolean;
@@ -18,6 +20,7 @@ interface AddResidentDialogProps {
 }
 
 export function AddResidentDialog({ isOpen, onClose }: AddResidentDialogProps) {
+  const createResident = useCreateResident();
   const [formData, setFormData] = useState({
     // Persönliche Daten
     firstName: '',
@@ -62,7 +65,7 @@ export function AddResidentDialog({ isOpen, onClose }: AddResidentDialogProps) {
     cognition: '',
     communication: '',
     nutrition: '',
-    incontinence: [],
+    incontinence: [] as string[],
     decubitusRisk: false,
     fallRisk: false,
     sleepBehavior: '',
@@ -76,7 +79,7 @@ export function AddResidentDialog({ isOpen, onClose }: AddResidentDialogProps) {
     petConnection: '',
     
     // Versorgung
-    aids: [],
+    aids: [] as string[],
     careAids: false,
     roomEquipment: '',
     nutritionPlan: '',
@@ -87,9 +90,106 @@ export function AddResidentDialog({ isOpen, onClose }: AddResidentDialogProps) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    console.log('Saving resident data:', formData);
-    onClose();
+  const calculateAge = (birthDate: string): number => {
+    if (!birthDate) return 0;
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const handleSave = async () => {
+    try {
+      // Validierung der Pflichtfelder
+      if (!formData.firstName || !formData.lastName || !formData.birthDate) {
+        toast({
+          title: "Fehler",
+          description: "Bitte füllen Sie alle Pflichtfelder aus (Vorname, Nachname, Geburtsdatum).",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Daten für die Datenbank vorbereiten
+      const residentData = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        name: `${formData.firstName} ${formData.lastName}`,
+        birth_date: formData.birthDate,
+        age: calculateAge(formData.birthDate),
+        gender: formData.gender,
+        nationality: formData.nationality,
+        previous_address: formData.previousAddress,
+        marital_status: formData.maritalStatus,
+        religion: formData.religion,
+        language: formData.language,
+        emergency_contact: formData.emergencyContact,
+        emergency_relation: formData.emergencyRelation,
+        emergency_phone: formData.emergencyPhone,
+        legal_guardian: formData.legalGuardian,
+        guardian_scope: formData.guardianScope,
+        guardian_contact: formData.guardianContact,
+        advance_directive: formData.advanceDirective,
+        doctor: formData.doctor,
+        doctor_address: formData.doctorAddress,
+        doctor_phone: formData.doctorPhone,
+        care_level: formData.careLevel,
+        insurance_type: formData.insuranceType,
+        diagnoses: formData.diagnoses,
+        allergies: formData.allergies ? [formData.allergies] : [],
+        medications: formData.medications,
+        blood_pressure: formData.bloodPressure,
+        pulse: formData.pulse,
+        blood_sugar: formData.bloodSugar,
+        temperature: formData.temperature,
+        respiratory_rate: formData.respiratoryRate,
+        height: formData.height,
+        weight: formData.weight,
+        bmi: formData.bmi,
+        mobility: formData.mobility,
+        cognition: formData.cognition,
+        communication: formData.communication,
+        nutrition: formData.nutrition,
+        incontinence: formData.incontinence,
+        decubitus_risk: formData.decubitusRisk,
+        fall_risk: formData.fallRisk,
+        sleep_behavior: formData.sleepBehavior,
+        psychological_state: formData.psychologicalState,
+        profession: formData.profession,
+        hobbies: formData.hobbies,
+        rituals: formData.rituals,
+        music_preferences: formData.musicPreferences,
+        pet_connection: formData.petConnection,
+        aids: formData.aids,
+        care_aids: formData.careAids,
+        room_equipment: formData.roomEquipment,
+        nutrition_plan: formData.nutritionPlan,
+        billing_carrier: formData.billingCarrier,
+        room: '', // Wird später zugewiesen
+        admission_date: new Date().toISOString().split('T')[0],
+        medical_conditions: formData.diagnoses ? [formData.diagnoses] : []
+      };
+
+      await createResident.mutateAsync(residentData);
+      
+      toast({
+        title: "Erfolg",
+        description: `Bewohner ${formData.firstName} ${formData.lastName} wurde erfolgreich hinzugefügt.`,
+      });
+      
+      onClose();
+    } catch (error) {
+      console.error('Error saving resident:', error);
+      toast({
+        title: "Fehler",
+        description: "Beim Speichern des Bewohners ist ein Fehler aufgetreten.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -102,9 +202,13 @@ export function AddResidentDialog({ isOpen, onClose }: AddResidentDialogProps) {
               Neuen Bewohner hinzufügen
             </DialogTitle>
             <div className="flex gap-2">
-              <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+              <Button 
+                onClick={handleSave} 
+                className="bg-green-600 hover:bg-green-700"
+                disabled={createResident.isPending}
+              >
                 <Save className="w-4 h-4 mr-2" />
-                Speichern
+                {createResident.isPending ? 'Speichert...' : 'Speichern'}
               </Button>
               <Button variant="outline" onClick={onClose}>
                 <X className="w-4 h-4 mr-2" />
