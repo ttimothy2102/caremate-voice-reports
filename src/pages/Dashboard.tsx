@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,19 +6,22 @@ import { VitalsChart } from "@/components/dashboard/VitalsChart";
 import { PatientFilters } from "@/components/dashboard/PatientFilters";
 import { MedicationTracker } from "@/components/medications/MedicationTracker";
 import { DrugOrdering } from "@/components/medications/DrugOrdering";
-import { Plus, AlertTriangle, FileText, Users, Heart, LogOut } from 'lucide-react';
+import { WithingsIntegration } from "@/components/withings/WithingsIntegration";
+import { Plus, AlertTriangle, FileText, Users, Heart, LogOut, Calendar } from 'lucide-react';
 import { useResidents } from '@/hooks/useResidents';
 import { useVitalSignsChart } from '@/hooks/useVitalSigns';
 import { useCareReports } from '@/hooks/useCareReports';
 import { useAuth } from '@/hooks/useAuth';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { toast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 function DashboardContent() {
   const { data: residents = [], isLoading: residentsLoading } = useResidents();
   const { data: heartRateData = [] } = useVitalSignsChart();
   const { data: careReports = [] } = useCareReports();
   const { signOut, user } = useAuth();
+  const navigate = useNavigate();
 
   // Filter states
   const [searchName, setSearchName] = useState('');
@@ -104,6 +106,10 @@ function DashboardContent() {
               <Plus className="w-4 h-4 mr-2" />
               Add Resident
             </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate('/schedule')}>
+              <Calendar className="w-4 h-4 mr-2" />
+              Schedule
+            </Button>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
@@ -129,76 +135,27 @@ function DashboardContent() {
           ))}
         </div>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Residents List */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-800">Residents</h2>
-            </div>
-            
-            <PatientFilters
-              searchName={searchName}
-              onSearchNameChange={setSearchName}
-              roomFilter={roomFilter}
-              onRoomFilterChange={setRoomFilter}
-              careLevelFilter={careLevelFilter}
-              onCareLevelFilterChange={setCareLevelFilter}
-              availableRooms={availableRooms}
-              availableCareLevels={availableCareLevels}
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Medication Tracking */}
+          <MedicationTracker />
+
+          {/* Drug Ordering */}
+          <DrugOrdering />
+
+          {/* Vitals Overview */}
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Vitals Overview</h2>
+            <VitalsChart 
+              title="Heart Rate (BPM)"
+              data={heartRateData}
+              color="#29B6F6"
+              unit="bpm"
             />
-            
-            <div className="space-y-3">
-              {residentsWithExtras.map((resident) => (
-                <ResidentCard 
-                  key={resident.id}
-                  resident={resident}
-                  onClick={() => console.log('Open resident details for:', resident.name)}
-                />
-              ))}
-            </div>
           </div>
 
-          {/* Right Column - Vitals and Medications */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Vitals Overview */}
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Vitals Overview</h2>
-              <VitalsChart 
-                title="Heart Rate (BPM)"
-                data={heartRateData}
-                color="#29B6F6"
-                unit="bpm"
-              />
-            </div>
-
-            {/* Medication Tracking */}
-            <MedicationTracker />
-
-            {/* Drug Ordering */}
-            <DrugOrdering />
-
-            {/* Recent Alerts */}
-            <Card className="p-4">
-              <h3 className="font-semibold text-gray-800 mb-3">Recent Alerts</h3>
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 p-2 bg-red-50 rounded-lg">
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Hans Weber - High BP</p>
-                    <p className="text-xs text-gray-600">15:30 - 145/95 mmHg</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-2 bg-yellow-50 rounded-lg">
-                  <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Anna Müller - Missed Meal</p>
-                    <p className="text-xs text-gray-600">12:00 - Lunch not completed</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
+          {/* Withings Integration */}
+          <WithingsIntegration />
         </div>
       </div>
     </div>
