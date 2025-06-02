@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Plus, Filter } from 'lucide-react';
 import { useSchedules } from '@/hooks/useSchedules';
 import { useResidents } from '@/hooks/useResidents';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
+import { de } from 'date-fns/locale';
 
 const eventTypeColors = {
   medical: 'bg-red-100 text-red-800 border-red-300',
@@ -46,7 +47,7 @@ export function WeeklyCalendar() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-800">Weekly Schedule</h2>
+        <h2 className="text-xl font-semibold text-gray-800">Wöchentlicher Terminplan</h2>
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
@@ -56,7 +57,7 @@ export function WeeklyCalendar() {
             <ChevronLeft className="w-4 h-4" />
           </Button>
           <span className="text-sm font-medium">
-            {format(weekStart, 'MMM d')} - {format(addDays(weekStart, 6), 'MMM d, yyyy')}
+            {format(weekStart, 'd. MMM', { locale: de })} - {format(addDays(weekStart, 6), 'd. MMM yyyy', { locale: de })}
           </span>
           <Button
             variant="outline"
@@ -73,7 +74,7 @@ export function WeeklyCalendar() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-medium">Filters:</span>
+            <span className="text-sm font-medium">Filter:</span>
           </div>
           
           <select 
@@ -81,7 +82,7 @@ export function WeeklyCalendar() {
             onChange={(e) => setSelectedResident(e.target.value)}
             className="px-3 py-1 border rounded-md text-sm"
           >
-            <option value="all">All Residents</option>
+            <option value="all">Alle Bewohner</option>
             {residents.map(resident => (
               <option key={resident.id} value={resident.id}>
                 {resident.name}
@@ -94,19 +95,19 @@ export function WeeklyCalendar() {
             onChange={(e) => setSelectedEventType(e.target.value)}
             className="px-3 py-1 border rounded-md text-sm"
           >
-            <option value="all">All Types</option>
-            <option value="medical">Medical</option>
-            <option value="therapy">Therapy</option>
-            <option value="social">Social</option>
+            <option value="all">Alle Typen</option>
+            <option value="medical">Medizinisch</option>
+            <option value="therapy">Therapie</option>
+            <option value="social">Sozial</option>
             <option value="hygiene">Hygiene</option>
-            <option value="meal">Meals</option>
-            <option value="rest">Rest</option>
-            <option value="custom">Custom</option>
+            <option value="meal">Mahlzeiten</option>
+            <option value="rest">Ruhe</option>
+            <option value="custom">Sonstige</option>
           </select>
 
           <Button size="sm" className="ml-auto">
             <Plus className="w-4 h-4 mr-2" />
-            Add Event
+            Termin hinzufügen
           </Button>
         </div>
       </Card>
@@ -118,10 +119,10 @@ export function WeeklyCalendar() {
             <div key={index} className="min-h-[300px]">
               <div className="sticky top-0 bg-white pb-2 border-b mb-3">
                 <h3 className="font-medium text-gray-800">
-                  {format(day, 'EEE')}
+                  {format(day, 'EEEE', { locale: de })}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {format(day, 'MMM d')}
+                  {format(day, 'd. MMM', { locale: de })}
                 </p>
               </div>
               
@@ -140,7 +141,13 @@ export function WeeklyCalendar() {
                         variant="outline" 
                         className={`text-xs ${eventTypeColors[schedule.event_type as keyof typeof eventTypeColors]}`}
                       >
-                        {schedule.event_type}
+                        {schedule.event_type === 'medical' && 'Medizinisch'}
+                        {schedule.event_type === 'therapy' && 'Therapie'}
+                        {schedule.event_type === 'social' && 'Sozial'}
+                        {schedule.event_type === 'hygiene' && 'Hygiene'}
+                        {schedule.event_type === 'meal' && 'Mahlzeit'}
+                        {schedule.event_type === 'rest' && 'Ruhe'}
+                        {schedule.event_type === 'custom' && 'Sonstige'}
                       </Badge>
                     </div>
                     <p className="text-sm font-medium text-gray-800 mb-1">

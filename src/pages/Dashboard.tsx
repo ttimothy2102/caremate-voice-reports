@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { Logo } from '@/components/layout/Logo';
 
 function DashboardContent() {
   const { data: residents = [], isLoading: residentsLoading } = useResidents();
@@ -31,8 +33,8 @@ function DashboardContent() {
   const handleSignOut = async () => {
     await signOut();
     toast({
-      title: "Signed out",
-      description: "You have been successfully signed out.",
+      title: "Abgemeldet",
+      description: "Sie wurden erfolgreich abgemeldet.",
     });
   };
 
@@ -81,7 +83,7 @@ function DashboardContent() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="text-gray-600">Dashboard wird geladen...</p>
         </div>
       </div>
     );
@@ -114,11 +116,7 @@ function DashboardContent() {
               <LogOut className="w-4 h-4 mr-2" />
               Abmelden
             </Button>
-            <div 
-              className="w-8 h-8 bg-caremate-gradient rounded-full cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => navigate('/')}
-              title="Zurück zur Startseite"
-            />
+            <Logo />
           </div>
         </div>
       </header>
@@ -149,9 +147,9 @@ function DashboardContent() {
 
           {/* Vitals Overview */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Vitals Overview</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Vitalwerte Übersicht</h2>
             <VitalsChart 
-              title="Heart Rate (BPM)"
+              title="Herzfrequenz (BPM)"
               data={heartRateData}
               color="#29B6F6"
               unit="bpm"

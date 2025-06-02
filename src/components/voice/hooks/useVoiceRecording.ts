@@ -27,6 +27,7 @@ export function useVoiceRecording() {
 
   const startRecording = async () => {
     try {
+      console.log('Starte Aufnahme...');
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           sampleRate: 44100,
@@ -37,23 +38,24 @@ export function useVoiceRecording() {
         }
       });
       
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
+      let mimeType = 'audio/webm';
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        mimeType = 'audio/webm;codecs=opus';
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mimeType = 'audio/mp4';
+      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+        mimeType = 'audio/wav';
+      }
       
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
+          console.log('Audio chunk empfangen:', event.data.size, 'bytes');
         }
-      };
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        stream.getTracks().forEach(track => track.stop());
-        return audioBlob;
       };
 
       mediaRecorder.start(1000);
@@ -77,8 +79,18 @@ export function useVoiceRecording() {
   const stopRecording = (): Promise<Blob | null> => {
     return new Promise((resolve) => {
       if (mediaRecorderRef.current && isRecording) {
+        console.log('Stoppe Aufnahme...');
+        
         mediaRecorderRef.current.onstop = async () => {
+          console.log('Aufnahme gestoppt, erstelle Audio Blob...');
           const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          console.log('Audio Blob erstellt:', audioBlob.size, 'bytes');
+          
+          // Stop all tracks
+          if (mediaRecorderRef.current?.stream) {
+            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+          }
+          
           resolve(audioBlob);
         };
         
@@ -89,7 +101,7 @@ export function useVoiceRecording() {
         
         toast({
           title: "Verarbeitung läuft",
-          description: "Ihr Sprachnotiz wird transkribiert und analysiert...",
+          description: "Ihre Sprachnotiz wird transkribiert und analysiert...",
         });
       } else {
         resolve(null);
@@ -99,13 +111,26 @@ export function useVoiceRecording() {
 
   const processAudioWithAI = async (audioBlob: Blob, residentId?: string) => {
     try {
+      console.log('Verarbeite Audio mit AI...');
+      console.log('Audio Blob Größe:', audioBlob.size);
+      
+      if (audioBlob.size === 0) {
+        throw new Error('Audio Blob ist leer');
+      }
+      
       const reader = new FileReader();
       
       return new Promise((resolve, reject) => {
         reader.onloadend = async () => {
           try {
             const base64Audio = reader.result as string;
+            console.log('Base64 Audio Länge:', base64Audio.length);
             
+            if (!base64Audio || base64Audio.length < 100) {
+              throw new Error('Audio Daten sind zu kurz oder ungültig');
+            }
+            
+            console.log('Sende Anfrage an Supabase Function...');
             const { data, error } = await supabase.functions.invoke('process-voice-note', {
               body: {
                 audio: base64Audio.split(',')[1],
@@ -113,16 +138,24 @@ export function useVoiceRecording() {
               }
             });
 
+            console.log('Antwort von Supabase Function:', { data, error });
+
             if (error) {
-              throw new Error(error.message);
+              console.error('Supabase Function Fehler:', error);
+              throw new Error(error.message || 'Unbekannter Fehler bei der Verarbeitung');
+            }
+
+            if (!data || !data.transcript) {
+              console.error('Keine gültigen Daten erhalten:', data);
+              throw new Error('Keine Transkription erhalten');
             }
 
             const structuredReport = {
-              physical_condition: data.structured.physical_condition,
-              mood: data.structured.mood,
-              food_water_intake: data.structured.food_water_intake,
-              medication_given: data.structured.medication_given,
-              special_notes: data.structured.special_notes,
+              physical_condition: data.structured?.physical_condition || "Nicht erwähnt",
+              mood: data.structured?.mood || "Nicht erwähnt",
+              food_water_intake: data.structured?.food_water_intake || "Nicht erwähnt",
+              medication_given: data.structured?.medication_given || "Nicht erwähnt",
+              special_notes: data.structured?.special_notes || "Nicht erwähnt",
               voice_transcript: data.transcript
             };
 
@@ -133,10 +166,19 @@ export function useVoiceRecording() {
               description: "Ihre Sprachnotiz wurde transkribiert und strukturiert.",
             });
 
+            console.log('Verarbeitung erfolgreich:', { transcript: data.transcript, structuredReport });
             resolve({ transcript: data.transcript, structuredReport });
           } catch (error) {
+            console.error('Fehler bei der Verarbeitung:', error);
+            setIsProcessing(false);
             reject(error);
           }
+        };
+        
+        reader.onerror = () => {
+          console.error('FileReader Fehler');
+          setIsProcessing(false);
+          reject(new Error('Fehler beim Lesen der Audio-Datei'));
         };
         
         reader.readAsDataURL(audioBlob);
