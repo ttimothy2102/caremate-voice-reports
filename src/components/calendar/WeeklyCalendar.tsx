@@ -95,14 +95,14 @@ export function WeeklyCalendar() {
             onChange={(e) => setSelectedEventType(e.target.value)}
             className="px-3 py-1 border rounded-md text-sm"
           >
-            <option value="all">Alle Typen</option>
-            <option value="medical">Medizinisch</option>
-            <option value="therapy">Therapie</option>
-            <option value="social">Sozial</option>
-            <option value="hygiene">Hygiene</option>
+            <option value="all">Alle Termine</option>
+            <option value="medical">Medizinische Termine</option>
+            <option value="therapy">Therapie-Termine</option>
+            <option value="social">Soziale Aktivitäten</option>
+            <option value="hygiene">Hygiene-Termine</option>
             <option value="meal">Mahlzeiten</option>
-            <option value="rest">Ruhe</option>
-            <option value="custom">Sonstige</option>
+            <option value="rest">Ruhezeiten</option>
+            <option value="custom">Sonstige Termine</option>
           </select>
 
           <Button size="sm" className="ml-auto">

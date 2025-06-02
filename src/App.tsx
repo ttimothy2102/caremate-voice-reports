@@ -10,6 +10,7 @@ import { MobileHome } from "./pages/MobileHome";
 import { VoiceInput } from "./pages/VoiceInput";
 import { Dashboard } from "./pages/Dashboard";
 import { Schedule } from "./pages/Schedule";
+import { Residents } from "./pages/Residents";
 import { Auth } from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/voice-input" element={<VoiceInput />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/schedule" element={<Schedule />} />
+            <Route path="/residents" element={<Residents />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

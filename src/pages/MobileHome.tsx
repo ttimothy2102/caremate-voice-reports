@@ -3,12 +3,13 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MobileHeader } from "@/components/layout/MobileHeader";
-import { Mic, Users, FileText, Heart, Calendar, BarChart3, ClipboardList, Clock } from 'lucide-react';
+import { Mic, Users, FileText, Heart, Calendar, BarChart3, ClipboardList, Clock, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { getPersonalizedGreeting } from '@/utils/greetingUtils';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
-export function MobileHome() {
+function MobileHomeContent() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -57,7 +58,7 @@ export function MobileHome() {
     <div className="min-h-screen bg-gray-50">
       <MobileHeader 
         title="CareMate" 
-        onTitleClick={() => navigate('/')}
+        onTitleClick={() => navigate('/mobile-home')}
       />
       
       <div className="p-6 space-y-6">
@@ -89,6 +90,27 @@ export function MobileHome() {
           </div>
         </Card>
 
+        {/* Quick Info for Shift Change */}
+        <Card className="p-4 bg-yellow-50 border-yellow-200">
+          <div className="flex items-start gap-3">
+            <Clock className="w-5 h-5 text-yellow-600 mt-0.5" />
+            <div>
+              <h4 className="font-medium text-yellow-800 mb-1">Schichtübergabe</h4>
+              <p className="text-sm text-yellow-700">
+                3 wichtige Notizen für die nächste Schicht verfügbar
+              </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-2 border-yellow-300 text-yellow-700 hover:bg-yellow-100"
+                onClick={() => navigate('/shift-handover')}
+              >
+                Jetzt ansehen
+              </Button>
+            </div>
+          </div>
+        </Card>
+
         {/* Quick Actions */}
         <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Schnellzugriff</h3>
@@ -115,7 +137,17 @@ export function MobileHome() {
 
         {/* Statistics Overview */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Heutige Übersicht</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Heutige Übersicht</h3>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/residents')}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Bewohner hinzufügen
+            </Button>
+          </div>
           <div className="grid gap-4">
             {shortcuts.map((shortcut, index) => (
               <Card 
@@ -141,28 +173,15 @@ export function MobileHome() {
             ))}
           </div>
         </div>
-
-        {/* Quick Info for Shift Change */}
-        <Card className="p-4 bg-yellow-50 border-yellow-200">
-          <div className="flex items-start gap-3">
-            <Clock className="w-5 h-5 text-yellow-600 mt-0.5" />
-            <div>
-              <h4 className="font-medium text-yellow-800 mb-1">Schichtübergabe</h4>
-              <p className="text-sm text-yellow-700">
-                3 wichtige Notizen für die nächste Schicht verfügbar
-              </p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="mt-2 border-yellow-300 text-yellow-700 hover:bg-yellow-100"
-                onClick={() => navigate('/shift-handover')}
-              >
-                Jetzt ansehen
-              </Button>
-            </div>
-          </div>
-        </Card>
       </div>
     </div>
+  );
+}
+
+export function MobileHome() {
+  return (
+    <ProtectedRoute>
+      <MobileHomeContent />
+    </ProtectedRoute>
   );
 }

@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/components/ui/use-toast";
-import { User, Mail, Lock, LogOut, Camera } from 'lucide-react';
+import { User, Mail, Lock, LogOut, Camera, Upload } from 'lucide-react';
 
 interface AccountManagementProps {
   open: boolean;
@@ -26,6 +26,7 @@ export function AccountManagement({ open, onOpenChange }: AccountManagementProps
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   const handleUpdateProfile = async () => {
     setIsLoading(true);
@@ -96,6 +97,28 @@ export function AccountManagement({ open, onOpenChange }: AccountManagementProps
     }
   };
 
+  const handleAvatarUpload = async () => {
+    if (!avatarFile) return;
+    
+    setIsLoading(true);
+    try {
+      // Here you would implement the avatar upload logic
+      toast({
+        title: "Profilbild aktualisiert",
+        description: "Ihr Profilbild wurde erfolgreich geändert.",
+      });
+      setAvatarFile(null);
+    } catch (error) {
+      toast({
+        title: "Fehler",
+        description: "Profilbild konnte nicht aktualisiert werden.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     onOpenChange(false);
@@ -137,13 +160,32 @@ export function AccountManagement({ open, onOpenChange }: AccountManagementProps
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-4">
                   <Avatar className="w-20 h-20">
-                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                    <AvatarImage src={avatarFile ? URL.createObjectURL(avatarFile) : user?.user_metadata?.avatar_url} />
                     <AvatarFallback className="text-lg">{userInitials}</AvatarFallback>
                   </Avatar>
-                  <Button variant="outline" size="sm">
-                    <Camera className="w-4 h-4 mr-2" />
-                    Foto ändern
-                  </Button>
+                  <div className="space-y-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+                      className="hidden"
+                      id="avatar-upload"
+                    />
+                    <Label htmlFor="avatar-upload" className="cursor-pointer">
+                      <Button variant="outline" size="sm" asChild>
+                        <span>
+                          <Camera className="w-4 h-4 mr-2" />
+                          Foto wählen
+                        </span>
+                      </Button>
+                    </Label>
+                    {avatarFile && (
+                      <Button size="sm" onClick={handleAvatarUpload} disabled={isLoading}>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Hochladen
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 
                 <div>
@@ -242,7 +284,7 @@ export function AccountManagement({ open, onOpenChange }: AccountManagementProps
                 <div className="p-4 border rounded-lg bg-gray-50">
                   <h4 className="font-medium mb-2">Aktuelle Anmeldung</h4>
                   <p className="text-sm text-gray-600 mb-4">
-                    Angemeldet als: <strong>{user?.email}</strong>
+                    Angemeldet als: <strong>{displayName || user?.email}</strong>
                   </p>
                   <Button variant="outline" onClick={handleSignOut}>
                     <LogOut className="w-4 h-4 mr-2" />

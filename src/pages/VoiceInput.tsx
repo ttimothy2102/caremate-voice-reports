@@ -4,8 +4,9 @@ import { MobileHeader } from "@/components/layout/MobileHeader";
 import { EnhancedVoiceRecorder } from "@/components/voice/EnhancedVoiceRecorder";
 import { GeneratedReport } from "@/components/reports/GeneratedReport";
 import { useNavigate } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
-export function VoiceInput() {
+function VoiceInputContent() {
   const navigate = useNavigate();
   const [showReport, setShowReport] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
@@ -48,5 +49,13 @@ export function VoiceInput() {
         />
       )}
     </div>
+  );
+}
+
+export function VoiceInput() {
+  return (
+    <ProtectedRoute>
+      <VoiceInputContent />
+    </ProtectedRoute>
   );
 }

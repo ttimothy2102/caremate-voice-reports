@@ -16,6 +16,9 @@ import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from '@/components/layout/Logo';
+import { getPersonalizedGreeting } from '@/utils/greetingUtils';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AccountManagement } from "@/components/account/AccountManagement";
 
 function DashboardContent() {
   const { data: residents = [], isLoading: residentsLoading } = useResidents();
@@ -23,6 +26,14 @@ function DashboardContent() {
   const { data: careReports = [] } = useCareReports();
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const [showAccountManagement, setShowAccountManagement] = useState(false);
+
+  const userName = user?.user_metadata?.full_name;
+  const greeting = getPersonalizedGreeting(userName);
+
+  const userInitials = user?.user_metadata?.full_name
+    ? user.user_metadata.full_name.split(' ').map((name: string) => name[0]).join('').toUpperCase()
+    : user?.email?.[0]?.toUpperCase() || 'U';
 
   const handleSignOut = async () => {
     await signOut();
@@ -59,7 +70,7 @@ function DashboardContent() {
         <div className="flex items-center justify-between">
           <div 
             className="cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/mobile-home')}
           >
             <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
               CareMate
@@ -68,7 +79,7 @@ function DashboardContent() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-600">
-              Willkommen, {user?.email}
+              {greeting}
             </span>
             <Button variant="outline" size="sm">
               <Plus className="w-4 h-4 mr-2" />
@@ -82,6 +93,13 @@ function DashboardContent() {
               <LogOut className="w-4 h-4 mr-2" />
               Abmelden
             </Button>
+            <Avatar 
+              className="cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => setShowAccountManagement(true)}
+            >
+              <AvatarImage src={user?.user_metadata?.avatar_url} />
+              <AvatarFallback>{userInitials}</AvatarFallback>
+            </Avatar>
             <Logo />
           </div>
         </div>
@@ -129,6 +147,11 @@ function DashboardContent() {
           <WithingsIntegration />
         </div>
       </div>
+
+      <AccountManagement 
+        open={showAccountManagement}
+        onOpenChange={setShowAccountManagement}
+      />
     </div>
   );
 }
