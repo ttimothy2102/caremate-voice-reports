@@ -9,7 +9,416 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      care_reports: {
+        Row: {
+          audio_file_url: string | null
+          caregiver_id: string | null
+          created_at: string | null
+          food_water_intake: string | null
+          id: string
+          medication_given: string | null
+          mood: string | null
+          physical_condition: string | null
+          resident_id: string | null
+          special_notes: string | null
+          voice_transcript: string | null
+        }
+        Insert: {
+          audio_file_url?: string | null
+          caregiver_id?: string | null
+          created_at?: string | null
+          food_water_intake?: string | null
+          id?: string
+          medication_given?: string | null
+          mood?: string | null
+          physical_condition?: string | null
+          resident_id?: string | null
+          special_notes?: string | null
+          voice_transcript?: string | null
+        }
+        Update: {
+          audio_file_url?: string | null
+          caregiver_id?: string | null
+          created_at?: string | null
+          food_water_intake?: string | null
+          id?: string
+          medication_given?: string | null
+          mood?: string | null
+          physical_condition?: string | null
+          resident_id?: string | null
+          special_notes?: string | null
+          voice_transcript?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_reports_caregiver_id_fkey"
+            columns: ["caregiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_reports_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "residents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drug_orders: {
+        Row: {
+          cost: number | null
+          expected_delivery: string | null
+          id: string
+          medication_id: string | null
+          notes: string | null
+          order_date: string | null
+          ordered_by: string | null
+          quantity_ordered: number
+          status: string | null
+          supplier: string | null
+        }
+        Insert: {
+          cost?: number | null
+          expected_delivery?: string | null
+          id?: string
+          medication_id?: string | null
+          notes?: string | null
+          order_date?: string | null
+          ordered_by?: string | null
+          quantity_ordered: number
+          status?: string | null
+          supplier?: string | null
+        }
+        Update: {
+          cost?: number | null
+          expected_delivery?: string | null
+          id?: string
+          medication_id?: string | null
+          notes?: string | null
+          order_date?: string | null
+          ordered_by?: string | null
+          quantity_ordered?: number
+          status?: string | null
+          supplier?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drug_orders_medication_id_fkey"
+            columns: ["medication_id"]
+            isOneToOne: false
+            referencedRelation: "medications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drug_orders_ordered_by_fkey"
+            columns: ["ordered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medication_logs: {
+        Row: {
+          actual_time: string | null
+          administered_by: string | null
+          completed: boolean | null
+          created_at: string | null
+          id: string
+          medication_id: string | null
+          notes: string | null
+          scheduled_time: string | null
+        }
+        Insert: {
+          actual_time?: string | null
+          administered_by?: string | null
+          completed?: boolean | null
+          created_at?: string | null
+          id?: string
+          medication_id?: string | null
+          notes?: string | null
+          scheduled_time?: string | null
+        }
+        Update: {
+          actual_time?: string | null
+          administered_by?: string | null
+          completed?: boolean | null
+          created_at?: string | null
+          id?: string
+          medication_id?: string | null
+          notes?: string | null
+          scheduled_time?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_logs_administered_by_fkey"
+            columns: ["administered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medication_logs_medication_id_fkey"
+            columns: ["medication_id"]
+            isOneToOne: false
+            referencedRelation: "medications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medications: {
+        Row: {
+          created_at: string | null
+          dosage: string
+          drug_name: string
+          end_date: string | null
+          frequency: string
+          id: string
+          instructions: string | null
+          prescribed_by: string | null
+          reorder_level: number | null
+          resident_id: string | null
+          start_date: string | null
+          stock_count: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          dosage: string
+          drug_name: string
+          end_date?: string | null
+          frequency: string
+          id?: string
+          instructions?: string | null
+          prescribed_by?: string | null
+          reorder_level?: number | null
+          resident_id?: string | null
+          start_date?: string | null
+          stock_count?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          dosage?: string
+          drug_name?: string
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          instructions?: string | null
+          prescribed_by?: string | null
+          reorder_level?: number | null
+          resident_id?: string | null
+          start_date?: string | null
+          stock_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medications_prescribed_by_fkey"
+            columns: ["prescribed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medications_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "residents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          role: string | null
+          shift_end: string | null
+          shift_start: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          role?: string | null
+          shift_end?: string | null
+          shift_start?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          role?: string | null
+          shift_end?: string | null
+          shift_start?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      residents: {
+        Row: {
+          admission_date: string | null
+          age: number | null
+          allergies: string[] | null
+          care_level: string | null
+          created_at: string | null
+          emergency_contact: string | null
+          emergency_phone: string | null
+          id: string
+          medical_conditions: string[] | null
+          name: string
+          room: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          admission_date?: string | null
+          age?: number | null
+          allergies?: string[] | null
+          care_level?: string | null
+          created_at?: string | null
+          emergency_contact?: string | null
+          emergency_phone?: string | null
+          id?: string
+          medical_conditions?: string[] | null
+          name: string
+          room?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          admission_date?: string | null
+          age?: number | null
+          allergies?: string[] | null
+          care_level?: string | null
+          created_at?: string | null
+          emergency_contact?: string | null
+          emergency_phone?: string | null
+          id?: string
+          medical_conditions?: string[] | null
+          name?: string
+          room?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      schedules: {
+        Row: {
+          assigned_staff: string | null
+          color_code: string | null
+          completed: boolean | null
+          created_at: string | null
+          description: string | null
+          end_time: string | null
+          event_type: string | null
+          id: string
+          recurring_pattern: string | null
+          resident_id: string | null
+          start_time: string
+          title: string
+        }
+        Insert: {
+          assigned_staff?: string | null
+          color_code?: string | null
+          completed?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          end_time?: string | null
+          event_type?: string | null
+          id?: string
+          recurring_pattern?: string | null
+          resident_id?: string | null
+          start_time: string
+          title: string
+        }
+        Update: {
+          assigned_staff?: string | null
+          color_code?: string | null
+          completed?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          end_time?: string | null
+          event_type?: string | null
+          id?: string
+          recurring_pattern?: string | null
+          resident_id?: string | null
+          start_time?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedules_assigned_staff_fkey"
+            columns: ["assigned_staff"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedules_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "residents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vital_signs: {
+        Row: {
+          blood_pressure_diastolic: number | null
+          blood_pressure_systolic: number | null
+          created_at: string | null
+          heart_rate: number | null
+          id: string
+          oxygen_saturation: number | null
+          recorded_at: string | null
+          resident_id: string | null
+          source: string | null
+          temperature: number | null
+          weight: number | null
+        }
+        Insert: {
+          blood_pressure_diastolic?: number | null
+          blood_pressure_systolic?: number | null
+          created_at?: string | null
+          heart_rate?: number | null
+          id?: string
+          oxygen_saturation?: number | null
+          recorded_at?: string | null
+          resident_id?: string | null
+          source?: string | null
+          temperature?: number | null
+          weight?: number | null
+        }
+        Update: {
+          blood_pressure_diastolic?: number | null
+          blood_pressure_systolic?: number | null
+          created_at?: string | null
+          heart_rate?: number | null
+          id?: string
+          oxygen_saturation?: number | null
+          recorded_at?: string | null
+          resident_id?: string | null
+          source?: string | null
+          temperature?: number | null
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vital_signs_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "residents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

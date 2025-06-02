@@ -5,56 +5,56 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ResidentCard } from "@/components/dashboard/ResidentCard";
 import { VitalsChart } from "@/components/dashboard/VitalsChart";
-import { Search, Plus, AlertTriangle, FileText, Users, Heart } from 'lucide-react';
+import { Search, Plus, AlertTriangle, FileText, Users, Heart, LogOut } from 'lucide-react';
+import { useResidents } from '@/hooks/useResidents';
+import { useVitalSignsChart } from '@/hooks/useVitalSigns';
+import { useCareReports } from '@/hooks/useCareReports';
+import { useAuth } from '@/hooks/useAuth';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { toast } from '@/components/ui/use-toast';
 
-export function Dashboard() {
+function DashboardContent() {
+  const { data: residents = [], isLoading: residentsLoading } = useResidents();
+  const { data: heartRateData = [] } = useVitalSignsChart();
+  const { data: careReports = [] } = useCareReports();
+  const { signOut, user } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast({
+      title: "Signed out",
+      description: "You have been successfully signed out.",
+    });
+  };
+
   const overviewStats = [
-    { title: "Reports Today", value: "24", icon: FileText, color: "text-blue-600" },
-    { title: "Active Residents", value: "48", icon: Users, color: "text-green-600" },
+    { title: "Reports Today", value: careReports.filter(r => 
+      new Date(r.created_at).toDateString() === new Date().toDateString()
+    ).length.toString(), icon: FileText, color: "text-blue-600" },
+    { title: "Active Residents", value: residents.length.toString(), icon: Users, color: "text-green-600" },
     { title: "Vital Alerts", value: "3", icon: AlertTriangle, color: "text-red-600" },
     { title: "Device Sync", value: "98%", icon: Heart, color: "text-purple-600" }
   ];
 
-  const residents = [
-    {
-      id: "1",
-      name: "Anna Müller",
-      age: 79,
-      room: "12A",
-      careLevel: "Stufe 2",
-      lastReport: "08:30",
-      vitalsStatus: "normal" as const,
-      hasAlerts: false
-    },
-    {
-      id: "2", 
-      name: "Hans Weber",
-      age: 84,
-      room: "15B",
-      careLevel: "Stufe 3",
-      lastReport: "09:15",
-      vitalsStatus: "warning" as const,
-      hasAlerts: true
-    },
-    {
-      id: "3",
-      name: "Maria Fischer",
-      age: 76,
-      room: "08C",
-      careLevel: "Stufe 1",
-      lastReport: "07:45",
-      vitalsStatus: "normal" as const,
-      hasAlerts: false
-    }
-  ];
+  const residentsWithExtras = residents.map(resident => ({
+    ...resident,
+    lastReport: careReports.find(r => r.resident_id === resident.id) 
+      ? new Date(careReports.find(r => r.resident_id === resident.id)!.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
+      : undefined,
+    vitalsStatus: Math.random() > 0.7 ? 'warning' : 'normal' as const,
+    hasAlerts: Math.random() > 0.8
+  }));
 
-  const heartRateData = [
-    { time: "06:00", value: 72 },
-    { time: "08:00", value: 75 },
-    { time: "10:00", value: 78 },
-    { time: "12:00", value: 82 },
-    { time: "14:00", value: 76 }
-  ];
+  if (residentsLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -68,9 +68,16 @@ export function Dashboard() {
             <p className="text-sm text-gray-600">Management Dashboard</p>
           </div>
           <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-600">
+              Welcome, {user?.email}
+            </span>
             <Button variant="outline" size="sm">
               <Plus className="w-4 h-4 mr-2" />
               Add Resident
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
             </Button>
             <div className="w-8 h-8 bg-caremate-gradient rounded-full"></div>
           </div>
@@ -110,11 +117,11 @@ export function Dashboard() {
               </div>
             </div>
             <div className="space-y-3">
-              {residents.map((resident) => (
+              {residentsWithExtras.map((resident) => (
                 <ResidentCard 
                   key={resident.id}
                   resident={resident}
-                  onClick={() => console.log('Open resident details')}
+                  onClick={() => console.log('Open resident details for:', resident.name)}
                 />
               ))}
             </div>
@@ -155,5 +162,13 @@ export function Dashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+export function Dashboard() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
   );
 }

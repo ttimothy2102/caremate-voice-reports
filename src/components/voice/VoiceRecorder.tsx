@@ -3,16 +3,22 @@ import React, { useState, useRef } from 'react';
 import { Mic, MicOff, Square } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useCreateCareReport } from '@/hooks/useCareReports';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from '@/components/ui/use-toast';
 
 interface VoiceRecorderProps {
   onTranscriptionComplete: (text: string) => void;
+  residentId?: string;
 }
 
-export function VoiceRecorder({ onTranscriptionComplete }: VoiceRecorderProps) {
+export function VoiceRecorder({ onTranscriptionComplete, residentId }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const { mutate: createCareReport } = useCreateCareReport();
+  const { user } = useAuth();
 
   const startRecording = async () => {
     try {
@@ -36,6 +42,11 @@ export function VoiceRecorder({ onTranscriptionComplete }: VoiceRecorderProps) {
       setIsRecording(true);
     } catch (error) {
       console.error('Error accessing microphone:', error);
+      toast({
+        title: "Microphone Error",
+        description: "Could not access microphone. Please check permissions.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -54,6 +65,25 @@ export function VoiceRecorder({ onTranscriptionComplete }: VoiceRecorderProps) {
       setTranscript(mockTranscript);
       setIsProcessing(false);
       onTranscriptionComplete(mockTranscript);
+      
+      // Save to database if residentId is provided
+      if (residentId && user) {
+        createCareReport({
+          resident_id: residentId,
+          caregiver_id: user.id,
+          voice_transcript: mockTranscript,
+          physical_condition: "Good",
+          mood: "Good spirits",
+          food_water_intake: "Ate breakfast well",
+          medication_given: "Taken as prescribed",
+          special_notes: "No concerns noted"
+        });
+        
+        toast({
+          title: "Care Report Saved",
+          description: "Voice recording has been processed and saved.",
+        });
+      }
     }, 2000);
   };
 

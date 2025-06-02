@@ -3,17 +3,13 @@ import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bell, AlertCircle } from 'lucide-react';
+import { Resident } from '@/hooks/useResidents';
 
 interface ResidentCardProps {
-  resident: {
-    id: string;
-    name: string;
-    age: number;
-    room: string;
-    careLevel: string;
-    lastReport: string;
-    vitalsStatus: 'normal' | 'warning' | 'critical';
-    hasAlerts: boolean;
+  resident: Resident & {
+    lastReport?: string;
+    vitalsStatus?: 'normal' | 'warning' | 'critical';
+    hasAlerts?: boolean;
   };
   onClick: () => void;
 }
@@ -47,19 +43,19 @@ export function ResidentCard({ resident, onClick }: ResidentCardProps) {
 
       <div className="flex items-center justify-between">
         <Badge variant="outline" className="text-xs">
-          {resident.careLevel}
+          {resident.care_level}
         </Badge>
         <Badge 
           variant="outline" 
-          className={`text-xs ${getVitalsColor(resident.vitalsStatus)}`}
+          className={`text-xs ${getVitalsColor(resident.vitalsStatus || 'normal')}`}
         >
-          Vitals: {resident.vitalsStatus}
+          Vitals: {resident.vitalsStatus || 'normal'}
         </Badge>
       </div>
 
       <div className="mt-3 pt-3 border-t">
         <p className="text-xs text-gray-500">
-          Letzter Bericht: {resident.lastReport}
+          Letzter Bericht: {resident.lastReport || 'Nicht verfügbar'}
         </p>
       </div>
     </Card>
