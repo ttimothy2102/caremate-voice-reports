@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,7 +25,7 @@ export function ResidentVitalSigns({ resident, onUpdate }: ResidentVitalSignsPro
             <Label htmlFor="blood_pressure">Blutdruck (mmHg)</Label>
             <Input
               id="blood_pressure"
-              value={resident.blood_pressure}
+              value={resident.blood_pressure || ''}
               onChange={(e) => onUpdate({ blood_pressure: e.target.value })}
               placeholder="120/80"
             />
@@ -36,9 +35,8 @@ export function ResidentVitalSigns({ resident, onUpdate }: ResidentVitalSignsPro
             <Label htmlFor="pulse">Puls (bpm)</Label>
             <Input
               id="pulse"
-              type="number"
-              value={resident.pulse}
-              onChange={(e) => onUpdate({ pulse: parseInt(e.target.value) })}
+              value={resident.pulse || ''}
+              onChange={(e) => onUpdate({ pulse: e.target.value })}
               placeholder="72"
             />
           </div>
@@ -57,10 +55,8 @@ export function ResidentVitalSigns({ resident, onUpdate }: ResidentVitalSignsPro
             <Label htmlFor="temperature">Körpertemperatur (°C)</Label>
             <Input
               id="temperature"
-              type="number"
-              step="0.1"
-              value={resident.temperature}
-              onChange={(e) => onUpdate({ temperature: parseFloat(e.target.value) })}
+              value={resident.temperature || ''}
+              onChange={(e) => onUpdate({ temperature: e.target.value })}
               placeholder="36.5"
             />
           </div>
@@ -69,9 +65,8 @@ export function ResidentVitalSigns({ resident, onUpdate }: ResidentVitalSignsPro
             <Label htmlFor="respiratory_rate">Atemfrequenz (/min)</Label>
             <Input
               id="respiratory_rate"
-              type="number"
-              value={resident.respiratory_rate}
-              onChange={(e) => onUpdate({ respiratory_rate: parseInt(e.target.value) })}
+              value={resident.respiratory_rate || ''}
+              onChange={(e) => onUpdate({ respiratory_rate: e.target.value })}
               placeholder="16"
             />
           </div>
@@ -90,9 +85,8 @@ export function ResidentVitalSigns({ resident, onUpdate }: ResidentVitalSignsPro
             <Label htmlFor="blood_sugar">Blutzucker (mg/dl)</Label>
             <Input
               id="blood_sugar"
-              type="number"
-              value={resident.blood_sugar}
-              onChange={(e) => onUpdate({ blood_sugar: parseInt(e.target.value) })}
+              value={resident.blood_sugar || ''}
+              onChange={(e) => onUpdate({ blood_sugar: e.target.value })}
               placeholder="100"
             />
           </div>
@@ -101,10 +95,8 @@ export function ResidentVitalSigns({ resident, onUpdate }: ResidentVitalSignsPro
             <Label htmlFor="bmi">BMI</Label>
             <Input
               id="bmi"
-              type="number"
-              step="0.1"
-              value={resident.bmi}
-              onChange={(e) => onUpdate({ bmi: parseFloat(e.target.value) })}
+              value={resident.bmi || ''}
+              onChange={(e) => onUpdate({ bmi: e.target.value })}
               placeholder="22.5"
             />
           </div>

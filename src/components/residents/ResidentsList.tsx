@@ -11,12 +11,13 @@ export interface ExtendedResident extends Resident {
   health_status?: 'gut' | 'bedenklich' | 'kritisch';
   birth_date?: string;
   upcoming_appointments?: number;
+  // Vitalwerte als strings (wie in der Datenbank gespeichert)
   blood_pressure?: string;
-  blood_sugar?: number;
-  temperature?: number;
-  pulse?: number;
-  respiratory_rate?: number;
-  bmi?: number;
+  blood_sugar?: string;
+  temperature?: string;
+  pulse?: string;
+  respiratory_rate?: string;
+  bmi?: string;
   care_situation?: string;
   shift_notes?: string;
   medication_deviations?: string;

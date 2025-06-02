@@ -42,6 +42,13 @@ function ResidentsContent() {
       health_status,
       birth_date: `19${Math.floor(Math.random() * 50 + 30)}-${Math.floor(Math.random() * 12 + 1).toString().padStart(2, '0')}-${Math.floor(Math.random() * 28 + 1).toString().padStart(2, '0')}`,
       upcoming_appointments: Math.floor(Math.random() * 5),
+      // Verwende string-Werte für Vitalwerte (wie in der Datenbank)
+      blood_pressure: resident.blood_pressure || `${Math.floor(Math.random() * 40 + 110)}/${Math.floor(Math.random() * 20 + 70)}`,
+      blood_sugar: resident.blood_sugar || `${Math.floor(Math.random() * 50 + 80)}`,
+      temperature: resident.temperature || `${(36.0 + Math.random() * 2).toFixed(1)}`,
+      pulse: resident.pulse || `${Math.floor(Math.random() * 40 + 60)}`,
+      respiratory_rate: resident.respiratory_rate || `${Math.floor(Math.random() * 8 + 12)}`,
+      bmi: resident.bmi || `${(18 + Math.random() * 15).toFixed(1)}`,
     };
   });
 
