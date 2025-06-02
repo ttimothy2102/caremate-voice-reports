@@ -45,6 +45,12 @@ function ResidentsContent() {
     };
   });
 
+  const filteredResidents = extendedResidents.filter(resident => {
+    const matchesName = resident.name.toLowerCase().includes(nameFilter.toLowerCase());
+    const matchesBirthdate = !birthdateFilter || resident.birth_date?.includes(birthdateFilter);
+    return matchesName && matchesBirthdate;
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
