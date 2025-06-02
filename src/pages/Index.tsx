@@ -44,7 +44,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-caremate-gradient rounded-full"></div>
-            <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
+            <h1 
+              className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => navigate('/')}
+            >
               CareMate
             </h1>
           </div>
@@ -52,7 +55,10 @@ const Index = () => {
             <Button variant="outline" onClick={() => navigate('/auth')}>
               Anmelden
             </Button>
-            <Button onClick={() => navigate('/auth')} className="bg-caremate-gradient hover:opacity-90">
+            <Button 
+              onClick={() => navigate('/auth')} 
+              className="liquid-gradient-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg"
+            >
               Registrieren
             </Button>
           </div>
@@ -78,7 +84,7 @@ const Index = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              className="bg-caremate-gradient hover:opacity-90 text-lg px-8 py-6"
+              className="liquid-gradient-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-lg px-8 py-6"
               onClick={() => navigate('/auth')}
             >
               Kostenlos starten
@@ -134,7 +140,7 @@ const Index = () => {
           </p>
           <Button 
             size="lg" 
-            className="bg-white text-primary hover:bg-gray-100 text-lg px-8 py-6"
+            className="liquid-gradient-button-inverse text-primary border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-lg px-8 py-6"
             onClick={() => navigate('/auth')}
           >
             Jetzt kostenlos testen
@@ -146,7 +152,10 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <div className="flex items-center justify-center gap-3 mb-4">
+          <div 
+            className="flex items-center justify-center gap-3 mb-4 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/')}
+          >
             <div className="w-6 h-6 bg-caremate-gradient rounded-full"></div>
             <span className="text-xl font-semibold">CareMate</span>
           </div>
@@ -155,6 +164,45 @@ const Index = () => {
           </p>
         </div>
       </footer>
+
+      <style jsx>{`
+        .liquid-gradient-button {
+          background: linear-gradient(135deg, #2D2CAB 0%, #29B6F6 50%, #2D2CAB 100%);
+          background-size: 200% 200%;
+          animation: liquidGradient 3s ease-in-out infinite;
+        }
+        
+        .liquid-gradient-button:hover {
+          animation: liquidGradientHover 0.8s ease-in-out infinite;
+          transform: translateY(-2px);
+        }
+        
+        .liquid-gradient-button-inverse {
+          background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #ffffff 100%);
+          background-size: 200% 200%;
+          animation: liquidGradient 3s ease-in-out infinite;
+        }
+        
+        .liquid-gradient-button-inverse:hover {
+          animation: liquidGradientHover 0.8s ease-in-out infinite;
+          transform: translateY(-2px);
+          box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
+        }
+        
+        @keyframes liquidGradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes liquidGradientHover {
+          0% { background-position: 0% 50%; }
+          25% { background-position: 100% 0%; }
+          50% { background-position: 100% 100%; }
+          75% { background-position: 0% 100%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
     </div>
   );
 };
