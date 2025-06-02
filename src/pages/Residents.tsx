@@ -31,18 +31,18 @@ function ResidentsContent() {
     ? user.user_metadata.full_name.split(' ').map((name: string) => name[0]).join('').toUpperCase()
     : user?.email?.[0]?.toUpperCase() || 'U';
 
-  // Mock extended data for residents
-  const extendedResidents = residents.map(resident => ({
-    ...resident,
-    health_status: Math.random() > 0.7 ? 'kritisch' : Math.random() > 0.4 ? 'bedenklich' : 'gut',
-    birth_date: `19${Math.floor(Math.random() * 50 + 30)}-${Math.floor(Math.random() * 12 + 1).toString().padStart(2, '0')}-${Math.floor(Math.random() * 28 + 1).toString().padStart(2, '0')}`,
-    upcoming_appointments: Math.floor(Math.random() * 5),
-  }));
-
-  const filteredResidents = extendedResidents.filter(resident => {
-    const matchesName = resident.name.toLowerCase().includes(nameFilter.toLowerCase());
-    const matchesBirthdate = !birthdateFilter || resident.birth_date?.includes(birthdateFilter);
-    return matchesName && matchesBirthdate;
+  // Mock extended data for residents with proper type safety
+  const extendedResidents = residents.map(resident => {
+    const randomNum = Math.random();
+    const health_status: 'kritisch' | 'bedenklich' | 'gut' = 
+      randomNum > 0.7 ? 'kritisch' : randomNum > 0.4 ? 'bedenklich' : 'gut';
+    
+    return {
+      ...resident,
+      health_status,
+      birth_date: `19${Math.floor(Math.random() * 50 + 30)}-${Math.floor(Math.random() * 12 + 1).toString().padStart(2, '0')}-${Math.floor(Math.random() * 28 + 1).toString().padStart(2, '0')}`,
+      upcoming_appointments: Math.floor(Math.random() * 5),
+    };
   });
 
   if (isLoading) {
