@@ -8,6 +8,7 @@ import { useSchedules } from '@/hooks/useSchedules';
 import { useResidents } from '@/hooks/useResidents';
 import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 import { de } from 'date-fns/locale';
+import { AddScheduleDialog } from '@/components/schedule/AddScheduleDialog';
 
 const eventTypeColors = {
   medical: 'bg-red-100 text-red-800 border-red-300',
@@ -23,6 +24,7 @@ export function WeeklyCalendar() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selectedResident, setSelectedResident] = useState<string>('all');
   const [selectedEventType, setSelectedEventType] = useState<string>('all');
+  const [showAddDialog, setShowAddDialog] = useState(false);
   
   const { data: schedules = [] } = useSchedules();
   const { data: residents = [] } = useResidents();
@@ -105,7 +107,7 @@ export function WeeklyCalendar() {
             <option value="custom">Sonstige Termine</option>
           </select>
 
-          <Button size="sm" className="ml-auto">
+          <Button size="sm" className="ml-auto" onClick={() => setShowAddDialog(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Termin hinzufügen
           </Button>
@@ -163,6 +165,12 @@ export function WeeklyCalendar() {
           ))}
         </div>
       </Card>
+
+      <AddScheduleDialog 
+        isOpen={showAddDialog}
+        onClose={() => setShowAddDialog(false)}
+        residents={residents}
+      />
     </div>
   );
 }

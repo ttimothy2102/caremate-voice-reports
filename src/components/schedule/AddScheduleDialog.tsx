@@ -7,16 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useCreateSchedule } from '@/hooks/useSchedules';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
+import { Resident } from '@/hooks/useResidents';
 
 interface AddScheduleDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  residentId: string;
-  residentName: string;
+  residents: Resident[];
 }
 
-export function AddScheduleDialog({ isOpen, onClose, residentId, residentName }: AddScheduleDialogProps) {
+export function AddScheduleDialog({ isOpen, onClose, residents }: AddScheduleDialogProps) {
   const [formData, setFormData] = useState({
     title: '',
     event_type: 'medical' as const,
@@ -25,34 +25,55 @@ export function AddScheduleDialog({ isOpen, onClose, residentId, residentName }:
     description: '',
     assigned_staff: '',
     recurring_pattern: 'none' as const,
-    color_code: '#3B82F6'
+    color_code: '#EF4444'
   });
 
+  const [residentSearch, setResidentSearch] = useState('');
+  const [selectedResident, setSelectedResident] = useState<Resident | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const { mutate: createSchedule, isPending } = useCreateSchedule();
+
+  const filteredResidents = residents.filter(resident =>
+    resident.name.toLowerCase().includes(residentSearch.toLowerCase())
+  );
+
+  const handleResidentSelect = (resident: Resident) => {
+    setSelectedResident(resident);
+    setResidentSearch(resident.name);
+    setShowSuggestions(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.start_time || !formData.end_time) {
+    if (!formData.title || !formData.start_time || !formData.end_time || !selectedResident) {
       toast({
         title: "Fehler",
-        description: "Bitte füllen Sie alle Pflichtfelder aus.",
+        description: "Bitte füllen Sie alle Pflichtfelder aus und wählen Sie einen Bewohner.",
         variant: "destructive"
       });
       return;
     }
 
+    // Convert datetime-local to ISO format
+    const startTime = new Date(formData.start_time).toISOString();
+    const endTime = new Date(formData.end_time).toISOString();
+
     createSchedule({
       ...formData,
-      resident_id: residentId,
+      start_time: startTime,
+      end_time: endTime,
+      resident_id: selectedResident.id,
       completed: false
     }, {
       onSuccess: () => {
         toast({
           title: "Termin erstellt",
-          description: `Termin für ${residentName} wurde erfolgreich hinzugefügt.`,
+          description: `Termin für ${selectedResident.name} wurde erfolgreich hinzugefügt.`,
         });
         onClose();
+        // Reset form
         setFormData({
           title: '',
           event_type: 'medical',
@@ -61,8 +82,10 @@ export function AddScheduleDialog({ isOpen, onClose, residentId, residentName }:
           description: '',
           assigned_staff: '',
           recurring_pattern: 'none',
-          color_code: '#3B82F6'
+          color_code: '#EF4444'
         });
+        setResidentSearch('');
+        setSelectedResident(null);
       },
       onError: () => {
         toast({
@@ -86,12 +109,45 @@ export function AddScheduleDialog({ isOpen, onClose, residentId, residentName }:
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Neuer Termin für {residentName}</DialogTitle>
+          <DialogTitle>Neuen Termin hinzufügen</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="relative">
+            <Label htmlFor="resident">Bewohner *</Label>
+            <Input
+              id="resident"
+              value={residentSearch}
+              onChange={(e) => {
+                setResidentSearch(e.target.value);
+                setShowSuggestions(true);
+                setSelectedResident(null);
+              }}
+              onFocus={() => setShowSuggestions(true)}
+              placeholder="Bewohner suchen..."
+            />
+            {showSuggestions && residentSearch && (
+              <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                {filteredResidents.length > 0 ? (
+                  filteredResidents.map((resident) => (
+                    <div
+                      key={resident.id}
+                      className="px-3 py-2 cursor-pointer hover:bg-gray-100 border-b last:border-b-0"
+                      onClick={() => handleResidentSelect(resident)}
+                    >
+                      <div className="font-medium">{resident.name}</div>
+                      <div className="text-sm text-gray-500">Zimmer: {resident.room}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-gray-500">Keine Bewohner gefunden</div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div>
             <Label htmlFor="title">Titel *</Label>
             <Input
