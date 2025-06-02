@@ -7,6 +7,7 @@ import { MedicationTracker } from "@/components/medications/MedicationTracker";
 import { DrugOrdering } from "@/components/medications/DrugOrdering";
 import { WithingsIntegration } from "@/components/withings/WithingsIntegration";
 import { ResidentsList } from "@/components/residents/ResidentsList";
+import { AddResidentDialog } from "@/components/residents/AddResidentDialog";
 import { Plus, AlertTriangle, FileText, Users, Heart, LogOut, Calendar } from 'lucide-react';
 import { useResidents } from '@/hooks/useResidents';
 import { useVitalSignsChart } from '@/hooks/useVitalSigns';
@@ -27,6 +28,7 @@ function DashboardContent() {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const [showAccountManagement, setShowAccountManagement] = useState(false);
+  const [showAddResidentDialog, setShowAddResidentDialog] = useState(false);
 
   const userName = user?.user_metadata?.full_name;
   const greeting = getPersonalizedGreeting(userName);
@@ -81,7 +83,11 @@ function DashboardContent() {
             <span className="text-sm text-gray-600">
               {greeting}
             </span>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowAddResidentDialog(true)}
+            >
               <Plus className="w-4 h-4 mr-2" />
               Bewohner hinzufügen
             </Button>
@@ -151,6 +157,11 @@ function DashboardContent() {
       <AccountManagement 
         open={showAccountManagement}
         onOpenChange={setShowAccountManagement}
+      />
+
+      <AddResidentDialog
+        isOpen={showAddResidentDialog}
+        onClose={() => setShowAddResidentDialog(false)}
       />
     </div>
   );
