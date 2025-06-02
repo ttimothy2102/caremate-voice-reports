@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Clock, User, Calendar } from 'lucide-react';
 import { useSchedules } from '@/hooks/useSchedules';
+import { useResidents } from '@/hooks/useResidents';
 import { AddScheduleDialog } from './AddScheduleDialog';
 
 interface PatientScheduleProps {
@@ -14,6 +15,7 @@ interface PatientScheduleProps {
 
 export function PatientSchedule({ residentId, residentName }: PatientScheduleProps) {
   const { data: schedules = [], isLoading } = useSchedules(residentId);
+  const { data: residents = [] } = useResidents();
   const [showAddDialog, setShowAddDialog] = useState(false);
 
   const getEventTypeColor = (eventType: string) => {
@@ -131,8 +133,7 @@ export function PatientSchedule({ residentId, residentName }: PatientSchedulePro
       <AddScheduleDialog
         isOpen={showAddDialog}
         onClose={() => setShowAddDialog(false)}
-        residentId={residentId}
-        residentName={residentName}
+        residents={residents}
       />
     </div>
   );
