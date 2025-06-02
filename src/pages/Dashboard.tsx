@@ -2,12 +2,11 @@
 import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ResidentCard } from "@/components/dashboard/ResidentCard";
 import { VitalsChart } from "@/components/dashboard/VitalsChart";
-import { PatientFilters } from "@/components/dashboard/PatientFilters";
 import { MedicationTracker } from "@/components/medications/MedicationTracker";
 import { DrugOrdering } from "@/components/medications/DrugOrdering";
 import { WithingsIntegration } from "@/components/withings/WithingsIntegration";
+import { ResidentsList } from "@/components/residents/ResidentsList";
 import { Plus, AlertTriangle, FileText, Users, Heart, LogOut, Calendar } from 'lucide-react';
 import { useResidents } from '@/hooks/useResidents';
 import { useVitalSignsChart } from '@/hooks/useVitalSigns';
@@ -25,11 +24,6 @@ function DashboardContent() {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
 
-  // Filter states
-  const [searchName, setSearchName] = useState('');
-  const [roomFilter, setRoomFilter] = useState('all');
-  const [careLevelFilter, setCareLevelFilter] = useState('all');
-
   const handleSignOut = async () => {
     await signOut();
     toast({
@@ -37,28 +31,6 @@ function DashboardContent() {
       description: "Sie wurden erfolgreich abgemeldet.",
     });
   };
-
-  // Get unique rooms and care levels for filters
-  const availableRooms = useMemo(() => 
-    [...new Set(residents.map(r => r.room).filter(Boolean))].sort(),
-    [residents]
-  );
-
-  const availableCareLevels = useMemo(() => 
-    [...new Set(residents.map(r => r.care_level).filter(Boolean))].sort(),
-    [residents]
-  );
-
-  // Filter residents based on search and filters
-  const filteredResidents = useMemo(() => {
-    return residents.filter(resident => {
-      const matchesName = resident.name.toLowerCase().includes(searchName.toLowerCase());
-      const matchesRoom = roomFilter === 'all' || resident.room === roomFilter;
-      const matchesCarelevel = careLevelFilter === 'all' || resident.care_level === careLevelFilter;
-      
-      return matchesName && matchesRoom && matchesCarelevel;
-    });
-  }, [residents, searchName, roomFilter, careLevelFilter]);
 
   const overviewStats = [
     { title: "Berichte heute", value: careReports.filter(r => 
@@ -68,15 +40,6 @@ function DashboardContent() {
     { title: "Vital-Alarme", value: "3", icon: AlertTriangle, color: "text-red-600" },
     { title: "Gerätesync", value: "98%", icon: Heart, color: "text-purple-600" }
   ];
-
-  const residentsWithExtras = filteredResidents.map(resident => ({
-    ...resident,
-    lastReport: careReports.find(r => r.resident_id === resident.id) 
-      ? new Date(careReports.find(r => r.resident_id === resident.id)!.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
-      : undefined,
-    vitalsStatus: (Math.random() > 0.7 ? 'warning' : 'normal') as 'normal' | 'warning' | 'critical',
-    hasAlerts: Math.random() > 0.8
-  }));
 
   if (residentsLoading) {
     return (
@@ -139,6 +102,9 @@ function DashboardContent() {
             </Card>
           ))}
         </div>
+
+        {/* Residents List - New comprehensive section */}
+        <ResidentsList />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
