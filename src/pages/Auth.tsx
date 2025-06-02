@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
-import { Loader2, Heart } from "lucide-react";
+import { Loader2, Heart, CheckCircle, AlertCircle } from "lucide-react";
 
 interface AuthFormData {
   email: string;
@@ -19,6 +19,7 @@ interface AuthFormData {
 export function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
 
@@ -38,6 +39,7 @@ export function Auth() {
 
   const onSubmit = async (data: AuthFormData) => {
     setLoading(true);
+    setEmailSent(false);
     
     try {
       let result;
@@ -60,6 +62,13 @@ export function Auth() {
             description: "This email is already registered. Please sign in instead.",
             variant: "destructive"
           });
+          setIsSignUp(false);
+        } else if (result.error.message.includes('Email not confirmed')) {
+          toast({
+            title: "Email Not Verified",
+            description: "Please check your email and click the verification link before signing in.",
+            variant: "destructive"
+          });
         } else {
           toast({
             title: isSignUp ? "Sign Up Failed" : "Sign In Failed",
@@ -69,9 +78,10 @@ export function Auth() {
         }
       } else {
         if (isSignUp) {
+          setEmailSent(true);
           toast({
             title: "Account Created",
-            description: "Please check your email to verify your account.",
+            description: "Please check your email to verify your account before signing in.",
           });
         } else {
           toast({
@@ -92,6 +102,34 @@ export function Auth() {
     }
   };
 
+  if (emailSent) {
+    return (
+      <div className="min-h-screen bg-caremate-gradient flex items-center justify-center p-4">
+        <Card className="w-full max-w-md p-6 text-center">
+          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Check Your Email</h2>
+          <p className="text-gray-600 mb-4">
+            We've sent a verification link to <strong>{form.getValues('email')}</strong>
+          </p>
+          <p className="text-sm text-gray-500 mb-6">
+            Click the link in your email to verify your account, then return here to sign in.
+          </p>
+          <Button
+            onClick={() => {
+              setEmailSent(false);
+              setIsSignUp(false);
+              form.reset();
+            }}
+            variant="outline"
+            className="w-full"
+          >
+            Back to Sign In
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-caremate-gradient flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-6">
@@ -108,6 +146,17 @@ export function Auth() {
           <p className="text-gray-600 text-sm">
             {isSignUp ? 'Join the CareMate platform' : 'Sign in to your account'}
           </p>
+        </div>
+
+        {/* Email verification notice */}
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-blue-800">
+              <p className="font-medium">Email Verification Required</p>
+              <p>After creating an account, check your email for a verification link before signing in.</p>
+            </div>
+          </div>
         </div>
 
         <Form {...form}>
@@ -166,7 +215,11 @@ export function Auth() {
         <div className="text-center mt-4">
           <Button
             variant="ghost"
-            onClick={() => setIsSignUp(!isSignUp)}
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setEmailSent(false);
+              form.reset();
+            }}
             className="text-sm"
           >
             {isSignUp 
