@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExtendedResident } from '../ResidentsList';
-import { Calendar, Plus, Clock, Repeat, DragHandleDots1Icon } from 'lucide-react';
+import { Calendar, Plus, Clock, Repeat, GripVertical } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 
 interface ResidentScheduleProps {
@@ -255,7 +254,7 @@ export function ResidentSchedule({ resident, onUpdate }: ResidentScheduleProps) 
                   draggable
                 >
                   <div className="flex items-center gap-3">
-                    <DragHandleDots1Icon className="w-4 h-4 text-gray-400" />
+                    <GripVertical className="w-4 h-4 text-gray-400" />
                     <div>
                       <div className="font-medium">{event.title}</div>
                       <div className="text-sm text-gray-600">
