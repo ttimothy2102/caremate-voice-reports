@@ -2,6 +2,7 @@
 import React from 'react';
 import { ArrowLeft, Bell } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Logo } from './Logo';
 
 interface MobileHeaderProps {
   title: string;
@@ -26,15 +27,18 @@ export function MobileHeader({ title, showBack = false, onBack, rightAction }: M
         )}
         <h1 className="text-lg font-semibold">{title}</h1>
       </div>
-      {rightAction || (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-white hover:bg-white/20 p-2"
-        >
-          <Bell className="w-5 h-5" />
-        </Button>
-      )}
+      <div className="flex items-center gap-3">
+        {rightAction || (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-white/20 p-2"
+          >
+            <Bell className="w-5 h-5" />
+          </Button>
+        )}
+        <Logo />
+      </div>
     </header>
   );
 }

@@ -1,212 +1,157 @@
-import React from 'react';
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Mic, Users, Heart, FileText, ArrowRight } from 'lucide-react';
+import { Mic, Users, FileText, Heart, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  if (user) {
+    navigate('/mobile-home');
+    return null;
+  }
 
   const features = [
     {
       icon: Mic,
-      title: "Voice-to-Report AI",
-      description: "Transform spoken observations into structured care reports instantly"
-    },
-    {
-      icon: Heart,
-      title: "Vital Signs Integration",
-      description: "Real-time monitoring with wearable devices like Fitbit and Apple Watch"
-    },
-    {
-      icon: FileText,
-      title: "Smart Documentation",
-      description: "Automated shift handovers and comprehensive care tracking"
+      title: "KI-Sprachtranskription",
+      description: "Sprechen Sie natürlich über Pflegebeobachtungen und lassen Sie die KI strukturierte Berichte erstellen"
     },
     {
       icon: Users,
-      title: "Resident Management",
-      description: "Complete oversight of all residents with quality assurance tools"
+      title: "Bewohnerverwaltung",
+      description: "Verwalten Sie alle Bewohnerinformationen, Medikationen und Pflegepläne an einem Ort"
+    },
+    {
+      icon: FileText,
+      title: "Intelligente Berichte",
+      description: "Automatisch generierte Pflegeberichte mit strukturierten Daten für bessere Nachverfolgung"
+    },
+    {
+      icon: Heart,
+      title: "Vitalwerte-Monitoring",
+      description: "Überwachen Sie Vitalwerte und erhalten Sie Benachrichtigungen bei kritischen Änderungen"
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-caremate-gradient text-white">
-        <div className="container mx-auto px-6 py-16 text-center">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-5xl font-bold mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-sm border-b px-6 py-4 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-caremate-gradient rounded-full"></div>
+            <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
               CareMate
             </h1>
-            <p className="text-xl mb-2 text-blue-100">
-              YOUR PERFECT FIT, YOUR EVERYDAY STYLE
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => navigate('/auth')}>
+              Anmelden
+            </Button>
+            <Button onClick={() => navigate('/auth')} className="bg-caremate-gradient hover:opacity-90">
+              Registrieren
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <div className="text-center space-y-8">
+          <div className="space-y-4">
+            <h2 className="text-5xl font-bold text-gray-900 leading-tight">
+              Intelligente Pflege
+              <span className="block bg-caremate-gradient bg-clip-text text-transparent">
+                mit KI-Unterstützung
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Revolutionieren Sie Ihre Pflegedokumentation mit KI-gestützter Sprachtranskription 
+              und intelligenter Berichtserstellung für Pflegeheime.
             </p>
-            <p className="text-lg mb-8 text-blue-100">
-              The all-in-one AI documentation and monitoring platform for elderly care homes
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg"
-                className="bg-white text-primary hover:bg-gray-100 px-8 py-3"
-                onClick={() => navigate('/mobile-home')}
-              >
-                <Mic className="w-5 h-5 mr-2" />
-                Mobile App (Caregivers)
-              </Button>
-              <Button 
-                size="lg"
-                variant="outline"
-                className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-primary px-8 py-3"
-                onClick={() => navigate('/auth')}
-              >
-                <Users className="w-5 h-5 mr-2" />
-                Sign In / Dashboard
-              </Button>
-            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="bg-caremate-gradient hover:opacity-90 text-lg px-8 py-6"
+              onClick={() => navigate('/auth')}
+            >
+              Kostenlos starten
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-lg px-8 py-6"
+              onClick={() => navigate('/dashboard')}
+            >
+              Demo ansehen
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Revolutionizing Elderly Care Documentation
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Speed, accuracy, and compassion combined in one intelligent platform designed specifically for care home professionals.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <Card key={index} className="p-6 text-center hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 bg-caremate-gradient rounded-full flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </Card>
-            ))}
-          </div>
+      <section className="max-w-7xl mx-auto px-6 py-20">
+        <div className="text-center mb-16">
+          <h3 className="text-3xl font-bold text-gray-900 mb-4">
+            Alles was Sie für moderne Pflege brauchen
+          </h3>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            CareMate kombiniert modernste KI-Technologie mit intuitiver Benutzerführung 
+            für effiziente Pflegedokumentation.
+          </p>
         </div>
-      </section>
 
-      {/* USP Section */}
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-              Why CareMate is Different
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <ArrowRight className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">AI-Generated Reports</h3>
-                    <p className="text-gray-600">Voice observations automatically become structured, professional care reports</p>
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {features.map((feature, index) => (
+            <Card key={index} className="p-8 hover:shadow-lg transition-shadow border-0 bg-white/60 backdrop-blur-sm">
+              <div className="space-y-4">
+                <div className="w-12 h-12 bg-caremate-gradient rounded-lg flex items-center justify-center">
+                  <feature.icon className="w-6 h-6 text-white" />
                 </div>
-                
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <ArrowRight className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Real Wearable Integration</h3>
-                    <p className="text-gray-600">Direct connection to Fitbit, Apple Watch, and other health monitoring devices</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <ArrowRight className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Mobile-First + Web Overview</h3>
-                    <p className="text-gray-600">Designed for both daily caregiving and management oversight</p>
-                  </div>
-                </div>
+                <h4 className="text-xl font-semibold text-gray-900">{feature.title}</h4>
+                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
               </div>
-              
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <ArrowRight className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Daily Summary Generator</h3>
-                    <p className="text-gray-600">Automated shift handovers with AI-powered care summaries</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <ArrowRight className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">GDPR Compliant</h3>
-                    <p className="text-gray-600">Built with European privacy standards and healthcare compliance in mind</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <ArrowRight className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800 mb-2">Speed & Efficiency</h3>
-                    <p className="text-gray-600">Minimal clicks, large buttons, designed for busy healthcare professionals</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            </Card>
+          ))}
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="bg-caremate-gradient text-white py-16">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Ready to Transform Your Care Documentation?
-          </h2>
+      <section className="bg-caremate-gradient text-white py-20">
+        <div className="max-w-4xl mx-auto text-center px-6">
+          <h3 className="text-3xl font-bold mb-4">
+            Bereit für intelligente Pflegedokumentation?
+          </h3>
           <p className="text-xl text-blue-100 mb-8">
-            Experience the future of elderly care management today.
+            Starten Sie noch heute und erleben Sie, wie KI Ihre Pflegearbeit vereinfacht.
           </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg"
-              className="bg-white text-primary hover:bg-gray-100 px-8 py-3"
-              onClick={() => navigate('/mobile-home')}
-            >
-              Try Mobile App
-            </Button>
-            <Button 
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-primary px-8 py-3"
-              onClick={() => navigate('/auth')}
-            >
-              Sign In / Dashboard
-            </Button>
-          </div>
+          <Button 
+            size="lg" 
+            className="bg-white text-primary hover:bg-gray-100 text-lg px-8 py-6"
+            onClick={() => navigate('/auth')}
+          >
+            Jetzt kostenlos testen
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-6 text-center">
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-6 h-6 bg-caremate-gradient rounded-full"></div>
+            <span className="text-xl font-semibold">CareMate</span>
+          </div>
           <p className="text-gray-400">
-            © 2024 CareMate. GDPR Compliant Healthcare Technology.
+            © 2025 CareMate. Alle Rechte vorbehalten.
           </p>
         </div>
       </footer>

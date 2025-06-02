@@ -33,7 +33,7 @@ export function VoiceInput() {
   return (
     <div className="min-h-screen bg-gray-50">
       <MobileHeader 
-        title="AI Voice Documentation" 
+        title="Sprachtranskription" 
         showBack 
         onBack={() => navigate('/mobile-home')} 
       />

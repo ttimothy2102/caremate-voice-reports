@@ -10,9 +10,9 @@ export function MobileHome() {
   const navigate = useNavigate();
 
   const shortcuts = [
-    { icon: Users, label: "Today's Residents", count: 12, href: "/residents" },
-    { icon: FileText, label: "Reports", count: 8, href: "/reports" },
-    { icon: Heart, label: "Vitals", count: 3, href: "/vitals" }
+    { icon: Users, label: "Heutige Bewohner", count: 12, href: "/residents" },
+    { icon: FileText, label: "Berichte", count: 8, href: "/reports" },
+    { icon: Heart, label: "Vitalwerte", count: 3, href: "/vitals" }
   ];
 
   return (
@@ -22,8 +22,8 @@ export function MobileHome() {
       <div className="p-6 space-y-6">
         {/* Welcome Section */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Good Morning!</h2>
-          <p className="text-gray-600">Ready to document care for your residents?</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Guten Morgen!</h2>
+          <p className="text-gray-600">Bereit für die Pflegedokumentation Ihrer Bewohner?</p>
         </div>
 
         {/* Main Action Button */}
@@ -33,9 +33,9 @@ export function MobileHome() {
               <Mic className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-semibold mb-2">New Voice Note</h3>
+              <h3 className="text-xl font-semibold mb-2">Neue Sprachnotiz</h3>
               <p className="text-blue-100 text-sm mb-4">
-                Record your observations and let AI create structured reports
+                Nehmen Sie Ihre Beobachtungen auf und lassen Sie die KI strukturierte Berichte erstellen
               </p>
             </div>
             <Button 
@@ -43,14 +43,14 @@ export function MobileHome() {
               size="lg"
               onClick={() => navigate('/voice-input')}
             >
-              Start Recording
+              Aufnahme starten
             </Button>
           </div>
         </Card>
 
         {/* Quick Shortcuts */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Access</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Schnellzugriff</h3>
           <div className="grid gap-4">
             {shortcuts.map((shortcut, index) => (
               <Card 
@@ -65,7 +65,7 @@ export function MobileHome() {
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-800">{shortcut.label}</h4>
-                      <p className="text-sm text-gray-600">{shortcut.count} items</p>
+                      <p className="text-sm text-gray-600">{shortcut.count} Einträge</p>
                     </div>
                   </div>
                   <div className="text-right">

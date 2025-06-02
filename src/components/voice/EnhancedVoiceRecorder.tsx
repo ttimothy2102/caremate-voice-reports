@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Mic, Square, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { useCreateCareReport } from '@/hooks/useCareReports';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/components/ui/use-toast';
@@ -17,7 +18,9 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [editableTranscript, setEditableTranscript] = useState('');
   const [recordingTime, setRecordingTime] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -71,6 +74,8 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
       setTranscript('');
+      setEditableTranscript('');
+      setIsEditing(false);
 
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
@@ -89,14 +94,14 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
       startTimer();
       
       toast({
-        title: "Recording Started",
-        description: "Speak clearly into your microphone",
+        title: "Aufnahme gestartet",
+        description: "Sprechen Sie deutlich in Ihr Mikrofon",
       });
     } catch (error) {
-      console.error('Error accessing microphone:', error);
+      console.error('Fehler beim Zugriff auf das Mikrofon:', error);
       toast({
-        title: "Microphone Error",
-        description: "Could not access microphone. Please check permissions.",
+        title: "Mikrofon-Fehler",
+        description: "Mikrofon konnte nicht zugegriffen werden. Bitte prüfen Sie die Berechtigungen.",
         variant: "destructive"
       });
     }
@@ -110,8 +115,8 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
       stopTimer();
       
       toast({
-        title: "Processing",
-        description: "Transcribing and analyzing your voice note...",
+        title: "Verarbeitung läuft",
+        description: "Ihr Sprachnotiz wird transkribiert und analysiert...",
       });
     }
   };
@@ -133,7 +138,9 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
           throw new Error(error.message);
         }
 
-        setTranscript(data.transcript);
+        const transcriptText = data.transcript;
+        setTranscript(transcriptText);
+        setEditableTranscript(transcriptText);
         
         const structuredReport = {
           physical_condition: data.structured.physical_condition,
@@ -141,7 +148,7 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
           food_water_intake: data.structured.food_water_intake,
           medication_given: data.structured.medication_given,
           special_notes: data.structured.special_notes,
-          voice_transcript: data.transcript
+          voice_transcript: transcriptText
         };
 
         if (residentId && user) {
@@ -156,28 +163,50 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
         setIsProcessing(false);
         
         toast({
-          title: "Voice Note Processed",
-          description: "Your voice note has been transcribed and structured.",
+          title: "Sprachnotiz verarbeitet",
+          description: "Ihre Sprachnotiz wurde transkribiert und strukturiert.",
         });
       };
       
       reader.readAsDataURL(audioBlob);
     } catch (error) {
-      console.error('Error processing audio:', error);
+      console.error('Fehler bei der Audioverarbeitung:', error);
       setIsProcessing(false);
       toast({
-        title: "Processing Error",
-        description: "Failed to process voice note. Please try again.",
+        title: "Verarbeitungsfehler",
+        description: "Sprachnotiz konnte nicht verarbeitet werden. Bitte versuchen Sie es erneut.",
         variant: "destructive"
       });
     }
   };
 
+  const handleSaveEdit = () => {
+    setTranscript(editableTranscript);
+    setIsEditing(false);
+    
+    // Update the report with edited transcript
+    const updatedReport = {
+      physical_condition: "Bearbeitet",
+      mood: "Bearbeitet", 
+      food_water_intake: "Bearbeitet",
+      medication_given: "Bearbeitet",
+      special_notes: "Bearbeitet",
+      voice_transcript: editableTranscript
+    };
+    
+    onTranscriptionComplete(updatedReport);
+    
+    toast({
+      title: "Transkription gespeichert",
+      description: "Die bearbeitete Transkription wurde gespeichert.",
+    });
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">AI Voice Documentation</h2>
-        <p className="text-gray-600 text-sm">Record and automatically structure care reports with AI</p>
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">Sprachtranskription</h2>
+        <p className="text-gray-600 text-sm">Nehmen Sie Pflegeberichte mit KI-Unterstützung auf</p>
       </div>
 
       <div className="flex flex-col items-center gap-4">
@@ -211,23 +240,50 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
         <div className="text-center">
           {isRecording && (
             <div className="space-y-2">
-              <p className="text-red-600 font-medium">Recording... Tap to stop</p>
+              <p className="text-red-600 font-medium">Aufnahme läuft... Tippen zum Stoppen</p>
               <p className="text-lg font-mono text-red-500">{formatTime(recordingTime)}</p>
             </div>
           )}
           {isProcessing && (
-            <p className="text-blue-600 font-medium">Processing with AI...</p>
+            <p className="text-blue-600 font-medium">Verarbeitung mit KI...</p>
           )}
           {!isRecording && !isProcessing && (
-            <p className="text-gray-500">Tap to start recording</p>
+            <p className="text-gray-500">Tippen zum Starten der Aufnahme</p>
           )}
         </div>
       </div>
 
       {transcript && (
         <Card className="p-4 bg-blue-50 border-blue-200">
-          <h3 className="font-medium text-blue-900 mb-2">AI Transcription:</h3>
-          <p className="text-blue-800 text-sm leading-relaxed whitespace-pre-wrap">{transcript}</p>
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-medium text-blue-900">KI-Transkription:</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              {isEditing ? 'Abbrechen' : 'Bearbeiten'}
+            </Button>
+          </div>
+          
+          {isEditing ? (
+            <div className="space-y-3">
+              <Textarea
+                value={editableTranscript}
+                onChange={(e) => setEditableTranscript(e.target.value)}
+                className="min-h-[120px] text-blue-800"
+                placeholder="Transkription bearbeiten..."
+              />
+              <Button
+                onClick={handleSaveEdit}
+                className="w-full"
+              >
+                Änderungen speichern
+              </Button>
+            </div>
+          ) : (
+            <p className="text-blue-800 text-sm leading-relaxed whitespace-pre-wrap">{transcript}</p>
+          )}
         </Card>
       )}
     </div>

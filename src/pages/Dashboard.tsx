@@ -59,12 +59,12 @@ function DashboardContent() {
   }, [residents, searchName, roomFilter, careLevelFilter]);
 
   const overviewStats = [
-    { title: "Reports Today", value: careReports.filter(r => 
+    { title: "Berichte heute", value: careReports.filter(r => 
       new Date(r.created_at).toDateString() === new Date().toDateString()
     ).length.toString(), icon: FileText, color: "text-blue-600" },
-    { title: "Active Residents", value: residents.length.toString(), icon: Users, color: "text-green-600" },
-    { title: "Vital Alerts", value: "3", icon: AlertTriangle, color: "text-red-600" },
-    { title: "Device Sync", value: "98%", icon: Heart, color: "text-purple-600" }
+    { title: "Aktive Bewohner", value: residents.length.toString(), icon: Users, color: "text-green-600" },
+    { title: "Vital-Alarme", value: "3", icon: AlertTriangle, color: "text-red-600" },
+    { title: "Gerätesync", value: "98%", icon: Heart, color: "text-purple-600" }
   ];
 
   const residentsWithExtras = filteredResidents.map(resident => ({
@@ -100,21 +100,25 @@ function DashboardContent() {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-600">
-              Welcome, {user?.email}
+              Willkommen, {user?.email}
             </span>
             <Button variant="outline" size="sm">
               <Plus className="w-4 h-4 mr-2" />
-              Add Resident
+              Bewohner hinzufügen
             </Button>
             <Button variant="outline" size="sm" onClick={() => navigate('/schedule')}>
               <Calendar className="w-4 h-4 mr-2" />
-              Schedule
+              Terminplan
             </Button>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
-              Sign Out
+              Abmelden
             </Button>
-            <div className="w-8 h-8 bg-caremate-gradient rounded-full"></div>
+            <div 
+              className="w-8 h-8 bg-caremate-gradient rounded-full cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => navigate('/')}
+              title="Zurück zur Startseite"
+            />
           </div>
         </div>
       </header>
