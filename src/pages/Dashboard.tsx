@@ -94,7 +94,10 @@ function DashboardContent() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b px-6 py-4">
         <div className="flex items-center justify-between">
-          <div>
+          <div 
+            className="cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/')}
+          >
             <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
               CareMate
             </h1>

@@ -1,42 +1,40 @@
 
 import React from 'react';
-import { ArrowLeft, Bell } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { ArrowLeft } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface MobileHeaderProps {
   title: string;
   showBack?: boolean;
   onBack?: () => void;
-  rightAction?: React.ReactNode;
+  onTitleClick?: () => void;
 }
 
-export function MobileHeader({ title, showBack = false, onBack, rightAction }: MobileHeaderProps) {
+export function MobileHeader({ title, showBack, onBack, onTitleClick }: MobileHeaderProps) {
   return (
-    <header className="bg-caremate-gradient text-white px-4 py-3 flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        {showBack && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 p-2"
-            onClick={onBack}
+    <header className="bg-white shadow-sm border-b px-6 py-4 sticky top-0 z-50">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {showBack && onBack && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBack}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+          )}
+          <h1 
+            className={`text-xl font-bold bg-caremate-gradient bg-clip-text text-transparent ${
+              onTitleClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
+            }`}
+            onClick={onTitleClick}
           >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        )}
-        <h1 className="text-lg font-semibold">{title}</h1>
-      </div>
-      <div className="flex items-center gap-3">
-        {rightAction || (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 p-2"
-          >
-            <Bell className="w-5 h-5" />
-          </Button>
-        )}
+            {title}
+          </h1>
+        </div>
         <Logo />
       </div>
     </header>

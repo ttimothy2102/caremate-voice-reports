@@ -52,26 +52,26 @@ export function Auth() {
       if (result.error) {
         if (result.error.message.includes('Invalid login credentials')) {
           toast({
-            title: "Login Failed",
-            description: "Invalid email or password. Please try again.",
+            title: "Anmeldung fehlgeschlagen",
+            description: "Ungültige E-Mail oder Passwort. Bitte versuchen Sie es erneut.",
             variant: "destructive"
           });
         } else if (result.error.message.includes('User already registered')) {
           toast({
-            title: "Account Exists",
-            description: "This email is already registered. Please sign in instead.",
+            title: "Konto existiert bereits",
+            description: "Diese E-Mail ist bereits registriert. Bitte melden Sie sich stattdessen an.",
             variant: "destructive"
           });
           setIsSignUp(false);
         } else if (result.error.message.includes('Email not confirmed')) {
           toast({
-            title: "Email Not Verified",
-            description: "Please check your email and click the verification link before signing in.",
+            title: "E-Mail nicht verifiziert",
+            description: "Bitte überprüfen Sie Ihre E-Mail und klicken Sie auf den Verifizierungslink, bevor Sie sich anmelden.",
             variant: "destructive"
           });
         } else {
           toast({
-            title: isSignUp ? "Sign Up Failed" : "Sign In Failed",
+            title: isSignUp ? "Registrierung fehlgeschlagen" : "Anmeldung fehlgeschlagen",
             description: result.error.message,
             variant: "destructive"
           });
@@ -80,21 +80,21 @@ export function Auth() {
         if (isSignUp) {
           setEmailSent(true);
           toast({
-            title: "Account Created",
-            description: "Please check your email to verify your account before signing in.",
+            title: "Konto erstellt",
+            description: "Bitte überprüfen Sie Ihre E-Mail, um Ihr Konto zu verifizieren, bevor Sie sich anmelden.",
           });
         } else {
           toast({
-            title: "Welcome back!",
-            description: "Successfully signed in.",
+            title: "Willkommen zurück!",
+            description: "Erfolgreich angemeldet.",
           });
           navigate('/dashboard');
         }
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: "Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
         variant: "destructive"
       });
     } finally {
@@ -107,12 +107,12 @@ export function Auth() {
       <div className="min-h-screen bg-caremate-gradient flex items-center justify-center p-4">
         <Card className="w-full max-w-md p-6 text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Check Your Email</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Überprüfen Sie Ihre E-Mail</h2>
           <p className="text-gray-600 mb-4">
-            We've sent a verification link to <strong>{form.getValues('email')}</strong>
+            Wir haben einen Verifizierungslink an <strong>{form.getValues('email')}</strong> gesendet
           </p>
           <p className="text-sm text-gray-500 mb-6">
-            Click the link in your email to verify your account, then return here to sign in.
+            Klicken Sie auf den Link in Ihrer E-Mail, um Ihr Konto zu verifizieren, und kehren Sie dann hierher zurück, um sich anzumelden.
           </p>
           <Button
             onClick={() => {
@@ -123,7 +123,7 @@ export function Auth() {
             variant="outline"
             className="w-full"
           >
-            Back to Sign In
+            Zurück zur Anmeldung
           </Button>
         </Card>
       </div>
@@ -134,17 +134,20 @@ export function Auth() {
     <div className="min-h-screen bg-caremate-gradient flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-6">
         <div className="text-center mb-6">
-          <div className="flex items-center justify-center mb-4">
+          <div 
+            className="flex items-center justify-center mb-4 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/')}
+          >
             <Heart className="w-8 h-8 text-primary mr-2" />
             <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
               CareMate
             </h1>
           </div>
           <h2 className="text-xl font-semibold text-gray-800">
-            {isSignUp ? 'Create Account' : 'Welcome Back'}
+            {isSignUp ? 'Konto erstellen' : 'Willkommen zurück'}
           </h2>
           <p className="text-gray-600 text-sm">
-            {isSignUp ? 'Join the CareMate platform' : 'Sign in to your account'}
+            {isSignUp ? 'Der CareMate Plattform beitreten' : 'Melden Sie sich in Ihr Konto an'}
           </p>
         </div>
 
@@ -153,8 +156,8 @@ export function Auth() {
           <div className="flex items-start gap-2">
             <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
             <div className="text-sm text-blue-800">
-              <p className="font-medium">Email Verification Required</p>
-              <p>After creating an account, check your email for a verification link before signing in.</p>
+              <p className="font-medium">E-Mail-Verifizierung erforderlich</p>
+              <p>Nach der Kontoerstellung überprüfen Sie Ihre E-Mail auf einen Verifizierungslink, bevor Sie sich anmelden.</p>
             </div>
           </div>
         </div>
@@ -167,9 +170,9 @@ export function Auth() {
                 name="fullName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>Vollständiger Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your full name" {...field} />
+                      <Input placeholder="Geben Sie Ihren vollständigen Namen ein" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -182,9 +185,9 @@ export function Auth() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>E-Mail</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="Enter your email" {...field} />
+                    <Input type="email" placeholder="Geben Sie Ihre E-Mail ein" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -196,9 +199,9 @@ export function Auth() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Passwort</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Enter your password" {...field} />
+                    <Input type="password" placeholder="Geben Sie Ihr Passwort ein" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -207,7 +210,7 @@ export function Auth() {
 
             <Button type="submit" className="w-full bg-caremate-gradient" disabled={loading}>
               {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {isSignUp ? 'Create Account' : 'Sign In'}
+              {isSignUp ? 'Konto erstellen' : 'Anmelden'}
             </Button>
           </form>
         </Form>
@@ -223,8 +226,8 @@ export function Auth() {
             className="text-sm"
           >
             {isSignUp 
-              ? 'Already have an account? Sign in' 
-              : "Don't have an account? Sign up"
+              ? 'Bereits ein Konto? Anmelden' 
+              : "Noch kein Konto? Registrieren"
             }
           </Button>
         </div>

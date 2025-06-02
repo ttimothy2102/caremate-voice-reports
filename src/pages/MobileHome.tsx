@@ -17,7 +17,10 @@ export function MobileHome() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <MobileHeader title="CareMate" />
+      <MobileHeader 
+        title="CareMate" 
+        onTitleClick={() => navigate('/')}
+      />
       
       <div className="p-6 space-y-6">
         {/* Welcome Section */}
