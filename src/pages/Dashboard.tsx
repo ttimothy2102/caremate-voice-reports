@@ -1,11 +1,13 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ResidentCard } from "@/components/dashboard/ResidentCard";
 import { VitalsChart } from "@/components/dashboard/VitalsChart";
-import { Search, Plus, AlertTriangle, FileText, Users, Heart, LogOut } from 'lucide-react';
+import { PatientFilters } from "@/components/dashboard/PatientFilters";
+import { MedicationTracker } from "@/components/medications/MedicationTracker";
+import { DrugOrdering } from "@/components/medications/DrugOrdering";
+import { Plus, AlertTriangle, FileText, Users, Heart, LogOut } from 'lucide-react';
 import { useResidents } from '@/hooks/useResidents';
 import { useVitalSignsChart } from '@/hooks/useVitalSigns';
 import { useCareReports } from '@/hooks/useCareReports';
@@ -19,6 +21,11 @@ function DashboardContent() {
   const { data: careReports = [] } = useCareReports();
   const { signOut, user } = useAuth();
 
+  // Filter states
+  const [searchName, setSearchName] = useState('');
+  const [roomFilter, setRoomFilter] = useState('all');
+  const [careLevelFilter, setCareLevelFilter] = useState('all');
+
   const handleSignOut = async () => {
     await signOut();
     toast({
@@ -26,6 +33,28 @@ function DashboardContent() {
       description: "You have been successfully signed out.",
     });
   };
+
+  // Get unique rooms and care levels for filters
+  const availableRooms = useMemo(() => 
+    [...new Set(residents.map(r => r.room).filter(Boolean))].sort(),
+    [residents]
+  );
+
+  const availableCareLevels = useMemo(() => 
+    [...new Set(residents.map(r => r.care_level).filter(Boolean))].sort(),
+    [residents]
+  );
+
+  // Filter residents based on search and filters
+  const filteredResidents = useMemo(() => {
+    return residents.filter(resident => {
+      const matchesName = resident.name.toLowerCase().includes(searchName.toLowerCase());
+      const matchesRoom = roomFilter === 'all' || resident.room === roomFilter;
+      const matchesCarelevel = careLevelFilter === 'all' || resident.care_level === careLevelFilter;
+      
+      return matchesName && matchesRoom && matchesCarelevel;
+    });
+  }, [residents, searchName, roomFilter, careLevelFilter]);
 
   const overviewStats = [
     { title: "Reports Today", value: careReports.filter(r => 
@@ -36,7 +65,7 @@ function DashboardContent() {
     { title: "Device Sync", value: "98%", icon: Heart, color: "text-purple-600" }
   ];
 
-  const residentsWithExtras = residents.map(resident => ({
+  const residentsWithExtras = filteredResidents.map(resident => ({
     ...resident,
     lastReport: careReports.find(r => r.resident_id === resident.id) 
       ? new Date(careReports.find(r => r.resident_id === resident.id)!.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
@@ -101,21 +130,24 @@ function DashboardContent() {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Residents List */}
-          <div>
+          <div className="lg:col-span-1">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-800">Residents</h2>
-              <div className="flex gap-2">
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-3 text-gray-400" />
-                  <Input 
-                    placeholder="Search residents..." 
-                    className="w-64 pl-10"
-                  />
-                </div>
-              </div>
             </div>
+            
+            <PatientFilters
+              searchName={searchName}
+              onSearchNameChange={setSearchName}
+              roomFilter={roomFilter}
+              onRoomFilterChange={setRoomFilter}
+              careLevelFilter={careLevelFilter}
+              onCareLevelFilterChange={setCareLevelFilter}
+              availableRooms={availableRooms}
+              availableCareLevels={availableCareLevels}
+            />
+            
             <div className="space-y-3">
               {residentsWithExtras.map((resident) => (
                 <ResidentCard 
@@ -127,37 +159,45 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* Vitals Overview */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Vitals Overview</h2>
-            <div className="space-y-4">
+          {/* Right Column - Vitals and Medications */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Vitals Overview */}
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Vitals Overview</h2>
               <VitalsChart 
                 title="Heart Rate (BPM)"
                 data={heartRateData}
                 color="#29B6F6"
                 unit="bpm"
               />
-              
-              <Card className="p-4">
-                <h3 className="font-semibold text-gray-800 mb-3">Recent Alerts</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3 p-2 bg-red-50 rounded-lg">
-                    <AlertTriangle className="w-4 h-4 text-red-500" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Hans Weber - High BP</p>
-                      <p className="text-xs text-gray-600">15:30 - 145/95 mmHg</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-2 bg-yellow-50 rounded-lg">
-                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">Anna Müller - Missed Meal</p>
-                      <p className="text-xs text-gray-600">12:00 - Lunch not completed</p>
-                    </div>
+            </div>
+
+            {/* Medication Tracking */}
+            <MedicationTracker />
+
+            {/* Drug Ordering */}
+            <DrugOrdering />
+
+            {/* Recent Alerts */}
+            <Card className="p-4">
+              <h3 className="font-semibold text-gray-800 mb-3">Recent Alerts</h3>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 p-2 bg-red-50 rounded-lg">
+                  <AlertTriangle className="w-4 h-4 text-red-500" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">Hans Weber - High BP</p>
+                    <p className="text-xs text-gray-600">15:30 - 145/95 mmHg</p>
                   </div>
                 </div>
-              </Card>
-            </div>
+                <div className="flex items-center gap-3 p-2 bg-yellow-50 rounded-lg">
+                  <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">Anna Müller - Missed Meal</p>
+                    <p className="text-xs text-gray-600">12:00 - Lunch not completed</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
