@@ -63,7 +63,8 @@ function DashboardContent() {
       title: "Berichte heute",
       value: careReports.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString()).length.toString(),
       icon: FileText,
-      color: "text-blue-600"
+      color: "text-blue-600",
+      onClick: () => navigate('/todays-reports')
     },
     {
       title: "Vital-Alarme",

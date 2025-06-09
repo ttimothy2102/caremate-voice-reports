@@ -11,6 +11,7 @@ import { VoiceInput } from "./pages/VoiceInput";
 import { Dashboard } from "./pages/Dashboard";
 import { Schedule } from "./pages/Schedule";
 import { Residents } from "./pages/Residents";
+import { TodaysReports } from "./pages/TodaysReports";
 import { Auth } from "./pages/Auth";
 import Demo from "./pages/Demo";
 import About from "./pages/About";
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/residents" element={<Residents />} />
+            <Route path="/todays-reports" element={<TodaysReports />} />
             
             {/* Company Pages */}
             <Route path="/about" element={<About />} />
