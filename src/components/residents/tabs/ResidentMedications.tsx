@@ -36,12 +36,12 @@ interface Medication {
 
 interface MedicationLog {
   id: string;
-  medicationId: string;
-  scheduledTime: string;
-  actualTime?: string;
+  medication_id: string;
+  scheduled_time: string;
+  actual_time?: string;
   completed: boolean;
   notes?: string;
-  administeredBy: string;
+  administered_by: string;
 }
 
 interface CareReport {
@@ -131,19 +131,19 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
   const mockLogs: MedicationLog[] = [
     {
       id: '1',
-      medicationId: '1',
-      scheduledTime: '08:00',
-      actualTime: '08:15',
+      medication_id: '1',
+      scheduled_time: '08:00',
+      actual_time: '08:15',
       completed: true,
-      administeredBy: 'Schwester Maria',
+      administered_by: 'Schwester Maria',
       notes: 'Problemlos eingenommen'
     },
     {
       id: '2',
-      medicationId: '2',
-      scheduledTime: '08:00',
+      medication_id: '2',
+      scheduled_time: '08:00',
       completed: false,
-      administeredBy: 'Schwester Maria'
+      administered_by: 'Schwester Maria'
     }
   ];
 
