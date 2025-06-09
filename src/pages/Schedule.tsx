@@ -32,7 +32,7 @@ function ScheduleContent() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate('/mobile-home')}
+              onClick={() => navigate('/dashboard')}
               className="text-gray-600 hover:text-gray-800"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AccountManagement } from "@/components/account/AccountManagement";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from 'react-router-dom';
 
 interface MobileHeaderProps {
   title: string;
@@ -16,31 +17,48 @@ interface MobileHeaderProps {
 export function MobileHeader({ title, showBack, onBack, onTitleClick }: MobileHeaderProps) {
   const [showAccountManagement, setShowAccountManagement] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const userInitials = user?.user_metadata?.full_name
     ? user.user_metadata.full_name.split(' ').map((name: string) => name[0]).join('').toUpperCase()
     : user?.email?.[0]?.toUpperCase() || 'U';
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      // Default navigation back to dashboard
+      navigate('/dashboard');
+    }
+  };
+
+  const handleTitleClick = () => {
+    if (onTitleClick) {
+      onTitleClick();
+    } else {
+      // Default navigation to dashboard
+      navigate('/dashboard');
+    }
+  };
 
   return (
     <>
       <header className="bg-white shadow-sm border-b px-6 py-4 sticky top-0 z-50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {showBack && onBack && (
+            {showBack && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onBack}
+                onClick={handleBack}
                 className="text-gray-600 hover:text-gray-800"
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             )}
             <h1 
-              className={`text-xl font-bold text-primary ${
-                onTitleClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
-              }`}
-              onClick={onTitleClick}
+              className="text-xl font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={handleTitleClick}
             >
               {title}
             </h1>

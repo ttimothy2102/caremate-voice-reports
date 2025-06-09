@@ -8,11 +8,12 @@ export function Logo() {
 
   return (
     <div 
-      className="cursor-pointer hover:opacity-80 transition-opacity"
+      className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
       onClick={() => navigate('/')}
       title="Zurück zur Startseite"
     >
-      <Heart className="w-8 h-8 text-primary" />
+      <Heart className="w-6 h-6 text-primary" />
+      <span className="text-sm font-semibold text-primary">CareMate</span>
     </div>
   );
 }

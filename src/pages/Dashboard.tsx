@@ -55,14 +55,14 @@ function DashboardContent() {
     // For now, we'll just show a toast
   };
 
-  // Reordered stats with scheduled tasks first and contact doctor button
+  // Updated stats with berichte heute first and proper navigation back to dashboard
   const overviewStats = [
     {
-      title: "Terminierte Aufgaben",
-      value: "5",
-      icon: Calendar,
-      color: "text-purple-600",
-      onClick: () => navigate('/schedule')
+      title: "Berichte heute",
+      value: careReports.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString()).length.toString(),
+      icon: FileText,
+      color: "text-blue-600",
+      onClick: () => navigate('/todays-reports')
     },
     {
       title: "Aktive Bewohner",
@@ -72,17 +72,18 @@ function DashboardContent() {
       onClick: () => navigate('/residents')
     },
     {
-      title: "Berichte heute",
-      value: careReports.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString()).length.toString(),
-      icon: FileText,
-      color: "text-blue-600",
-      onClick: () => navigate('/todays-reports')
-    },
-    {
       title: "Vital-Alarme",
       value: "3",
       icon: AlertTriangle,
-      color: "text-red-600"
+      color: "text-red-600",
+      onClick: () => navigate('/vitals')
+    },
+    {
+      title: "Terminierte Aufgaben",
+      value: "5",
+      icon: Calendar,
+      color: "text-purple-600",
+      onClick: () => navigate('/schedule')
     }
   ];
 
@@ -99,7 +100,7 @@ function DashboardContent() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/mobile-home')}>
+          <div className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/dashboard')}>
             <h1 className="text-2xl font-bold text-primary">
               CareMate
             </h1>
@@ -110,11 +111,6 @@ function DashboardContent() {
               {greeting}
             </span>
             
-            <Button variant="outline" size="sm" onClick={() => navigate('/schedule')}>
-              <Calendar className="w-4 h-4 mr-2" />
-              Terminplan
-            </Button>
-            
             <Button 
               variant="outline" 
               size="sm" 
@@ -123,6 +119,15 @@ function DashboardContent() {
             >
               <Phone className="w-4 h-4 mr-2" />
               Arzt kontaktieren
+            </Button>
+            
+            <Button 
+              size="sm" 
+              onClick={() => setShowAddResidentDialog(true)}
+              className="bg-caremate-gradient"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Bewohner hinzufügen
             </Button>
             
             <Button variant="outline" size="sm" onClick={handleSignOut}>

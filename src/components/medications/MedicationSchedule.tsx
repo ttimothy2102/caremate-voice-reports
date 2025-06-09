@@ -3,24 +3,10 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, Sunrise, Sun, CloudSun, Moon } from 'lucide-react';
-
-interface Medication {
-  id: string;
-  name: string;
-  dosage: string;
-  schedule: {
-    morning: number;
-    midday: number;
-    evening: number;
-    night: number;
-  };
-  instructions: string;
-  stockCount: number;
-  reorderLevel: number;
-  lastTaken?: string;
-  times: string[];
-}
+import { Calendar, Sunrise, Sun, CloudSun, Moon, Clock } from 'lucide-react';
+import { useMedications } from '@/hooks/useMedications';
+import { useMedicationLogs } from '@/hooks/useMedicationLogs';
+import { useResidents } from '@/hooks/useResidents';
 
 interface MedicationLog {
   id: string;
@@ -33,12 +19,31 @@ interface MedicationLog {
 }
 
 interface MedicationScheduleProps {
-  medications: Medication[];
-  logs: MedicationLog[];
-  onMarkCompleted: (medicationId: string, timeSlot: string) => void;
+  medications?: any[];
+  logs?: MedicationLog[];
+  onMarkCompleted?: (medicationId: string, timeSlot: string) => void;
 }
 
-export function MedicationSchedule({ medications, logs, onMarkCompleted }: MedicationScheduleProps) {
+export function MedicationSchedule({ medications: propMedications, logs: propLogs, onMarkCompleted }: MedicationScheduleProps) {
+  const { data: allMedications = [] } = useMedications();
+  const { data: allLogs = [] } = useMedicationLogs();
+  const { data: residents = [] } = useResidents();
+
+  const medications = propMedications || allMedications;
+  const logs = propLogs || allLogs;
+
+  const getCurrentTimeSlot = () => {
+    const now = new Date();
+    const hour = now.getHours();
+    
+    if (hour >= 6 && hour < 12) return 'morning';
+    if (hour >= 12 && hour < 18) return 'midday';
+    if (hour >= 18 && hour < 22) return 'evening';
+    return 'night';
+  };
+
+  const currentTimeSlot = getCurrentTimeSlot();
+
   const getTimeSlotIcon = (slot: string) => {
     switch (slot) {
       case 'morning': return <Sunrise className="w-4 h-4 text-orange-500" />;
@@ -51,102 +56,153 @@ export function MedicationSchedule({ medications, logs, onMarkCompleted }: Medic
 
   const getTimeSlotLabel = (slot: string) => {
     switch (slot) {
-      case 'morning': return 'Morgens';
-      case 'midday': return 'Mittags';
-      case 'evening': return 'Abends';
-      case 'night': return 'Nachts';
+      case 'morning': return 'Morgens (06:00-12:00)';
+      case 'midday': return 'Mittags (12:00-18:00)';
+      case 'evening': return 'Abends (18:00-22:00)';
+      case 'night': return 'Nachts (22:00-06:00)';
       default: return slot;
     }
   };
 
-  const formatSchedule = (schedule: Medication['schedule']) => {
-    return `${schedule.morning}-${schedule.midday}-${schedule.evening}-${schedule.night}`;
+  const getMedicationsForTimeSlot = (timeSlot: string) => {
+    return medications.filter(med => {
+      const frequency = med.frequency?.toLowerCase() || '';
+      
+      switch (timeSlot) {
+        case 'morning':
+          return frequency.includes('daily') || frequency.includes('morning') || frequency.includes('twice') || frequency.includes('three') || frequency.includes('four');
+        case 'midday':
+          return frequency.includes('three') || frequency.includes('four') || frequency.includes('midday') || frequency.includes('lunch');
+        case 'evening':
+          return frequency.includes('daily') || frequency.includes('evening') || frequency.includes('twice') || frequency.includes('three') || frequency.includes('four');
+        case 'night':
+          return frequency.includes('four') || frequency.includes('night') || frequency.includes('bedtime');
+        default:
+          return false;
+      }
+    });
   };
 
   const getTodayLogs = (medicationId: string) => {
     return logs.filter(log => log.medicationId === medicationId);
   };
 
-  const getDayPlan = () => {
-    const timeSlots = [
-      { key: 'morning', label: 'Morgens (08:00)', time: '08:00' },
-      { key: 'midday', label: 'Mittags (13:00)', time: '13:00' },
-      { key: 'evening', label: 'Abends (20:00)', time: '20:00' },
-      { key: 'night', label: 'Nachts (22:00)', time: '22:00' }
-    ];
-
-    return timeSlots.map(slot => {
-      const medicationsForSlot = medications.filter(med => 
-        med.schedule[slot.key as keyof typeof med.schedule] > 0
-      );
-
-      return {
-        ...slot,
-        medications: medicationsForSlot
-      };
-    });
+  const getResidentName = (residentId: string) => {
+    const resident = residents.find(r => r.id === residentId);
+    return resident?.name || 'Unbekannter Bewohner';
   };
+
+  const currentMedications = getMedicationsForTimeSlot(currentTimeSlot);
 
   return (
     <Card className="border-2 border-blue-200">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-blue-700">
           <Calendar className="w-5 h-5" />
-          Tagesplan Medikamente - {new Date().toLocaleDateString('de-DE')}
+          Aktuelle Medikamentengabe - {new Date().toLocaleDateString('de-DE')}
+          <Badge variant="outline" className="ml-2">
+            {getTimeSlotLabel(currentTimeSlot)}
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {getDayPlan().map((timeSlot) => (
-            <div key={timeSlot.key} className="space-y-3">
-              <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                {getTimeSlotIcon(timeSlot.key)}
-                <div>
-                  <h4 className="font-semibold text-sm">{getTimeSlotLabel(timeSlot.key)}</h4>
-                  <p className="text-xs text-gray-600">{timeSlot.time}</p>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                {timeSlot.medications.length === 0 ? (
-                  <p className="text-xs text-gray-500 italic">Keine Medikamente</p>
-                ) : (
-                  timeSlot.medications.map((med) => {
-                    const dosageCount = med.schedule[timeSlot.key as keyof typeof med.schedule];
-                    const todayLogs = getTodayLogs(med.id);
-                    const timeLog = todayLogs.find(log => log.scheduledTime === timeSlot.time);
-                    
-                    return (
-                      <div key={med.id} className="bg-white border rounded p-2 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <Checkbox 
-                            id={`med-${med.id}-${timeSlot.key}`}
-                            checked={timeLog?.completed || false}
-                            onCheckedChange={() => onMarkCompleted(med.id, timeSlot.time)}
-                            className="data-[state=checked]:bg-green-600"
-                          />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">{med.name}</p>
-                            <p className="text-xs text-gray-600">
-                              {dosageCount}x {med.dosage}
-                            </p>
-                            <Badge variant="outline" className="text-xs font-mono mt-1">
-                              {formatSchedule(med.schedule)}
-                            </Badge>
-                          </div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+            {getTimeSlotIcon(currentTimeSlot)}
+            <div>
+              <h4 className="font-semibold text-sm">Jetzt fällig: {getTimeSlotLabel(currentTimeSlot)}</h4>
+              <p className="text-xs text-gray-600 flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            {currentMedications.length === 0 ? (
+              <p className="text-sm text-gray-500 italic text-center py-4">
+                Keine Medikamente für die aktuelle Zeit geplant
+              </p>
+            ) : (
+              currentMedications.map((med) => {
+                const todayLogs = getTodayLogs(med.id);
+                const timeLog = todayLogs.find(log => log.scheduledTime === currentTimeSlot);
+                const residentName = getResidentName(med.resident_id);
+                
+                return (
+                  <div key={med.id} className="bg-white border rounded-lg p-4 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <Checkbox 
+                        id={`med-${med.id}-${currentTimeSlot}`}
+                        checked={timeLog?.completed || false}
+                        onCheckedChange={() => onMarkCompleted?.(med.id, currentTimeSlot)}
+                        className="data-[state=checked]:bg-green-600"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-medium">{med.drug_name}</p>
+                          <Badge variant="outline" className="text-xs">
+                            {med.dosage}
+                          </Badge>
                         </div>
-                        {timeLog?.completed && timeLog.actualTime && (
-                          <p className="text-xs text-green-600">
-                            Gegeben um {timeLog.actualTime}
-                          </p>
+                        <p className="text-xs text-gray-600">
+                          Bewohner: <span className="font-medium">{residentName}</span>
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          Häufigkeit: {med.frequency}
+                        </p>
+                        {med.instructions && (
+                          <p className="text-xs text-gray-500 mt-1">{med.instructions}</p>
                         )}
                       </div>
-                    );
-                  })
-                )}
-              </div>
+                      {med.stock_count && med.stock_count <= (med.reorder_level || 5) && (
+                        <Badge variant="destructive" className="text-xs">
+                          Wenig Vorrat: {med.stock_count}
+                        </Badge>
+                      )}
+                    </div>
+                    {timeLog?.completed && timeLog.actualTime && (
+                      <p className="text-xs text-green-600">
+                        ✓ Gegeben um {timeLog.actualTime}
+                      </p>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* All time slots overview */}
+          <div className="mt-6 pt-4 border-t">
+            <h5 className="text-sm font-medium text-gray-700 mb-3">Tagesübersicht</h5>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {['morning', 'midday', 'evening', 'night'].map((slot) => {
+                const slotMedications = getMedicationsForTimeSlot(slot);
+                const isCurrent = slot === currentTimeSlot;
+                
+                return (
+                  <div 
+                    key={slot} 
+                    className={`p-2 rounded border text-center ${
+                      isCurrent ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      {getTimeSlotIcon(slot)}
+                      <span className="text-xs font-medium">
+                        {slot === 'morning' ? 'Morgen' : 
+                         slot === 'midday' ? 'Mittag' : 
+                         slot === 'evening' ? 'Abend' : 'Nacht'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600">
+                      {slotMedications.length} Medikament{slotMedications.length !== 1 ? 'e' : ''}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
-          ))}
+          </div>
         </div>
       </CardContent>
     </Card>
