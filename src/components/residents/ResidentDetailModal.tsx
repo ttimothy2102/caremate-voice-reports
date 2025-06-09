@@ -60,9 +60,9 @@ export function ResidentDetailModal({
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="medications">Medikamente</TabsTrigger>
             <TabsTrigger value="care">Pflege</TabsTrigger>
+            <TabsTrigger value="vitals">Vitalwerte</TabsTrigger>
             <TabsTrigger value="docs">Dokumentation</TabsTrigger>
             <TabsTrigger value="schedule">Termine</TabsTrigger>
-            <TabsTrigger value="vitals">Vitalwerte</TabsTrigger>
             <TabsTrigger value="basic">Basisdaten</TabsTrigger>
           </TabsList>
 
@@ -80,6 +80,13 @@ export function ResidentDetailModal({
             />
           </TabsContent>
 
+          <TabsContent value="vitals" className="mt-6">
+            <ResidentVitalSigns 
+              resident={editedResident}
+              onUpdate={updateResident}
+            />
+          </TabsContent>
+
           <TabsContent value="docs" className="mt-6">
             <ResidentDocumentationModules 
               resident={editedResident}
@@ -89,13 +96,6 @@ export function ResidentDetailModal({
 
           <TabsContent value="schedule" className="mt-6">
             <ResidentSchedule 
-              resident={editedResident}
-              onUpdate={updateResident}
-            />
-          </TabsContent>
-
-          <TabsContent value="vitals" className="mt-6">
-            <ResidentVitalSigns 
               resident={editedResident}
               onUpdate={updateResident}
             />
