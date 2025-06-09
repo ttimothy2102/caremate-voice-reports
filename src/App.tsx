@@ -5,13 +5,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { LiquidGradientStyles } from "@/components/ui/liquid-gradient-styles";
 
 import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
-import MobileHome from "./pages/MobileHome";
+import { Dashboard } from "./pages/Dashboard";
+import { MobileHome } from "./pages/MobileHome";
 import Residents from "./pages/Residents";
 import Schedule from "./pages/Schedule";
 import TodaysReports from "./pages/TodaysReports";
 import VoiceInput from "./pages/VoiceInput";
-import Auth from "./pages/Auth";
+import { Auth } from "./pages/Auth";
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import Careers from "./pages/Careers";
