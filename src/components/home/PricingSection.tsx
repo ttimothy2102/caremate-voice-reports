@@ -77,48 +77,48 @@ export function PricingSection() {
   ];
 
   return (
-    <section ref={sectionRef} id="pricing" className={`max-w-7xl mx-auto px-6 py-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-      <div className="text-center mb-16">
-        <h3 className="text-4xl font-bold text-gray-900 mb-4">
+    <section ref={sectionRef} id="pricing" className={`max-w-7xl mx-auto px-6 py-12 md:py-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+      <div className="text-center mb-8 md:mb-16">
+        <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
           Simple, transparent pricing
         </h3>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-sm md:text-lg text-gray-600 max-w-2xl mx-auto">
           Choose the perfect plan for your care facility. All plans include a 14-day free trial with credit card required.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
         {plans.map((plan, index) => (
-          <Card key={index} className={`relative p-8 ${plan.popular ? 'border-2 border-blue-500 shadow-xl scale-105' : 'border-0'} bg-white/90 backdrop-blur-sm hover:shadow-lg transition-all duration-300 ${isVisible ? 'animate-fade-in' : ''}`} style={{ animationDelay: `${index * 0.2}s` }}>
+          <Card key={index} className={`relative p-4 md:p-8 ${plan.popular ? 'border-2 border-blue-500 shadow-xl scale-105' : 'border-0'} bg-white/90 backdrop-blur-sm hover:shadow-lg transition-all duration-300 ${isVisible ? 'animate-fade-in' : ''}`} style={{ animationDelay: `${index * 0.2}s` }}>
             {plan.popular && (
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
-                  <Star className="w-4 h-4" />
+              <div className="absolute -top-3 md:-top-4 left-1/2 transform -translate-x-1/2">
+                <div className="bg-blue-500 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium flex items-center gap-2">
+                  <Star className="w-3 h-3 md:w-4 md:h-4" />
                   Most Popular
                 </div>
               </div>
             )}
             
-            <div className="text-center mb-8">
-              <h4 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h4>
-              <p className="text-gray-600 mb-4">{plan.description}</p>
+            <div className="text-center mb-4 md:mb-8">
+              <h4 className="text-lg md:text-2xl font-bold text-gray-900 mb-1 md:mb-2">{plan.name}</h4>
+              <p className="text-sm md:text-base text-gray-600 mb-2 md:mb-4">{plan.description}</p>
               <div className="flex items-baseline justify-center">
-                <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                <span className="text-gray-600 ml-2">/{plan.period}</span>
+                <span className="text-2xl md:text-4xl font-bold text-gray-900">{plan.price}</span>
+                <span className="text-sm md:text-base text-gray-600 ml-2">/{plan.period}</span>
               </div>
             </div>
 
-            <div className="space-y-4 mb-8">
+            <div className="space-y-2 md:space-y-4 mb-4 md:mb-8">
               {plan.features.map((feature, featureIndex) => (
-                <div key={featureIndex} className="flex items-center gap-3">
-                  <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
-                  <span className="text-gray-700">{feature}</span>
+                <div key={featureIndex} className="flex items-center gap-2 md:gap-3">
+                  <Check className="w-4 h-4 md:w-5 md:h-5 text-green-500 flex-shrink-0" />
+                  <span className="text-sm md:text-base text-gray-700">{feature}</span>
                 </div>
               ))}
             </div>
 
             <Button 
-              className={`w-full ${plan.popular ? 'liquid-gradient-button text-white border-0' : 'border-2 border-gray-200 hover:border-blue-500'}`}
+              className={`w-full text-sm md:text-base ${plan.popular ? 'liquid-gradient-button text-white border-0' : 'border-2 border-gray-200 hover:border-blue-500'}`}
               variant={plan.popular ? 'default' : 'outline'}
               onClick={() => navigate('/auth')}
             >
@@ -128,25 +128,25 @@ export function PricingSection() {
         ))}
       </div>
 
-      <div className="text-center mt-12">
-        <p className="text-gray-600 mb-4">
+      <div className="text-center mt-8 md:mt-12">
+        <p className="text-sm md:text-base text-gray-600 mb-3 md:mb-4">
           All plans include a 14-day free trial. Credit card required for subscription.
         </p>
-        <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-500">
+        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 text-xs md:text-sm text-gray-500">
           <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
             GDPR Compliant
           </div>
           <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
             EU Data Protection
           </div>
           <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
             99.9% Uptime SLA
           </div>
           <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
             24/7 Support
           </div>
         </div>

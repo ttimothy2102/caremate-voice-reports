@@ -62,17 +62,17 @@ export function DashboardPreview() {
   ];
 
   return (
-    <section ref={sectionRef} id="dashboard-preview" className="max-w-7xl mx-auto px-6 py-20 opacity-0 animate-fade-in">
-      <div className="text-center mb-16">
-        <h3 className="text-4xl font-bold text-gray-900 mb-4">
+    <section ref={sectionRef} id="dashboard-preview" className="max-w-7xl mx-auto px-6 py-12 md:py-20 opacity-0 animate-fade-in">
+      <div className="text-center mb-8 md:mb-16">
+        <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
           See CareMate in action
         </h3>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+        <p className="text-sm md:text-lg text-gray-600 max-w-2xl mx-auto mb-6 md:mb-8">
           Get a glimpse of our comprehensive dashboard that puts all care information at your fingertips.
         </p>
         <Button 
           onClick={() => navigate('/demo')}
-          className="liquid-gradient-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg"
+          className="liquid-gradient-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-sm md:text-base px-6 py-3 md:px-8 md:py-4"
         >
           View Live Demo
           <ArrowRight className="w-4 h-4 ml-2" />
@@ -80,66 +80,66 @@ export function DashboardPreview() {
       </div>
 
       <div className="relative">
-        <Card className="p-8 bg-white/90 backdrop-blur-sm border-0 shadow-2xl">
-          <div className="space-y-8">
+        <Card className="p-4 md:p-8 bg-white/90 backdrop-blur-sm border-0 shadow-2xl">
+          <div className="space-y-4 md:space-y-8">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
+                <h4 className="text-lg md:text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
                   CareMate Dashboard
                 </h4>
-                <p className="text-gray-600">Real-time care facility overview</p>
+                <p className="text-sm md:text-base text-gray-600">Real-time care facility overview</p>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                 Live Data
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {stats.map((stat, index) => (
-                <div key={index} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div className="flex items-center justify-between mb-2">
-                    <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                    <span className="text-2xl font-bold text-gray-800">
+                <div key={index} className="bg-gray-50 rounded-lg p-3 md:p-4 hover:bg-gray-100 transition-colors">
+                  <div className="flex items-center justify-between mb-1 md:mb-2">
+                    <stat.icon className={`w-4 h-4 md:w-6 md:h-6 ${stat.color}`} />
+                    <span className="text-lg md:text-2xl font-bold text-gray-800">
                       <CountUpNumber end={stat.value} isVisible={isVisible} />
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600">{stat.label}</p>
+                  <p className="text-xs md:text-sm text-gray-600">{stat.label}</p>
                 </div>
               ))}
             </div>
 
-            {/* Chart Placeholder */}
-            <div className="bg-gray-50 rounded-lg p-6 h-64 flex items-center justify-center">
+            {/* Compact Chart Placeholder */}
+            <div className="bg-gray-50 rounded-lg p-4 md:p-6 h-32 md:h-64 flex items-center justify-center">
               <div className="text-center">
-                <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Interactive charts and analytics</p>
-                <p className="text-sm text-gray-400">Track vital signs, medication compliance, and care quality metrics</p>
+                <BarChart3 className="w-8 h-8 md:w-16 md:h-16 text-gray-400 mx-auto mb-2 md:mb-4" />
+                <p className="text-sm md:text-base text-gray-500">Interactive charts and analytics</p>
+                <p className="text-xs md:text-sm text-gray-400">Track vital signs, medication compliance, and care quality metrics</p>
               </div>
             </div>
 
-            {/* Features List */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t">
+            {/* Features List - More compact */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 pt-4 md:pt-6 border-t">
               <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Mic className="w-6 h-6 text-blue-600" />
+                <div className="w-8 h-8 md:w-12 md:h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                  <Mic className="w-4 h-4 md:w-6 md:h-6 text-blue-600" />
                 </div>
-                <h5 className="font-semibold text-gray-800 mb-2">Voice Documentation</h5>
-                <p className="text-sm text-gray-600">Record care notes with AI transcription</p>
+                <h5 className="text-sm md:text-base font-semibold text-gray-800 mb-1 md:mb-2">Voice Documentation</h5>
+                <p className="text-xs md:text-sm text-gray-600">Record care notes with AI transcription</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Users className="w-6 h-6 text-green-600" />
+                <div className="w-8 h-8 md:w-12 md:h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                  <Users className="w-4 h-4 md:w-6 md:h-6 text-green-600" />
                 </div>
-                <h5 className="font-semibold text-gray-800 mb-2">Resident Profiles</h5>
-                <p className="text-sm text-gray-600">Comprehensive care information</p>
+                <h5 className="text-sm md:text-base font-semibold text-gray-800 mb-1 md:mb-2">Resident Profiles</h5>
+                <p className="text-xs md:text-sm text-gray-600">Comprehensive care information</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Heart className="w-6 h-6 text-purple-600" />
+                <div className="w-8 h-8 md:w-12 md:h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3">
+                  <Heart className="w-4 h-4 md:w-6 md:h-6 text-purple-600" />
                 </div>
-                <h5 className="font-semibold text-gray-800 mb-2">Health Monitoring</h5>
-                <p className="text-sm text-gray-600">Real-time vital signs tracking</p>
+                <h5 className="text-sm md:text-base font-semibold text-gray-800 mb-1 md:mb-2">Health Monitoring</h5>
+                <p className="text-xs md:text-sm text-gray-600">Real-time vital signs tracking</p>
               </div>
             </div>
           </div>
