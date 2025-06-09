@@ -48,14 +48,14 @@ const Demo = () => {
             </Button>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-caremate-gradient rounded-full"></div>
-              <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold text-primary">
                 CareMate Demo
               </h1>
             </div>
           </div>
           <Button 
             onClick={() => navigate('/auth')}
-            className="cursor-tracking-button text-white border-0"
+            className="bg-caremate-gradient text-white border-0"
           >
             Start Free Trial
           </Button>

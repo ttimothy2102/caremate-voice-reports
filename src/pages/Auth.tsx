@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -139,7 +138,7 @@ export function Auth() {
             onClick={() => navigate('/')}
           >
             <Heart className="w-8 h-8 text-primary mr-2" />
-            <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold text-primary">
               CareMate
             </h1>
           </div>

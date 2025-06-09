@@ -13,7 +13,7 @@ export function Logo() {
       title="Zurück zur Startseite"
     >
       <Heart className="w-6 h-6 text-primary" />
-      <span className="text-sm font-semibold text-primary">CareMate</span>
+      <span className="text-lg font-bold text-primary">CareMate</span>
     </div>
   );
 }
