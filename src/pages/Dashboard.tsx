@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { VitalsChart } from "@/components/dashboard/VitalsChart";
 import { MedicationTracker } from "@/components/medications/MedicationTracker";
 import { DrugOrdering } from "@/components/medications/DrugOrdering";
 import { WithingsIntegration } from "@/components/withings/WithingsIntegration";
@@ -9,7 +8,6 @@ import { ResidentsList } from "@/components/residents/ResidentsList";
 import { AddResidentDialog } from "@/components/residents/AddResidentDialog";
 import { Plus, AlertTriangle, FileText, Users, Heart, LogOut, Calendar } from 'lucide-react';
 import { useResidents } from '@/hooks/useResidents';
-import { useVitalSignsChart } from '@/hooks/useVitalSigns';
 import { useCareReports } from '@/hooks/useCareReports';
 import { useAuth } from '@/hooks/useAuth';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
@@ -25,9 +23,6 @@ function DashboardContent() {
     data: residents = [],
     isLoading: residentsLoading
   } = useResidents();
-  const {
-    data: heartRateData = []
-  } = useVitalSignsChart();
   const {
     data: careReports = []
   } = useCareReports();
@@ -144,7 +139,7 @@ function DashboardContent() {
         {/* Residents List - New comprehensive section */}
         <ResidentsList />
 
-        {/* Main Content Grid */}
+        {/* Main Content Grid - Updated to 2 columns without VitalsChart */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Medication Tracking */}
           <MedicationTracker />
@@ -152,14 +147,10 @@ function DashboardContent() {
           {/* Drug Ordering */}
           <DrugOrdering />
 
-          {/* Vitals Overview */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Vitalwerte Übersicht</h2>
-            <VitalsChart title="Herzfrequenz (BPM)" data={heartRateData} color="#29B6F6" unit="bpm" />
+          {/* Withings Integration - Now spans full width */}
+          <div className="lg:col-span-2">
+            <WithingsIntegration />
           </div>
-
-          {/* Withings Integration */}
-          <WithingsIntegration />
         </div>
       </div>
 
