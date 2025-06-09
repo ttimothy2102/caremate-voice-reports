@@ -17,7 +17,11 @@ import {
   CheckCircle,
   Calendar,
   FileText,
-  Upload
+  Upload,
+  Sun,
+  CloudSun,
+  Moon,
+  Sunrise
 } from 'lucide-react';
 
 interface ResidentMedicationsProps {
@@ -29,13 +33,17 @@ interface Medication {
   id: string;
   name: string;
   dosage: string;
-  frequency: string;
-  times: string[];
+  schedule: {
+    morning: number;
+    midday: number;
+    evening: number;
+    night: number;
+  };
   instructions: string;
   stockCount: number;
   reorderLevel: number;
   lastTaken?: string;
-  nextDue: string;
+  times: string[];
 }
 
 interface MedicationLog {
@@ -53,40 +61,47 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
   const [reportText, setReportText] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
 
-  // Mock medication data for demonstration
+  // Updated mock medication data with German schedule format
   const mockMedications: Medication[] = [
     {
       id: '1',
       name: 'Aspirin 100mg',
       dosage: '1 Tablette',
-      frequency: 'Täglich',
-      times: ['08:00'],
+      schedule: { morning: 1, midday: 0, evening: 0, night: 0 },
       instructions: 'Nach dem Frühstück einnehmen',
       stockCount: 28,
       reorderLevel: 7,
-      nextDue: '08:00'
+      times: ['08:00']
     },
     {
       id: '2',
       name: 'Metformin 500mg',
       dosage: '1 Tablette',
-      frequency: '2x täglich',
-      times: ['08:00', '20:00'],
+      schedule: { morning: 1, midday: 0, evening: 1, night: 0 },
       instructions: 'Zu den Mahlzeiten',
       stockCount: 15,
       reorderLevel: 10,
-      nextDue: '20:00'
+      times: ['08:00', '20:00']
     },
     {
       id: '3',
       name: 'Lisinopril 10mg',
       dosage: '1 Tablette',
-      frequency: 'Täglich',
-      times: ['08:00'],
+      schedule: { morning: 1, midday: 0, evening: 0, night: 0 },
       instructions: 'Morgens nüchtern',
       stockCount: 5,
       reorderLevel: 7,
-      nextDue: '08:00'
+      times: ['08:00']
+    },
+    {
+      id: '4',
+      name: 'Ibuprofen 400mg',
+      dosage: '1 Tablette',
+      schedule: { morning: 1, midday: 1, evening: 1, night: 0 },
+      instructions: 'Bei Bedarf gegen Schmerzen',
+      stockCount: 20,
+      reorderLevel: 5,
+      times: ['08:00', '13:00', '20:00']
     }
   ];
 
@@ -109,6 +124,50 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
     }
   ];
 
+  const formatSchedule = (schedule: Medication['schedule']) => {
+    return `${schedule.morning}-${schedule.midday}-${schedule.evening}-${schedule.night}`;
+  };
+
+  const getTimeSlotIcon = (slot: string) => {
+    switch (slot) {
+      case 'morning': return <Sunrise className="w-4 h-4 text-orange-500" />;
+      case 'midday': return <Sun className="w-4 h-4 text-yellow-500" />;
+      case 'evening': return <CloudSun className="w-4 h-4 text-orange-600" />;
+      case 'night': return <Moon className="w-4 h-4 text-blue-500" />;
+      default: return <Clock className="w-4 h-4" />;
+    }
+  };
+
+  const getTimeSlotLabel = (slot: string) => {
+    switch (slot) {
+      case 'morning': return 'Morgens';
+      case 'midday': return 'Mittags';
+      case 'evening': return 'Abends';
+      case 'night': return 'Nachts';
+      default: return slot;
+    }
+  };
+
+  const getDayPlan = () => {
+    const timeSlots = [
+      { key: 'morning', label: 'Morgens (08:00)', time: '08:00' },
+      { key: 'midday', label: 'Mittags (13:00)', time: '13:00' },
+      { key: 'evening', label: 'Abends (20:00)', time: '20:00' },
+      { key: 'night', label: 'Nachts (22:00)', time: '22:00' }
+    ];
+
+    return timeSlots.map(slot => {
+      const medicationsForSlot = mockMedications.filter(med => 
+        med.schedule[slot.key as keyof typeof med.schedule] > 0
+      );
+
+      return {
+        ...slot,
+        medications: medicationsForSlot
+      };
+    });
+  };
+
   const getTodayLogs = (medicationId: string) => {
     return mockLogs.filter(log => log.medicationId === medicationId);
   };
@@ -124,12 +183,10 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
 
   const handleMarkCompleted = (medicationId: string, timeSlot: string) => {
     console.log(`Marking medication ${medicationId} as completed for ${timeSlot}`);
-    // Here you would typically update the medication log
   };
 
   const handleAddReport = () => {
     console.log('Adding care report:', { reportText, selectedFiles });
-    // Here you would save the report to the database
     setReportText('');
     setSelectedFiles(null);
     setShowAddReport(false);
@@ -197,12 +254,73 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
         </div>
       </div>
 
-      {/* Medication Schedule */}
+      {/* Daily Medication Plan */}
+      <Card className="border-2 border-blue-200">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-blue-700">
+            <Calendar className="w-5 h-5" />
+            Tagesplan Medikamente
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {getDayPlan().map((timeSlot) => (
+              <div key={timeSlot.key} className="space-y-3">
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                  {getTimeSlotIcon(timeSlot.key)}
+                  <div>
+                    <h4 className="font-semibold text-sm">{getTimeSlotLabel(timeSlot.key)}</h4>
+                    <p className="text-xs text-gray-600">{timeSlot.time}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  {timeSlot.medications.length === 0 ? (
+                    <p className="text-xs text-gray-500 italic">Keine Medikamente</p>
+                  ) : (
+                    timeSlot.medications.map((med) => {
+                      const dosageCount = med.schedule[timeSlot.key as keyof typeof med.schedule];
+                      const todayLogs = getTodayLogs(med.id);
+                      const timeLog = todayLogs.find(log => log.scheduledTime === timeSlot.time);
+                      
+                      return (
+                        <div key={med.id} className="bg-white border rounded p-2 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Checkbox 
+                              id={`med-${med.id}-${timeSlot.key}`}
+                              checked={timeLog?.completed || false}
+                              onCheckedChange={() => handleMarkCompleted(med.id, timeSlot.time)}
+                              className="data-[state=checked]:bg-green-600"
+                            />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{med.name}</p>
+                              <p className="text-xs text-gray-600">
+                                {dosageCount}x {med.dosage}
+                              </p>
+                            </div>
+                          </div>
+                          {timeLog?.completed && timeLog.actualTime && (
+                            <p className="text-xs text-green-600">
+                              Gegeben um {timeLog.actualTime}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Detailed Medication List */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Pill className="w-5 h-5 text-blue-500" />
-            Medikamentenplan
+            Medikamentenplan (Detailansicht)
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -220,6 +338,9 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
                         <Badge variant="outline" className="text-xs">
                           {medication.dosage}
                         </Badge>
+                        <Badge variant="outline" className="text-xs font-mono">
+                          {formatSchedule(medication.schedule)}
+                        </Badge>
                         <Badge 
                           variant="outline" 
                           className={`text-xs ${stockStatus.color}`}
@@ -228,53 +349,34 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
                         </Badge>
                       </div>
                       
-                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          {medication.frequency}
-                        </span>
-                        <span>Nächste Gabe: {medication.nextDue}</span>
-                      </div>
-
                       {medication.instructions && (
-                        <p className="text-sm text-gray-600">{medication.instructions}</p>
+                        <p className="text-sm text-gray-600 mb-2">{medication.instructions}</p>
                       )}
+
+                      {/* Schedule breakdown */}
+                      <div className="flex gap-4 text-xs text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <Sunrise className="w-3 h-3" />
+                          <span>Morgens: {medication.schedule.morning}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Sun className="w-3 h-3" />
+                          <span>Mittags: {medication.schedule.midday}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <CloudSun className="w-3 h-3" />
+                          <span>Abends: {medication.schedule.evening}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Moon className="w-3 h-3" />
+                          <span>Nachts: {medication.schedule.night}</span>
+                        </div>
+                      </div>
                     </div>
 
                     {stockStatus.status === 'critical' && (
                       <AlertTriangle className="w-5 h-5 text-red-500" />
                     )}
-                  </div>
-
-                  {/* Time slots for today */}
-                  <div className="flex gap-2 flex-wrap">
-                    {medication.times.map((time, index) => {
-                      const timeLog = todayLogs.find(log => 
-                        log.scheduledTime === time
-                      );
-                      
-                      return (
-                        <div key={index} className="flex items-center gap-2">
-                          <Checkbox 
-                            id={`med-${medication.id}-${time}`}
-                            checked={timeLog?.completed || false}
-                            onCheckedChange={() => handleMarkCompleted(medication.id, time)}
-                            className="data-[state=checked]:bg-green-600"
-                          />
-                          <label 
-                            htmlFor={`med-${medication.id}-${time}`}
-                            className={`text-sm ${timeLog?.completed ? 'line-through text-gray-500' : ''}`}
-                          >
-                            {time}
-                            {timeLog?.completed && timeLog.actualTime && (
-                              <span className="text-xs text-green-600 ml-1">
-                                (um {timeLog.actualTime})
-                              </span>
-                            )}
-                          </label>
-                        </div>
-                      );
-                    })}
                   </div>
 
                   {/* Notes from logs */}
@@ -341,7 +443,6 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
               </div>
             ))}
             
-            {/* Empty state */}
             <div className="text-center py-4">
               <Button variant="outline" size="sm" onClick={() => setShowAddReport(true)}>
                 <Plus className="w-4 h-4 mr-2" />
