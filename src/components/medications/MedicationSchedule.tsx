@@ -10,12 +10,12 @@ import { useResidents } from '@/hooks/useResidents';
 
 interface MedicationLog {
   id: string;
-  medicationId: string;
-  scheduledTime: string;
-  actualTime?: string;
+  medication_id: string;
+  scheduled_time: string;
+  actual_time?: string;
   completed: boolean;
   notes?: string;
-  administeredBy: string;
+  administered_by: string;
 }
 
 interface MedicationScheduleProps {
@@ -84,7 +84,7 @@ export function MedicationSchedule({ medications: propMedications, logs: propLog
   };
 
   const getTodayLogs = (medicationId: string) => {
-    return logs.filter(log => log.medicationId === medicationId);
+    return logs.filter(log => log.medication_id === medicationId);
   };
 
   const getResidentName = (residentId: string) => {
@@ -126,7 +126,7 @@ export function MedicationSchedule({ medications: propMedications, logs: propLog
             ) : (
               currentMedications.map((med) => {
                 const todayLogs = getTodayLogs(med.id);
-                const timeLog = todayLogs.find(log => log.scheduledTime === currentTimeSlot);
+                const timeLog = todayLogs.find(log => log.scheduled_time === currentTimeSlot);
                 const residentName = getResidentName(med.resident_id);
                 
                 return (
@@ -161,9 +161,9 @@ export function MedicationSchedule({ medications: propMedications, logs: propLog
                         </Badge>
                       )}
                     </div>
-                    {timeLog?.completed && timeLog.actualTime && (
+                    {timeLog?.completed && timeLog.actual_time && (
                       <p className="text-xs text-green-600">
-                        ✓ Gegeben um {timeLog.actualTime}
+                        ✓ Gegeben um {timeLog.actual_time}
                       </p>
                     )}
                   </div>
