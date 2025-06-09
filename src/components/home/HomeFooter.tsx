@@ -29,10 +29,13 @@ export function HomeFooter() {
             <p className="text-gray-400 leading-relaxed">
               Transforming elderly care with AI-powered documentation and comprehensive facility management.
             </p>
-            <div className="flex items-center gap-2 text-gray-400">
+            <a 
+              href="mailto:contact@caremate.com"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            >
               <Mail className="w-4 h-4" />
               <span className="text-sm">contact@caremate.com</span>
-            </div>
+            </a>
           </div>
 
           {/* Product */}
@@ -48,7 +51,7 @@ export function HomeFooter() {
               <button onClick={() => scrollToSection('pricing')} className="block text-gray-400 hover:text-white transition-colors text-left">
                 Pricing
               </button>
-              <button onClick={() => navigate('/dashboard')} className="block text-gray-400 hover:text-white transition-colors text-left">
+              <button onClick={() => navigate('/demo')} className="block text-gray-400 hover:text-white transition-colors text-left">
                 Demo
               </button>
             </div>
