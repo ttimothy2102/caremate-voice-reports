@@ -10,7 +10,7 @@ import { MedicationList } from "@/components/medications/MedicationList";
 import { CareReports } from "@/components/care/CareReports";
 import { DeviationsSection } from "@/components/care/DeviationsSection";
 import { ExtendedResident } from '../ResidentsList';
-import { Plus, FileText, Upload } from 'lucide-react';
+import { Plus, FileText } from 'lucide-react';
 
 interface ResidentMedicationsProps {
   resident: ExtendedResident;
@@ -32,16 +32,6 @@ interface Medication {
   reorderLevel: number;
   lastTaken?: string;
   times: string[];
-}
-
-interface MedicationLog {
-  id: string;
-  medication_id: string;
-  scheduled_time: string;
-  actual_time?: string;
-  completed: boolean;
-  notes?: string;
-  administered_by: string;
 }
 
 interface CareReport {
@@ -127,25 +117,6 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
       type: 'Besondere Beobachtung'
     }
   ]);
-
-  const mockLogs: MedicationLog[] = [
-    {
-      id: '1',
-      medication_id: '1',
-      scheduled_time: '08:00',
-      actual_time: '08:15',
-      completed: true,
-      administered_by: 'Schwester Maria',
-      notes: 'Problemlos eingenommen'
-    },
-    {
-      id: '2',
-      medication_id: '2',
-      scheduled_time: '08:00',
-      completed: false,
-      administered_by: 'Schwester Maria'
-    }
-  ];
 
   const handleMarkCompleted = (medicationId: string, timeSlot: string) => {
     console.log(`Marking medication ${medicationId} as completed for ${timeSlot}`);
@@ -252,14 +223,12 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
       {/* Daily Medication Plan */}
       <MedicationSchedule 
         medications={medications}
-        logs={mockLogs}
         onMarkCompleted={handleMarkCompleted}
       />
 
       {/* Detailed Medication List */}
       <MedicationList 
         medications={medications}
-        logs={mockLogs}
         onEditMedication={handleEditMedication}
         onDeleteMedication={handleDeleteMedication}
       />

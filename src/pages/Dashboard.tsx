@@ -7,6 +7,7 @@ import { DrugOrdering } from "@/components/medications/DrugOrdering";
 import { WithingsIntegration } from "@/components/withings/WithingsIntegration";
 import { ResidentsList } from "@/components/residents/ResidentsList";
 import { AddResidentDialog } from "@/components/residents/AddResidentDialog";
+import { MedicationOverview } from "@/components/dashboard/MedicationOverview";
 import { Plus, AlertTriangle, FileText, Users, Heart, LogOut, Calendar, Phone } from 'lucide-react';
 import { useResidents } from '@/hooks/useResidents';
 import { useCareReports } from '@/hooks/useCareReports';
@@ -14,7 +15,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { toast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Logo } from '@/components/layout/Logo';
 import { getPersonalizedGreeting } from '@/utils/greetingUtils';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AccountManagement } from "@/components/account/AccountManagement";
@@ -51,11 +51,8 @@ function DashboardContent() {
       title: "Arzt kontaktieren",
       description: "Weiterleitung zur Arztkontakt-Funktion..."
     });
-    // Here you could implement actual doctor contact functionality
-    // For now, we'll just show a toast
   };
 
-  // Updated stats with berichte heute first and proper navigation back to dashboard
   const overviewStats = [
     {
       title: "Berichte heute",
@@ -101,10 +98,13 @@ function DashboardContent() {
       <header className="bg-white shadow-sm border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/dashboard')}>
-            <h1 className="text-2xl font-bold text-primary">
-              CareMate
-            </h1>
-            <p className="text-sm text-gray-600">Management Dashboard</p>
+            <div className="flex items-center gap-2">
+              <Heart className="w-6 h-6 text-primary" />
+              <div>
+                <h1 className="text-2xl font-bold text-primary">CareMate</h1>
+                <p className="text-sm text-gray-600">Management Dashboard</p>
+              </div>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-gray-600">
@@ -138,7 +138,6 @@ function DashboardContent() {
               <AvatarImage src={user?.user_metadata?.avatar_url} />
               <AvatarFallback>{userInitials}</AvatarFallback>
             </Avatar>
-            <Logo />
           </div>
         </div>
       </header>
@@ -169,7 +168,12 @@ function DashboardContent() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Medication Overview */}
+          <div>
+            <MedicationOverview />
+          </div>
+
           {/* Medication Tracking */}
           <div>
             <MedicationTracker />
@@ -181,7 +185,7 @@ function DashboardContent() {
           </div>
 
           {/* Withings Integration */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <WithingsIntegration />
           </div>
         </div>
