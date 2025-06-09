@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,60 +19,68 @@ import { Logo } from '@/components/layout/Logo';
 import { getPersonalizedGreeting } from '@/utils/greetingUtils';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AccountManagement } from "@/components/account/AccountManagement";
-
 function DashboardContent() {
-  const { data: residents = [], isLoading: residentsLoading } = useResidents();
-  const { data: heartRateData = [] } = useVitalSignsChart();
-  const { data: careReports = [] } = useCareReports();
-  const { signOut, user } = useAuth();
+  const {
+    data: residents = [],
+    isLoading: residentsLoading
+  } = useResidents();
+  const {
+    data: heartRateData = []
+  } = useVitalSignsChart();
+  const {
+    data: careReports = []
+  } = useCareReports();
+  const {
+    signOut,
+    user
+  } = useAuth();
   const navigate = useNavigate();
   const [showAccountManagement, setShowAccountManagement] = useState(false);
   const [showAddResidentDialog, setShowAddResidentDialog] = useState(false);
-
   const userName = user?.user_metadata?.full_name;
   const greeting = getPersonalizedGreeting(userName);
-
-  const userInitials = user?.user_metadata?.full_name
-    ? user.user_metadata.full_name.split(' ').map((name: string) => name[0]).join('').toUpperCase()
-    : user?.email?.[0]?.toUpperCase() || 'U';
-
+  const userInitials = user?.user_metadata?.full_name ? user.user_metadata.full_name.split(' ').map((name: string) => name[0]).join('').toUpperCase() : user?.email?.[0]?.toUpperCase() || 'U';
   const handleSignOut = async () => {
     await signOut();
     toast({
       title: "Abgemeldet",
-      description: "Sie wurden erfolgreich abgemeldet.",
+      description: "Sie wurden erfolgreich abgemeldet."
     });
   };
-
-  const overviewStats = [
-    { title: "Berichte heute", value: careReports.filter(r => 
-      new Date(r.created_at).toDateString() === new Date().toDateString()
-    ).length.toString(), icon: FileText, color: "text-blue-600" },
-    { title: "Aktive Bewohner", value: residents.length.toString(), icon: Users, color: "text-green-600" },
-    { title: "Vital-Alarme", value: "3", icon: AlertTriangle, color: "text-red-600" },
-    { title: "Gerätesync", value: "98%", icon: Heart, color: "text-purple-600" }
-  ];
-
+  const overviewStats = [{
+    title: "Berichte heute",
+    value: careReports.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString()).length.toString(),
+    icon: FileText,
+    color: "text-blue-600"
+  }, {
+    title: "Aktive Bewohner",
+    value: residents.length.toString(),
+    icon: Users,
+    color: "text-green-600"
+  }, {
+    title: "Vital-Alarme",
+    value: "3",
+    icon: AlertTriangle,
+    color: "text-red-600"
+  }, {
+    title: "Gerätesync",
+    value: "98%",
+    icon: Heart,
+    color: "text-purple-600"
+  }];
   if (residentsLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Dashboard wird geladen...</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gray-50">
+  return <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b px-6 py-4">
         <div className="flex items-center justify-between">
-          <div 
-            className="cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => navigate('/mobile-home')}
-          >
+          <div className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/mobile-home')}>
             <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
               CareMate
             </h1>
@@ -83,14 +90,7 @@ function DashboardContent() {
             <span className="text-sm text-gray-600">
               {greeting}
             </span>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowAddResidentDialog(true)}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Bewohner hinzufügen
-            </Button>
+            
             <Button variant="outline" size="sm" onClick={() => navigate('/schedule')}>
               <Calendar className="w-4 h-4 mr-2" />
               Terminplan
@@ -99,10 +99,7 @@ function DashboardContent() {
               <LogOut className="w-4 h-4 mr-2" />
               Abmelden
             </Button>
-            <Avatar 
-              className="cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={() => setShowAccountManagement(true)}
-            >
+            <Avatar className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setShowAccountManagement(true)}>
               <AvatarImage src={user?.user_metadata?.avatar_url} />
               <AvatarFallback>{userInitials}</AvatarFallback>
             </Avatar>
@@ -114,8 +111,7 @@ function DashboardContent() {
       <div className="p-6 space-y-6">
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {overviewStats.map((stat, index) => (
-            <Card key={index} className="p-4">
+          {overviewStats.map((stat, index) => <Card key={index} className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">{stat.title}</p>
@@ -123,8 +119,7 @@ function DashboardContent() {
                 </div>
                 <stat.icon className={`w-8 h-8 ${stat.color}`} />
               </div>
-            </Card>
-          ))}
+            </Card>)}
         </div>
 
         {/* Residents List - New comprehensive section */}
@@ -141,12 +136,7 @@ function DashboardContent() {
           {/* Vitals Overview */}
           <div>
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Vitalwerte Übersicht</h2>
-            <VitalsChart 
-              title="Herzfrequenz (BPM)"
-              data={heartRateData}
-              color="#29B6F6"
-              unit="bpm"
-            />
+            <VitalsChart title="Herzfrequenz (BPM)" data={heartRateData} color="#29B6F6" unit="bpm" />
           </div>
 
           {/* Withings Integration */}
@@ -154,23 +144,13 @@ function DashboardContent() {
         </div>
       </div>
 
-      <AccountManagement 
-        open={showAccountManagement}
-        onOpenChange={setShowAccountManagement}
-      />
+      <AccountManagement open={showAccountManagement} onOpenChange={setShowAccountManagement} />
 
-      <AddResidentDialog
-        isOpen={showAddResidentDialog}
-        onClose={() => setShowAddResidentDialog(false)}
-      />
-    </div>
-  );
+      <AddResidentDialog isOpen={showAddResidentDialog} onClose={() => setShowAddResidentDialog(false)} />
+    </div>;
 }
-
 export function Dashboard() {
-  return (
-    <ProtectedRoute>
+  return <ProtectedRoute>
       <DashboardContent />
-    </ProtectedRoute>
-  );
+    </ProtectedRoute>;
 }
