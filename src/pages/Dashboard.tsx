@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,7 @@ import { DrugOrdering } from "@/components/medications/DrugOrdering";
 import { WithingsIntegration } from "@/components/withings/WithingsIntegration";
 import { ResidentsList } from "@/components/residents/ResidentsList";
 import { AddResidentDialog } from "@/components/residents/AddResidentDialog";
-import { Plus, AlertTriangle, FileText, Users, Heart, LogOut, Calendar } from 'lucide-react';
+import { Plus, AlertTriangle, FileText, Users, Heart, LogOut, Calendar, Phone } from 'lucide-react';
 import { useResidents } from '@/hooks/useResidents';
 import { useCareReports } from '@/hooks/useCareReports';
 import { useAuth } from '@/hooks/useAuth';
@@ -45,8 +46,24 @@ function DashboardContent() {
     });
   };
 
-  // Reordered stats with functional navigation
+  const handleContactDoctor = () => {
+    toast({
+      title: "Arzt kontaktieren",
+      description: "Weiterleitung zur Arztkontakt-Funktion..."
+    });
+    // Here you could implement actual doctor contact functionality
+    // For now, we'll just show a toast
+  };
+
+  // Reordered stats with scheduled tasks first and contact doctor button
   const overviewStats = [
+    {
+      title: "Terminierte Aufgaben",
+      value: "5",
+      icon: Calendar,
+      color: "text-purple-600",
+      onClick: () => navigate('/schedule')
+    },
     {
       title: "Aktive Bewohner",
       value: residents.length.toString(),
@@ -66,12 +83,6 @@ function DashboardContent() {
       value: "3",
       icon: AlertTriangle,
       color: "text-red-600"
-    },
-    {
-      title: "Gerätesync",
-      value: "98%",
-      icon: Heart,
-      color: "text-purple-600"
     }
   ];
 
@@ -103,6 +114,17 @@ function DashboardContent() {
               <Calendar className="w-4 h-4 mr-2" />
               Terminplan
             </Button>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleContactDoctor}
+              className="text-green-600 border-green-300 hover:bg-green-50"
+            >
+              <Phone className="w-4 h-4 mr-2" />
+              Arzt kontaktieren
+            </Button>
+            
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Abmelden
