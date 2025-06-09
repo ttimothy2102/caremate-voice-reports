@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -90,7 +89,7 @@ function DashboardContent() {
       <header className="bg-white shadow-sm border-b px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/mobile-home')}>
-            <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold text-primary">
               CareMate
             </h1>
             <p className="text-sm text-gray-600">Management Dashboard</p>

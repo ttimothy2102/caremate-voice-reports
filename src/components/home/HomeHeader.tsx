@@ -20,7 +20,7 @@ export function HomeHeader() {
         <div className="flex items-center gap-3">
           <Heart className="w-8 h-8 text-primary" />
           <h1 
-            className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity"
+            className="text-2xl font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => navigate('/')}
           >
             CareMate

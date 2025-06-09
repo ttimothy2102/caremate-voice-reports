@@ -8,20 +8,20 @@ export function HeroSection() {
   const navigate = useNavigate();
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-12 md:py-20">
-      <div className="text-center space-y-6 md:space-y-8">
-        <div className="space-y-4 md:space-y-6">
+    <section className="max-w-7xl mx-auto px-6 py-8 md:py-12">
+      <div className="text-center space-y-4 md:space-y-6">
+        <div className="space-y-3 md:space-y-4">
           <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium">
             <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-blue-500 rounded-full animate-pulse"></div>
             Trusted by 200+ care facilities worldwide
           </div>
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
             AI-Powered Care
-            <span className="block bg-caremate-gradient bg-clip-text text-transparent">
+            <span className="block text-primary">
               Documentation Platform
             </span>
           </h2>
-          <p className="text-base md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm md:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Transform elderly care with intelligent voice transcription, automated reporting, 
             and comprehensive resident management. Reduce documentation time by 70% while improving care quality.
           </p>

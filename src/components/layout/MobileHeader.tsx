@@ -37,7 +37,7 @@ export function MobileHeader({ title, showBack, onBack, onTitleClick }: MobileHe
               </Button>
             )}
             <h1 
-              className={`text-xl font-bold bg-caremate-gradient bg-clip-text text-transparent ${
+              className={`text-xl font-bold text-primary ${
                 onTitleClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
               }`}
               onClick={onTitleClick}

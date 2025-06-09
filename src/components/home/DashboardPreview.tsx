@@ -62,12 +62,12 @@ export function DashboardPreview() {
   ];
 
   return (
-    <section ref={sectionRef} id="dashboard-preview" className="max-w-7xl mx-auto px-6 py-12 md:py-20 opacity-0 animate-fade-in">
-      <div className="text-center mb-8 md:mb-16">
-        <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-4">
+    <section ref={sectionRef} id="dashboard-preview" className="max-w-7xl mx-auto px-6 py-8 md:py-12 opacity-0 animate-fade-in">
+      <div className="text-center mb-6 md:mb-12">
+        <h3 className="text-xl md:text-3xl font-bold text-gray-900 mb-2 md:mb-3">
           See CareMate in action
         </h3>
-        <p className="text-sm md:text-lg text-gray-600 max-w-2xl mx-auto mb-6 md:mb-8">
+        <p className="text-sm md:text-base text-gray-600 max-w-2xl mx-auto mb-4 md:mb-6">
           Get a glimpse of our comprehensive dashboard that puts all care information at your fingertips.
         </p>
         <Button 
@@ -80,14 +80,14 @@ export function DashboardPreview() {
       </div>
 
       <div className="relative">
-        <Card className="p-4 md:p-8 bg-white/90 backdrop-blur-sm border-0 shadow-2xl">
-          <div className="space-y-4 md:space-y-8">
+        <Card className="p-3 md:p-6 bg-white/90 backdrop-blur-sm border-0 shadow-2xl">
+          <div className="space-y-3 md:space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-lg md:text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
+                <h4 className="text-base md:text-xl font-bold text-primary">
                   CareMate Dashboard
                 </h4>
-                <p className="text-sm md:text-base text-gray-600">Real-time care facility overview</p>
+                <p className="text-xs md:text-sm text-gray-600">Real-time care facility overview</p>
               </div>
               <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>

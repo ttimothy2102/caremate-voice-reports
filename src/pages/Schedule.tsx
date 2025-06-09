@@ -39,7 +39,7 @@ function ScheduleContent() {
               Zurück
             </Button>
             <div>
-              <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold text-primary">
                 Terminverwaltung
               </h1>
               <p className="text-sm text-gray-600">Verwalten Sie Bewohner-Termine und Aktivitäten</p>

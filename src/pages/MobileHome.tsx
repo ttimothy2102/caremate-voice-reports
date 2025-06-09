@@ -69,7 +69,7 @@ function MobileHomeContent() {
         </div>
 
         {/* Main Action Button */}
-        <Card className="p-6 bg-caremate-gradient text-white">
+        <Card className="p-6 bg-primary text-white">
           <div className="text-center space-y-4">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto">
               <Mic className="w-8 h-8 text-white" />
