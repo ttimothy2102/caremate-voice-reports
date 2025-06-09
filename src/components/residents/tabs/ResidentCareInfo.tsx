@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { ColorCodedEditor } from "@/components/ui/color-coded-editor";
 import { ExtendedResident } from '../ResidentsList';
 import { Clipboard, AlertTriangle, Pill, FileText } from 'lucide-react';
 
@@ -12,6 +13,27 @@ interface ResidentCareInfoProps {
 }
 
 export function ResidentCareInfo({ resident, onUpdate }: ResidentCareInfoProps) {
+  const handleShiftNotesChange = (value: string, colorCode?: string) => {
+    onUpdate({ 
+      shift_notes: value,
+      shift_notes_color: colorCode 
+    });
+  };
+
+  const handleCareDeviationChange = (value: string, colorCode?: string) => {
+    onUpdate({ 
+      care_deviations: value,
+      care_deviations_color: colorCode 
+    });
+  };
+
+  const handleMedicationDeviationChange = (value: string, colorCode?: string) => {
+    onUpdate({ 
+      medication_deviations: value,
+      medication_deviations_color: colorCode 
+    });
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card>
@@ -26,7 +48,7 @@ export function ResidentCareInfo({ resident, onUpdate }: ResidentCareInfoProps) 
             <Label htmlFor="care_situation">Mobilität & Pflegebedarf</Label>
             <Textarea
               id="care_situation"
-              value={resident.care_situation}
+              value={resident.care_situation || ''}
               onChange={(e) => onUpdate({ care_situation: e.target.value })}
               placeholder="Beschreibung der Pflegesituation, Mobilität und besonderen Bedürfnisse..."
               rows={6}
@@ -37,7 +59,7 @@ export function ResidentCareInfo({ resident, onUpdate }: ResidentCareInfoProps) 
             <Label htmlFor="hygiene_data">Hygienedaten</Label>
             <Textarea
               id="hygiene_data"
-              value={resident.hygiene_data}
+              value={resident.hygiene_data || ''}
               onChange={(e) => onUpdate({ hygiene_data: e.target.value })}
               placeholder="Hygienemaßnahmen, Besonderheiten bei der Körperpflege..."
               rows={4}
@@ -56,10 +78,9 @@ export function ResidentCareInfo({ resident, onUpdate }: ResidentCareInfoProps) 
         <CardContent>
           <div>
             <Label htmlFor="shift_notes">Wichtige Informationen für den nächsten Dienst</Label>
-            <Textarea
-              id="shift_notes"
-              value={resident.shift_notes}
-              onChange={(e) => onUpdate({ shift_notes: e.target.value })}
+            <ColorCodedEditor
+              value={resident.shift_notes || ''}
+              onChange={handleShiftNotesChange}
               placeholder="Wichtige Beobachtungen, Besonderheiten, Anweisungen für die nächste Schicht..."
               rows={10}
             />
@@ -77,12 +98,12 @@ export function ResidentCareInfo({ resident, onUpdate }: ResidentCareInfoProps) 
         <CardContent>
           <div>
             <Label htmlFor="care_deviations">Dokumentation von Abweichungen</Label>
-            <Textarea
-              id="care_deviations"
-              value={resident.care_deviations}
-              onChange={(e) => onUpdate({ care_deviations: e.target.value })}
+            <ColorCodedEditor
+              value={resident.care_deviations || ''}
+              onChange={handleCareDeviationChange}
               placeholder="Dokumentation von Abweichungen bei geplanten Pflegemaßnahmen..."
               rows={6}
+              autoColorCode={true}
             />
           </div>
         </CardContent>
@@ -98,12 +119,12 @@ export function ResidentCareInfo({ resident, onUpdate }: ResidentCareInfoProps) 
         <CardContent className="space-y-4">
           <div>
             <Label htmlFor="medication_deviations">Abweichungen bei der Medikation</Label>
-            <Textarea
-              id="medication_deviations"
-              value={resident.medication_deviations}
-              onChange={(e) => onUpdate({ medication_deviations: e.target.value })}
+            <ColorCodedEditor
+              value={resident.medication_deviations || ''}
+              onChange={handleMedicationDeviationChange}
               placeholder="Dokumentation von Medikationsabweichungen..."
               rows={4}
+              autoColorCode={true}
             />
           </div>
           
@@ -111,7 +132,7 @@ export function ResidentCareInfo({ resident, onUpdate }: ResidentCareInfoProps) 
             <Label htmlFor="emergency_medication">Bedarfsmedikation</Label>
             <Textarea
               id="emergency_medication"
-              value={resident.emergency_medication}
+              value={resident.emergency_medication || ''}
               onChange={(e) => onUpdate({ emergency_medication: e.target.value })}
               placeholder="Bedarfsmedikation und Anwendungshinweise..."
               rows={4}

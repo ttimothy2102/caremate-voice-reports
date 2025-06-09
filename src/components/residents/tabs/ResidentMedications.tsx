@@ -4,10 +4,10 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ColorCodedEditor } from "@/components/ui/color-coded-editor";
+import { AddMedicationDialog } from "@/components/medications/AddMedicationDialog";
 import { ExtendedResident } from '../ResidentsList';
 import { 
   Pill, 
@@ -21,7 +21,9 @@ import {
   Sun,
   CloudSun,
   Moon,
-  Sunrise
+  Sunrise,
+  Edit,
+  Trash2
 } from 'lucide-react';
 
 interface ResidentMedicationsProps {
@@ -56,13 +58,22 @@ interface MedicationLog {
   administeredBy: string;
 }
 
+interface CareReport {
+  id: string;
+  text: string;
+  colorCode?: string;
+  timestamp: string;
+  author: string;
+  type: string;
+}
+
 export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsProps) {
   const [showAddReport, setShowAddReport] = useState(false);
+  const [showAddMedication, setShowAddMedication] = useState(false);
   const [reportText, setReportText] = useState('');
+  const [reportColorCode, setReportColorCode] = useState<string>();
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
-
-  // Updated mock medication data with German schedule format
-  const mockMedications: Medication[] = [
+  const [medications, setMedications] = useState<Medication[]>([
     {
       id: '1',
       name: 'Aspirin 100mg',
@@ -103,7 +114,32 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
       reorderLevel: 5,
       times: ['08:00', '13:00', '20:00']
     }
-  ];
+  ]);
+
+  const [careReports, setCareReports] = useState<CareReport[]>([
+    {
+      id: '1',
+      text: 'Patient war kooperativ, Medikamente pünktlich eingenommen.',
+      timestamp: '2024-01-09 14:30',
+      author: 'Schwester Maria',
+      type: 'Tagesrapport'
+    },
+    {
+      id: '2',
+      text: 'Morgendliche Körperpflege ohne Probleme durchgeführt.',
+      timestamp: '2024-01-09 08:15',
+      author: 'Pfleger Thomas',
+      type: 'Pflegemaßnahme'
+    },
+    {
+      id: '3',
+      text: 'Patient klagte über leichte Übelkeit nach Abendmedikation. Arzt informiert.',
+      colorCode: 'red',
+      timestamp: '2024-01-08 20:45',
+      author: 'Schwester Anna',
+      type: 'Besondere Beobachtung'
+    }
+  ]);
 
   const mockLogs: MedicationLog[] = [
     {
@@ -157,7 +193,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
     ];
 
     return timeSlots.map(slot => {
-      const medicationsForSlot = mockMedications.filter(med => 
+      const medicationsForSlot = medications.filter(med => 
         med.schedule[slot.key as keyof typeof med.schedule] > 0
       );
 
@@ -181,15 +217,67 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
     return { status: 'good', color: 'bg-green-100 text-green-800', text: 'Ausreichend' };
   };
 
+  const getReportColorStyle = (colorCode?: string) => {
+    switch (colorCode) {
+      case 'red': return 'border-l-red-500 bg-red-50';
+      case 'green': return 'border-l-green-500 bg-green-50';
+      case 'yellow': return 'border-l-yellow-500 bg-yellow-50';
+      default: return 'border-l-blue-500 bg-blue-50';
+    }
+  };
+
   const handleMarkCompleted = (medicationId: string, timeSlot: string) => {
     console.log(`Marking medication ${medicationId} as completed for ${timeSlot}`);
+    // TODO: Implement actual completion logic
   };
 
   const handleAddReport = () => {
-    console.log('Adding care report:', { reportText, selectedFiles });
+    const newReport: CareReport = {
+      id: Date.now().toString(),
+      text: reportText,
+      colorCode: reportColorCode,
+      timestamp: new Date().toLocaleString('de-DE'),
+      author: 'Aktuelle Pflegekraft', // TODO: Get from auth context
+      type: 'Pflegebericht'
+    };
+    
+    setCareReports(prev => [newReport, ...prev]);
+    console.log('Adding care report:', newReport);
+    
     setReportText('');
+    setReportColorCode(undefined);
     setSelectedFiles(null);
     setShowAddReport(false);
+  };
+
+  const handleAddMedication = (medication: Medication) => {
+    setMedications(prev => [...prev, medication]);
+    console.log('Adding medication:', medication);
+  };
+
+  const handleEditMedication = (medicationId: string) => {
+    console.log('Editing medication:', medicationId);
+    // TODO: Implement edit functionality
+  };
+
+  const handleDeleteMedication = (medicationId: string) => {
+    setMedications(prev => prev.filter(med => med.id !== medicationId));
+    console.log('Deleting medication:', medicationId);
+  };
+
+  const handleCareDeviationChange = (value: string, colorCode?: string) => {
+    onUpdate({ 
+      care_deviations: value,
+      // Store color code in a separate field for highlighting
+      care_deviations_color: colorCode 
+    });
+  };
+
+  const handleMedicationDeviationChange = (value: string, colorCode?: string) => {
+    onUpdate({ 
+      medication_deviations: value,
+      medication_deviations_color: colorCode 
+    });
   };
 
   return (
@@ -212,23 +300,26 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="report-text">Pflegebericht</Label>
-                  <Textarea
-                    id="report-text"
-                    placeholder="Beschreiben Sie die Pflegemaßnahmen, Beobachtungen und besondere Ereignisse..."
+                  <ColorCodedEditor
                     value={reportText}
-                    onChange={(e) => setReportText(e.target.value)}
+                    onChange={(value, colorCode) => {
+                      setReportText(value);
+                      setReportColorCode(colorCode);
+                    }}
+                    placeholder="Beschreiben Sie die Pflegemaßnahmen, Beobachtungen und besondere Ereignisse..."
                     rows={8}
                   />
                 </div>
                 
                 <div>
                   <Label htmlFor="file-upload">Dateien anhängen (optional)</Label>
-                  <Input
+                  <input
                     id="file-upload"
                     type="file"
                     multiple
                     accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                     onChange={(e) => setSelectedFiles(e.target.files)}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     Unterstützte Formate: PDF, DOC, DOCX, JPG, PNG
@@ -247,7 +338,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
             </DialogContent>
           </Dialog>
           
-          <Button size="sm" className="bg-caremate-gradient">
+          <Button size="sm" className="bg-caremate-gradient" onClick={() => setShowAddMedication(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Medikament hinzufügen
           </Button>
@@ -259,7 +350,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-blue-700">
             <Calendar className="w-5 h-5" />
-            Tagesplan Medikamente
+            Tagesplan Medikamente - {new Date().toLocaleDateString('de-DE')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -297,6 +388,9 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
                               <p className="text-xs text-gray-600">
                                 {dosageCount}x {med.dosage}
                               </p>
+                              <Badge variant="outline" className="text-xs font-mono mt-1">
+                                {formatSchedule(med.schedule)}
+                              </Badge>
                             </div>
                           </div>
                           {timeLog?.completed && timeLog.actualTime && (
@@ -325,7 +419,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockMedications.map((medication) => {
+            {medications.map((medication) => {
               const todayLogs = getTodayLogs(medication.id);
               const stockStatus = getStockStatus(medication.stockCount, medication.reorderLevel);
 
@@ -374,9 +468,26 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
                       </div>
                     </div>
 
-                    {stockStatus.status === 'critical' && (
-                      <AlertTriangle className="w-5 h-5 text-red-500" />
-                    )}
+                    <div className="flex items-center gap-2">
+                      {stockStatus.status === 'critical' && (
+                        <AlertTriangle className="w-5 h-5 text-red-500" />
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditMedication(medication.id)}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteMedication(medication.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Notes from logs */}
@@ -397,7 +508,52 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
         </CardContent>
       </Card>
 
-      {/* Recent Care Reports */}
+      {/* Deviations with Auto Color Coding */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-orange-500" />
+              Abweichungen bei Maßnahmen
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <Label htmlFor="care_deviations">Dokumentation von Abweichungen</Label>
+              <ColorCodedEditor
+                value={resident.care_deviations || ''}
+                onChange={handleCareDeviationChange}
+                placeholder="Dokumentation von Abweichungen bei geplanten Pflegemaßnahmen..."
+                rows={6}
+                autoColorCode={true}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Pill className="w-5 h-5 text-red-500" />
+              Abweichungen bei der Medikation
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <Label htmlFor="medication_deviations">Dokumentation von Medikationsabweichungen</Label>
+              <ColorCodedEditor
+                value={resident.medication_deviations || ''}
+                onChange={handleMedicationDeviationChange}
+                placeholder="Dokumentation von Medikationsabweichungen..."
+                rows={6}
+                autoColorCode={true}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Care Reports with Color Coding */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -407,36 +563,32 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {[
-              {
-                date: '2024-01-09 14:30',
-                author: 'Schwester Maria',
-                summary: 'Patient war kooperativ, Medikamente pünktlich eingenommen.',
-                type: 'Tagesrapport'
-              },
-              {
-                date: '2024-01-09 08:15',
-                author: 'Pfleger Thomas',
-                summary: 'Morgendliche Körperpflege ohne Probleme durchgeführt.',
-                type: 'Pflegemaßnahme'
-              },
-              {
-                date: '2024-01-08 20:45',
-                author: 'Schwester Anna',
-                summary: 'Patient klagte über leichte Übelkeit nach Abendmedikation.',
-                type: 'Besondere Beobachtung'
-              }
-            ].map((report, index) => (
-              <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
+            {careReports.map((report) => (
+              <div key={report.id} className={`border-l-4 pl-4 py-2 ${getReportColorStyle(report.colorCode)}`}>
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-sm font-medium text-gray-800">{report.summary}</p>
+                    <p className="text-sm font-medium text-gray-800">{report.text}</p>
                     <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
-                      <span>{report.date}</span>
+                      <span>{report.timestamp}</span>
                       <span>von {report.author}</span>
                       <Badge variant="outline" className="text-xs">
                         {report.type}
                       </Badge>
+                      {report.colorCode && (
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs ${
+                            report.colorCode === 'red' ? 'bg-red-100 text-red-800' :
+                            report.colorCode === 'green' ? 'bg-green-100 text-green-800' :
+                            report.colorCode === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {report.colorCode === 'red' ? 'Wichtig' :
+                           report.colorCode === 'green' ? 'Positiv' :
+                           report.colorCode === 'yellow' ? 'Achtung' : 'Normal'}
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -446,12 +598,20 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
             <div className="text-center py-4">
               <Button variant="outline" size="sm" onClick={() => setShowAddReport(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                Ersten Pflegebericht hinzufügen
+                Weiteren Pflegebericht hinzufügen
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Add Medication Dialog */}
+      <AddMedicationDialog
+        open={showAddMedication}
+        onOpenChange={setShowAddMedication}
+        residentId={resident.id}
+        onSave={handleAddMedication}
+      />
     </div>
   );
 }
