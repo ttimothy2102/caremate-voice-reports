@@ -70,10 +70,10 @@ function VitalsContent() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'border-red-300 bg-red-50/80';
-      case 'warning': return 'border-yellow-300 bg-yellow-50/80';
-      case 'normal': return 'border-green-300 bg-green-50/80';
-      default: return 'border-gray-300 bg-gray-50/80';
+      case 'critical': return 'border-red-300 bg-red-50';
+      case 'warning': return 'border-yellow-300 bg-yellow-50';
+      case 'normal': return 'border-green-300 bg-green-50';
+      default: return 'border-gray-300 bg-gray-50';
     }
   };
 
@@ -87,7 +87,7 @@ function VitalsContent() {
   };
 
   return (
-    <div className="min-h-screen liquid-gradient-bg">
+    <div className="min-h-screen bg-gray-50">
       <MobileHeader 
         title="Vitalwerte Übersicht" 
         onTitleClick={() => navigate('/mobile-home')}
@@ -96,7 +96,7 @@ function VitalsContent() {
       <div className="p-6 space-y-6">
         {/* Overview Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card variant="glass" className="p-4 floating-element glow-on-hover">
+          <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Aktive Alarme</p>
@@ -106,7 +106,7 @@ function VitalsContent() {
             </div>
           </Card>
 
-          <Card variant="glass" className="p-4 floating-element glow-on-hover" style={{ animationDelay: '0.1s' }}>
+          <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Überwacht</p>
@@ -116,7 +116,7 @@ function VitalsContent() {
             </div>
           </Card>
 
-          <Card variant="glass" className="p-4 floating-element glow-on-hover" style={{ animationDelay: '0.2s' }}>
+          <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Normal</p>
@@ -126,7 +126,7 @@ function VitalsContent() {
             </div>
           </Card>
 
-          <Card variant="glass" className="p-4 floating-element glow-on-hover" style={{ animationDelay: '0.3s' }}>
+          <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Geräte Online</p>
@@ -138,7 +138,7 @@ function VitalsContent() {
         </div>
 
         {/* Vital Alerts */}
-        <div className="floating-element" style={{ animationDelay: '0.4s' }}>
+        <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-blue-500" />
             Aktuelle Vitalwert-Meldungen
@@ -147,9 +147,7 @@ function VitalsContent() {
             {vitalAlerts.map((alert, index) => (
               <Card 
                 key={index}
-                variant="glass" 
-                className={`p-4 floating-element glow-on-hover cursor-pointer ${getSeverityColor(alert.severity)}`}
-                style={{ animationDelay: `${0.5 + index * 0.1}s` }}
+                className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${getSeverityColor(alert.severity)}`}
                 onClick={() => navigate('/residents')}
               >
                 <div className="flex items-center justify-between">
@@ -171,13 +169,13 @@ function VitalsContent() {
         </div>
 
         {/* Vital Signs Charts */}
-        <div className="floating-element" style={{ animationDelay: '0.8s' }}>
+        <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <Activity className="w-5 h-5 text-blue-500" />
             Tagesverlauf - Durchschnittswerte
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card variant="glass" className="floating-element glow-on-hover">
+            <Card>
               <VitalsChart 
                 title="Herzfrequenz (Ø)"
                 data={generateVitalData()}
@@ -186,7 +184,7 @@ function VitalsContent() {
               />
             </Card>
 
-            <Card variant="glass" className="floating-element glow-on-hover">
+            <Card>
               <VitalsChart 
                 title="Körpertemperatur (Ø)"
                 data={temperatureData}
@@ -195,7 +193,7 @@ function VitalsContent() {
               />
             </Card>
 
-            <Card variant="glass" className="floating-element glow-on-hover">
+            <Card>
               <VitalsChart 
                 title="Blutdruck Systolisch (Ø)"
                 data={bloodPressureData}
@@ -204,7 +202,7 @@ function VitalsContent() {
               />
             </Card>
 
-            <Card variant="glass" className="floating-element glow-on-hover">
+            <Card>
               <VitalsChart 
                 title="Sauerstoffsättigung (Ø)"
                 data={oxygenData}
@@ -216,12 +214,12 @@ function VitalsContent() {
         </div>
 
         {/* Quick Actions */}
-        <div className="floating-element" style={{ animationDelay: '1.0s' }}>
+        <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Schnellaktionen</h3>
           <div className="grid grid-cols-2 gap-4">
             <Button 
-              variant="glass" 
-              className="h-16 glow-on-hover"
+              variant="outline" 
+              className="h-16"
               onClick={() => navigate('/residents')}
             >
               <div className="text-center">
@@ -231,8 +229,8 @@ function VitalsContent() {
             </Button>
 
             <Button 
-              variant="glass" 
-              className="h-16 glow-on-hover"
+              variant="outline" 
+              className="h-16"
               onClick={() => navigate('/dashboard')}
             >
               <div className="text-center">

@@ -55,7 +55,7 @@ function MobileHomeContent() {
   ];
 
   return (
-    <div className="min-h-screen liquid-gradient-bg">
+    <div className="min-h-screen bg-gray-50">
       <MobileHeader 
         title="CareMate" 
         onTitleClick={() => navigate('/mobile-home')}
@@ -63,15 +63,15 @@ function MobileHomeContent() {
       
       <div className="p-6 space-y-6">
         {/* Welcome Section */}
-        <div className="floating-element">
+        <div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">{greeting}</h2>
           <p className="text-gray-600">Bereit für die Pflegedokumentation Ihrer Bewohner?</p>
         </div>
 
         {/* Main Action Button */}
-        <Card variant="glass" className="p-6 bg-caremate-gradient text-white floating-element glow-effect" style={{ animationDelay: '0.1s' }}>
+        <Card className="p-6 bg-caremate-gradient text-white">
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto floating-element">
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto">
               <Mic className="w-8 h-8 text-white" />
             </div>
             <div>
@@ -81,7 +81,7 @@ function MobileHomeContent() {
               </p>
             </div>
             <Button 
-              className="w-full bg-white text-primary hover:bg-gray-100 transition-all duration-200 hover:shadow-lg hover:-translate-y-1"
+              className="w-full bg-white text-primary hover:bg-gray-100"
               size="lg"
               onClick={() => navigate('/voice-input')}
             >
@@ -91,7 +91,7 @@ function MobileHomeContent() {
         </Card>
 
         {/* Quick Info for Shift Change */}
-        <Card variant="glass" className="p-4 bg-yellow-50/80 border-yellow-200 floating-element" style={{ animationDelay: '0.2s' }}>
+        <Card className="p-4 bg-yellow-50 border-yellow-200">
           <div className="flex items-start gap-3">
             <Clock className="w-5 h-5 text-yellow-600 mt-0.5" />
             <div>
@@ -100,7 +100,7 @@ function MobileHomeContent() {
                 3 wichtige Notizen für die nächste Schicht verfügbar
               </p>
               <Button 
-                variant="glass" 
+                variant="outline" 
                 size="sm" 
                 className="mt-2 border-yellow-300 text-yellow-700 hover:bg-yellow-100"
                 onClick={() => navigate('/shift-handover')}
@@ -118,13 +118,11 @@ function MobileHomeContent() {
             {quickActions.map((action, index) => (
               <Card 
                 key={index}
-                variant="glass"
-                className="p-4 cursor-pointer floating-element glow-on-hover"
-                style={{ animationDelay: `${0.3 + index * 0.1}s` }}
+                className="p-4 cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => navigate(action.href)}
               >
                 <div className="text-center space-y-3">
-                  <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center mx-auto floating-element shadow-lg`}>
+                  <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center mx-auto shadow-lg`}>
                     <action.icon className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -142,9 +140,8 @@ function MobileHomeContent() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-800">Heutige Übersicht</h3>
             <Button 
-              variant="glass" 
+              variant="outline" 
               size="sm"
-              className="glow-on-hover"
               onClick={() => navigate('/residents')}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -155,14 +152,12 @@ function MobileHomeContent() {
             {shortcuts.map((shortcut, index) => (
               <Card 
                 key={index}
-                variant="glass"
-                className="p-4 cursor-pointer floating-element glow-on-hover"
-                style={{ animationDelay: `${0.7 + index * 0.1}s` }}
+                className="p-4 cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => navigate(shortcut.href)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 ${shortcut.color} rounded-lg flex items-center justify-center floating-element`}>
+                    <div className={`w-10 h-10 ${shortcut.color} rounded-lg flex items-center justify-center`}>
                       <shortcut.icon className="w-5 h-5" />
                     </div>
                     <div>

@@ -102,22 +102,7 @@
 }
 
 @layer utilities {
-  .glass-morphism {
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
-  
-  .glass-hover {
-    @apply transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-1;
-  }
-  
-  .floating {
-    animation: float 6s ease-in-out infinite;
-  }
-  
-  .glow-effect {
-    box-shadow: 0 0 20px rgba(45, 44, 171, 0.3);
+  .bg-caremate-gradient {
+    background: linear-gradient(135deg, #2D2CAB 0%, #29B6F6 100%);
   }
 }

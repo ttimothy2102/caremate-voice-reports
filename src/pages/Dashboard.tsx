@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -76,19 +77,19 @@ function DashboardContent() {
   ];
 
   if (residentsLoading) {
-    return <div className="min-h-screen liquid-gradient-bg flex items-center justify-center">
-        <div className="text-center glass-card p-8 rounded-xl floating-element">
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-xl shadow-sm">
           <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Dashboard wird geladen...</p>
         </div>
       </div>;
   }
 
-  return <div className="min-h-screen liquid-gradient-bg">
+  return <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="glass-header px-6 py-4">
+      <header className="bg-white shadow-sm border-b px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="cursor-pointer hover:opacity-80 transition-opacity floating-element" onClick={() => navigate('/mobile-home')}>
+          <div className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/mobile-home')}>
             <h1 className="text-2xl font-bold bg-caremate-gradient bg-clip-text text-transparent">
               CareMate
             </h1>
@@ -99,34 +100,30 @@ function DashboardContent() {
               {greeting}
             </span>
             
-            <Button variant="glass" size="sm" onClick={() => navigate('/schedule')}>
+            <Button variant="outline" size="sm" onClick={() => navigate('/schedule')}>
               <Calendar className="w-4 h-4 mr-2" />
               Terminplan
             </Button>
-            <Button variant="glass" size="sm" onClick={handleSignOut}>
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Abmelden
             </Button>
-            <Avatar className="cursor-pointer hover:opacity-80 transition-opacity floating-element" onClick={() => setShowAccountManagement(true)}>
+            <Avatar className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setShowAccountManagement(true)}>
               <AvatarImage src={user?.user_metadata?.avatar_url} />
               <AvatarFallback>{userInitials}</AvatarFallback>
             </Avatar>
-            <div className="floating-element">
-              <Logo />
-            </div>
+            <Logo />
           </div>
         </div>
       </header>
 
       <div className="p-6 space-y-6">
-        {/* Overview Stats - Now with glass effects */}
+        {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {overviewStats.map((stat, index) => (
             <Card 
               key={index} 
-              variant="glass"
-              className={`p-4 floating-element ${stat.onClick ? 'cursor-pointer glow-on-hover' : ''}`}
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className={`p-4 ${stat.onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
               onClick={stat.onClick}
             >
               <div className="flex items-center justify-between">
@@ -140,25 +137,25 @@ function DashboardContent() {
           ))}
         </div>
 
-        {/* Residents List - New comprehensive section */}
-        <div className="floating-element" style={{ animationDelay: '0.4s' }}>
+        {/* Residents List */}
+        <div>
           <ResidentsList />
         </div>
 
-        {/* Main Content Grid - Updated to 2 columns with glass effects */}
+        {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Medication Tracking */}
-          <div className="floating-element" style={{ animationDelay: '0.5s' }}>
+          <div>
             <MedicationTracker />
           </div>
 
           {/* Drug Ordering */}
-          <div className="floating-element" style={{ animationDelay: '0.6s' }}>
+          <div>
             <DrugOrdering />
           </div>
 
-          {/* Withings Integration - Now spans full width */}
-          <div className="lg:col-span-2 floating-element" style={{ animationDelay: '0.7s' }}>
+          {/* Withings Integration */}
+          <div className="lg:col-span-2">
             <WithingsIntegration />
           </div>
         </div>
