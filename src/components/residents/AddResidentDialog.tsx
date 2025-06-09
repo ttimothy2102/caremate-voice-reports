@@ -183,7 +183,10 @@ export function AddResidentDialog({ isOpen, onClose }: AddResidentDialogProps) {
       
       onClose();
     } catch (error) {
-      console.error('Error saving resident:', error);
+      // Only log in development mode, always show user-friendly toast
+      if (import.meta.env.DEV) {
+        console.error('Error saving resident:', error);
+      }
       toast({
         title: "Fehler",
         description: "Beim Speichern des Bewohners ist ein Fehler aufgetreten.",
