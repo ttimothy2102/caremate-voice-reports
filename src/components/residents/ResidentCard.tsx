@@ -54,7 +54,8 @@ export function ResidentCard({ resident, onClick }: ResidentCardProps) {
 
   return (
     <Card 
-      className="cursor-pointer hover:shadow-md transition-all duration-200 hover:scale-105"
+      variant="glass"
+      className="cursor-pointer floating-element glow-on-hover"
       onClick={onClick}
     >
       <CardContent className="p-4">
@@ -76,11 +77,11 @@ export function ResidentCard({ resident, onClick }: ResidentCardProps) {
           <div className="flex flex-wrap gap-2">
             <Badge 
               variant="outline" 
-              className={`text-xs ${getHealthStatusColor(resident.health_status)}`}
+              className={`text-xs transition-all duration-200 hover:shadow-md ${getHealthStatusColor(resident.health_status)}`}
             >
               {resident.health_status || 'Unbekannt'}
             </Badge>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs transition-all duration-200 hover:shadow-md">
               {resident.care_level}
             </Badge>
           </div>
@@ -107,7 +108,7 @@ export function ResidentCard({ resident, onClick }: ResidentCardProps) {
 
           {/* Quick Notes */}
           {resident.shift_notes && (
-            <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
+            <div className="text-xs text-gray-600 glass-morphism p-2 rounded">
               <strong>Notiz:</strong> {resident.shift_notes.substring(0, 50)}...
             </div>
           )}
