@@ -31,18 +31,14 @@ export function useVoiceRecording() {
       console.log('Starte Aufnahme...');
       setLiveTranscript('');
       
-      // Request high-quality audio
+      // Request high-quality audio with standard constraints
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
           sampleRate: 48000,
           channelCount: 1,
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true,
-          googEchoCancellation: true,
-          googAutoGainControl: true,
-          googNoiseSuppression: true,
-          googHighpassFilter: true
+          autoGainControl: true
         }
       });
       
