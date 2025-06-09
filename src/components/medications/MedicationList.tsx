@@ -24,28 +24,31 @@ interface Medication {
 
 interface MedicationLog {
   id: string;
-  medicationId: string;
-  scheduledTime: string;
-  actualTime?: string;
+  medication_id: string;
+  scheduled_time: string;
+  actual_time?: string;
   completed: boolean;
   notes?: string;
-  administeredBy: string;
+  administered_by: string;
 }
 
 interface MedicationListProps {
   medications: Medication[];
-  logs: MedicationLog[];
+  logs?: MedicationLog[];
   onEditMedication: (medicationId: string) => void;
   onDeleteMedication: (medicationId: string) => void;
 }
 
-export function MedicationList({ medications, logs, onEditMedication, onDeleteMedication }: MedicationListProps) {
+export function MedicationList({ medications, logs = [], onEditMedication, onDeleteMedication }: MedicationListProps) {
   const formatSchedule = (schedule: Medication['schedule']) => {
     return `${schedule.morning}-${schedule.midday}-${schedule.evening}-${schedule.night}`;
   };
 
   const getTodayLogs = (medicationId: string) => {
-    return logs.filter(log => log.medicationId === medicationId);
+    if (!logs || !Array.isArray(logs)) {
+      return [];
+    }
+    return logs.filter(log => log.medication_id === medicationId);
   };
 
   const getStockStatus = (stockCount: number, reorderLevel: number) => {
@@ -142,7 +145,7 @@ export function MedicationList({ medications, logs, onEditMedication, onDeleteMe
                     <strong>Notizen:</strong>
                     {todayLogs.filter(log => log.notes).map((log, idx) => (
                       <div key={idx} className="text-blue-800">
-                        {log.scheduledTime}: {log.notes}
+                        {log.scheduled_time}: {log.notes}
                       </div>
                     ))}
                   </div>

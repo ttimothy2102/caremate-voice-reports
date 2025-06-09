@@ -34,6 +34,16 @@ interface Medication {
   times: string[];
 }
 
+interface MedicationLog {
+  id: string;
+  medication_id: string;
+  scheduled_time: string;
+  actual_time?: string;
+  completed: boolean;
+  notes?: string;
+  administered_by: string;
+}
+
 interface CareReport {
   id: string;
   text: string;
@@ -92,6 +102,8 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
       times: ['08:00', '13:00', '20:00']
     }
   ]);
+
+  const [medicationLogs, setMedicationLogs] = useState<MedicationLog[]>([]);
 
   const [careReports, setCareReports] = useState<CareReport[]>([
     {
@@ -229,6 +241,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
       {/* Detailed Medication List */}
       <MedicationList 
         medications={medications}
+        logs={medicationLogs}
         onEditMedication={handleEditMedication}
         onDeleteMedication={handleDeleteMedication}
       />
