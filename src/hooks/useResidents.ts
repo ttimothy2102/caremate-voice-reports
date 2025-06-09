@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { validateResident, sanitizeInput } from '@/utils/securityValidation';
+import { logDataAccess } from '@/utils/securityLogger';
 
 export interface Resident {
   id: string;
@@ -79,19 +81,23 @@ export function useResidents() {
   return useQuery({
     queryKey: ['residents'],
     queryFn: async () => {
-      console.log('Fetching residents...');
-      const { data, error } = await supabase
-        .from('residents')
-        .select('*')
-        .order('name');
-      
-      if (error) {
-        console.error('Error fetching residents:', error);
+      try {
+        const { data, error } = await supabase
+          .from('residents')
+          .select('*')
+          .order('name');
+        
+        if (error) {
+          logDataAccess('READ', 'residents', undefined, false, error.message);
+          throw error;
+        }
+        
+        logDataAccess('READ', 'residents');
+        return data as Resident[];
+      } catch (error: any) {
+        logDataAccess('READ', 'residents', undefined, false, error.message);
         throw error;
       }
-      
-      console.log('Fetched residents:', data);
-      return data as Resident[];
     },
   });
 }
@@ -101,21 +107,43 @@ export function useCreateResident() {
   
   return useMutation({
     mutationFn: async (resident: Omit<Resident, 'id' | 'created_at' | 'updated_at'>) => {
-      console.log('Creating resident with data:', resident);
-      
-      const { data, error } = await supabase
-        .from('residents')
-        .insert([resident])
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error creating resident:', error);
-        throw error;
+      // Validate input data
+      const validationErrors = validateResident(resident);
+      if (validationErrors.length > 0) {
+        const errorMessage = validationErrors.join(', ');
+        logDataAccess('CREATE', 'residents', undefined, false, `Validation failed: ${errorMessage}`);
+        throw new Error(`Validation failed: ${errorMessage}`);
       }
       
-      console.log('Created resident:', data);
-      return data;
+      // Sanitize string inputs
+      const sanitizedResident = {
+        ...resident,
+        name: sanitizeInput(resident.name),
+        first_name: resident.first_name ? sanitizeInput(resident.first_name) : undefined,
+        last_name: resident.last_name ? sanitizeInput(resident.last_name) : undefined,
+        room: resident.room ? sanitizeInput(resident.room) : undefined,
+        emergency_contact: resident.emergency_contact ? sanitizeInput(resident.emergency_contact) : undefined,
+        doctor: resident.doctor ? sanitizeInput(resident.doctor) : undefined,
+      };
+      
+      try {
+        const { data, error } = await supabase
+          .from('residents')
+          .insert([sanitizedResident])
+          .select()
+          .single();
+        
+        if (error) {
+          logDataAccess('CREATE', 'residents', undefined, false, error.message);
+          throw error;
+        }
+        
+        logDataAccess('CREATE', 'residents', data.id);
+        return data;
+      } catch (error: any) {
+        logDataAccess('CREATE', 'residents', undefined, false, error.message);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['residents'] });
