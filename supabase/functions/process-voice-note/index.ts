@@ -34,8 +34,20 @@ serve(async (req) => {
     
     // Convert base64 audio to blob for Whisper API
     console.log('Konvertiere Base64 zu Binary...');
-    const audioBuffer = Uint8Array.from(atob(audio), c => c.charCodeAt(0));
-    const audioBlob = new Blob([audioBuffer], { type: 'audio/webm' });
+    const binaryString = atob(audio);
+    const audioBuffer = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      audioBuffer[i] = binaryString.charCodeAt(i);
+    }
+    
+    console.log('Audio Buffer Größe:', audioBuffer.length);
+    
+    if (audioBuffer.length === 0) {
+      throw new Error('Audio Buffer ist leer');
+    }
+    
+    // Create proper audio blob for Whisper
+    const audioBlob = new Blob([audioBuffer], { type: 'audio/webm;codecs=opus' });
     console.log('Audio Blob Größe:', audioBlob.size);
     
     if (audioBlob.size === 0) {
@@ -47,7 +59,9 @@ serve(async (req) => {
     const formData = new FormData();
     formData.append('file', audioBlob, 'audio.webm');
     formData.append('model', 'whisper-1');
-    formData.append('language', 'de'); // Deutsch statt Englisch
+    formData.append('language', 'de');
+    formData.append('response_format', 'json');
+    formData.append('temperature', '0');
 
     const transcriptionResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
@@ -73,7 +87,7 @@ serve(async (req) => {
       throw new Error('Leere Transkription erhalten');
     }
 
-    // Step 2: Structure the transcript using GPT-4
+    // Step 2: Structure the transcript using GPT-4 with enhanced medication detection
     console.log('Strukturiere Transkript mit GPT-4...');
     const structuringResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -86,21 +100,31 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `Du bist ein Pflegeassistent, der Pflegenotizen strukturiert. Extrahiere Informationen aus dem Transkript und formatiere sie als JSON mit diesen exakten Feldern:
-            - physical_condition: Kurze Beschreibung des körperlichen Zustands
-            - mood: Beschreibung des emotionalen/mentalen Zustands  
-            - food_water_intake: Informationen über Essen und Trinken
-            - medication_given: Details über verabreichte Medikamente
-            - special_notes: Andere wichtige Beobachtungen
-            
-            Wenn Informationen nicht erwähnt werden, verwende "Nicht erwähnt" für dieses Feld. Antworte nur auf Deutsch.`
+            content: `Du bist ein Pflegeassistent, der Pflegenotizen strukturiert und medizinische Informationen erkennt. 
+
+Extrahiere Informationen aus dem Transkript und formatiere sie als JSON mit diesen exakten Feldern:
+- physical_condition: Kurze Beschreibung des körperlichen Zustands
+- mood: Beschreibung des emotionalen/mentalen Zustands  
+- food_water_intake: Informationen über Essen und Trinken
+- medication_given: Details über verabreichte Medikamente (Namen, Dosierungen, Uhrzeiten)
+- special_notes: Andere wichtige Beobachtungen
+- vital_signs: Erkannte Vitalwerte (Blutdruck, Puls, Temperatur, etc.)
+- detected_medications: Array mit erkannten Medikamentennamen für Automatisierung
+- detected_vitals: Objekt mit erkannten Vitalwerten für Automatisierung
+
+Für detected_medications: Erkenne Medikamentennamen wie "Aspirin", "Metformin", "Ibuprofen" etc.
+Für detected_vitals: Erkenne Werte wie "Blutdruck 120/80", "Puls 75", "Temperatur 37.2" etc.
+
+Wenn Informationen nicht erwähnt werden, verwende "Nicht erwähnt" für Textfelder und leere Arrays/Objekte für Listen.
+Antworte nur auf Deutsch.`
           },
           {
             role: 'user',
             content: `Bitte strukturiere diese Pflegenotiz: "${transcript}"`
           }
         ],
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
+        temperature: 0.1
       }),
     });
 
@@ -120,7 +144,12 @@ serve(async (req) => {
 
     const result = {
       transcript,
-      structured
+      structured: {
+        ...structured,
+        // Ensure all required fields exist
+        detected_medications: structured.detected_medications || [],
+        detected_vitals: structured.detected_vitals || {}
+      }
     };
 
     console.log('Erfolgreich verarbeitet:', result);

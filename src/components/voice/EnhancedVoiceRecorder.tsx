@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { VoiceRecorderButton } from './VoiceRecorderButton';
 import { RecordingTimer } from './RecordingTimer';
 import { TranscriptEditor } from './TranscriptEditor';
+import { LiveTranscription } from './LiveTranscription';
+import { MedicationDetector } from './MedicationDetector';
 import { useVoiceRecording } from './hooks/useVoiceRecording';
 import { useCreateCareReport } from '@/hooks/useCareReports';
 import { useAuth } from '@/hooks/useAuth';
@@ -15,6 +17,8 @@ interface EnhancedVoiceRecorderProps {
 
 export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: EnhancedVoiceRecorderProps) {
   const [transcript, setTranscript] = useState('');
+  const [detectedMedications, setDetectedMedications] = useState<string[]>([]);
+  const [detectedVitals, setDetectedVitals] = useState<Record<string, any>>({});
   const { mutate: createCareReport } = useCreateCareReport();
   const { user } = useAuth();
   
@@ -22,6 +26,7 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
     isRecording,
     isProcessing,
     recordingTime,
+    liveTranscript,
     startRecording,
     stopRecording,
     processAudioWithAI
@@ -34,6 +39,8 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
         try {
           const result = await processAudioWithAI(audioBlob, residentId) as any;
           setTranscript(result.transcript);
+          setDetectedMedications(result.structuredReport.detected_medications || []);
+          setDetectedVitals(result.structuredReport.detected_vitals || {});
           
           if (residentId && user) {
             createCareReport({
@@ -46,10 +53,17 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
           onTranscriptionComplete(result.structuredReport);
         } catch (error) {
           console.error('Processing failed:', error);
+          toast({
+            title: "Verarbeitungsfehler",
+            description: error instanceof Error ? error.message : "Unbekannter Fehler",
+            variant: "destructive"
+          });
         }
       }
     } else {
       setTranscript('');
+      setDetectedMedications([]);
+      setDetectedVitals({});
       await startRecording();
     }
   };
@@ -67,6 +81,18 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
     };
     
     onTranscriptionComplete(updatedReport);
+  };
+
+  const handleMedicationConfirmed = (medication: string) => {
+    console.log('Medikament bestätigt:', medication);
+    // Here you would integrate with the medication system
+    // to mark the medication as given in the medication logs
+  };
+
+  const handleVitalConfirmed = (vital: any) => {
+    console.log('Vitalwert bestätigt:', vital);
+    // Here you would integrate with the vital signs system
+    // to save the vital sign measurement
   };
 
   return (
@@ -89,6 +115,21 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
           recordingTime={recordingTime}
         />
       </div>
+
+      <LiveTranscription
+        isRecording={isRecording}
+        isProcessing={isProcessing}
+        liveTranscript={liveTranscript}
+        recordingTime={recordingTime}
+      />
+
+      <MedicationDetector
+        detectedMedications={detectedMedications}
+        detectedVitals={detectedVitals}
+        residentId={residentId}
+        onMedicationConfirmed={handleMedicationConfirmed}
+        onVitalConfirmed={handleVitalConfirmed}
+      />
 
       <TranscriptEditor
         transcript={transcript}
