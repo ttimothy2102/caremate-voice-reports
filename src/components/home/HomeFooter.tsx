@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Heart } from 'lucide-react';
 
 export function HomeFooter() {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export function HomeFooter() {
               className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/')}
             >
-              <div className="w-8 h-8 bg-caremate-gradient rounded-full"></div>
+              <Heart className="w-8 h-8 text-primary" />
               <span className="text-2xl font-bold">CareMate</span>
             </div>
             <p className="text-gray-400 leading-relaxed">
@@ -58,10 +58,10 @@ export function HomeFooter() {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Company</h4>
             <div className="space-y-2">
-              <a href="#" className="block text-gray-400 hover:text-white transition-colors">About Us</a>
-              <a href="#" className="block text-gray-400 hover:text-white transition-colors">Careers</a>
-              <a href="#" className="block text-gray-400 hover:text-white transition-colors">Blog</a>
-              <button onClick={() => scrollToSection('contact')} className="block text-gray-400 hover:text-white transition-colors text-left">
+              <button onClick={() => navigate('/about')} className="block text-gray-400 hover:text-white transition-colors text-left">About Us</button>
+              <button onClick={() => navigate('/careers')} className="block text-gray-400 hover:text-white transition-colors text-left">Careers</button>
+              <button onClick={() => navigate('/blog')} className="block text-gray-400 hover:text-white transition-colors text-left">Blog</button>
+              <button onClick={() => navigate('/contact')} className="block text-gray-400 hover:text-white transition-colors text-left">
                 Contact
               </button>
             </div>
@@ -71,10 +71,10 @@ export function HomeFooter() {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Legal</h4>
             <div className="space-y-2">
-              <a href="#" className="block text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="block text-gray-400 hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="block text-gray-400 hover:text-white transition-colors">HIPAA Compliance</a>
-              <a href="#" className="block text-gray-400 hover:text-white transition-colors">Security</a>
+              <button onClick={() => navigate('/privacy')} className="block text-gray-400 hover:text-white transition-colors text-left">Privacy Policy</button>
+              <button onClick={() => navigate('/terms')} className="block text-gray-400 hover:text-white transition-colors text-left">Terms of Service</button>
+              <button onClick={() => navigate('/gdpr')} className="block text-gray-400 hover:text-white transition-colors text-left">GDPR Compliance</button>
+              <button onClick={() => navigate('/security')} className="block text-gray-400 hover:text-white transition-colors text-left">Security</button>
             </div>
           </div>
         </div>

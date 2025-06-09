@@ -13,6 +13,14 @@ import { Schedule } from "./pages/Schedule";
 import { Residents } from "./pages/Residents";
 import { Auth } from "./pages/Auth";
 import Demo from "./pages/Demo";
+import About from "./pages/About";
+import Careers from "./pages/Careers";
+import Blog from "./pages/Blog";
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import GDPR from "./pages/GDPR";
+import Security from "./pages/Security";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +41,19 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/residents" element={<Residents />} />
+            
+            {/* Company Pages */}
+            <Route path="/about" element={<About />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/contact" element={<Contact />} />
+            
+            {/* Legal Pages */}
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/gdpr" element={<GDPR />} />
+            <Route path="/security" element={<Security />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
