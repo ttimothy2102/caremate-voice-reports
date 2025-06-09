@@ -1,30 +1,16 @@
 
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ColorCodedEditor } from "@/components/ui/color-coded-editor";
 import { AddMedicationDialog } from "@/components/medications/AddMedicationDialog";
+import { MedicationSchedule } from "@/components/medications/MedicationSchedule";
+import { MedicationList } from "@/components/medications/MedicationList";
+import { CareReports } from "@/components/care/CareReports";
+import { DeviationsSection } from "@/components/care/DeviationsSection";
 import { ExtendedResident } from '../ResidentsList';
-import { 
-  Pill, 
-  Clock, 
-  Plus, 
-  AlertTriangle, 
-  CheckCircle,
-  Calendar,
-  FileText,
-  Upload,
-  Sun,
-  CloudSun,
-  Moon,
-  Sunrise,
-  Edit,
-  Trash2
-} from 'lucide-react';
+import { Plus, FileText, Upload } from 'lucide-react';
 
 interface ResidentMedicationsProps {
   resident: ExtendedResident;
@@ -73,6 +59,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
   const [reportText, setReportText] = useState('');
   const [reportColorCode, setReportColorCode] = useState<string>();
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  
   const [medications, setMedications] = useState<Medication[]>([
     {
       id: '1',
@@ -160,75 +147,8 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
     }
   ];
 
-  const formatSchedule = (schedule: Medication['schedule']) => {
-    return `${schedule.morning}-${schedule.midday}-${schedule.evening}-${schedule.night}`;
-  };
-
-  const getTimeSlotIcon = (slot: string) => {
-    switch (slot) {
-      case 'morning': return <Sunrise className="w-4 h-4 text-orange-500" />;
-      case 'midday': return <Sun className="w-4 h-4 text-yellow-500" />;
-      case 'evening': return <CloudSun className="w-4 h-4 text-orange-600" />;
-      case 'night': return <Moon className="w-4 h-4 text-blue-500" />;
-      default: return <Clock className="w-4 h-4" />;
-    }
-  };
-
-  const getTimeSlotLabel = (slot: string) => {
-    switch (slot) {
-      case 'morning': return 'Morgens';
-      case 'midday': return 'Mittags';
-      case 'evening': return 'Abends';
-      case 'night': return 'Nachts';
-      default: return slot;
-    }
-  };
-
-  const getDayPlan = () => {
-    const timeSlots = [
-      { key: 'morning', label: 'Morgens (08:00)', time: '08:00' },
-      { key: 'midday', label: 'Mittags (13:00)', time: '13:00' },
-      { key: 'evening', label: 'Abends (20:00)', time: '20:00' },
-      { key: 'night', label: 'Nachts (22:00)', time: '22:00' }
-    ];
-
-    return timeSlots.map(slot => {
-      const medicationsForSlot = medications.filter(med => 
-        med.schedule[slot.key as keyof typeof med.schedule] > 0
-      );
-
-      return {
-        ...slot,
-        medications: medicationsForSlot
-      };
-    });
-  };
-
-  const getTodayLogs = (medicationId: string) => {
-    return mockLogs.filter(log => log.medicationId === medicationId);
-  };
-
-  const getStockStatus = (stockCount: number, reorderLevel: number) => {
-    if (stockCount <= reorderLevel) {
-      return { status: 'critical', color: 'bg-red-100 text-red-800', text: 'Kritisch niedrig' };
-    } else if (stockCount <= reorderLevel * 2) {
-      return { status: 'warning', color: 'bg-yellow-100 text-yellow-800', text: 'Nachbestellen' };
-    }
-    return { status: 'good', color: 'bg-green-100 text-green-800', text: 'Ausreichend' };
-  };
-
-  const getReportColorStyle = (colorCode?: string) => {
-    switch (colorCode) {
-      case 'red': return 'border-l-red-500 bg-red-50';
-      case 'green': return 'border-l-green-500 bg-green-50';
-      case 'yellow': return 'border-l-yellow-500 bg-yellow-50';
-      default: return 'border-l-blue-500 bg-blue-50';
-    }
-  };
-
   const handleMarkCompleted = (medicationId: string, timeSlot: string) => {
     console.log(`Marking medication ${medicationId} as completed for ${timeSlot}`);
-    // TODO: Implement actual completion logic
   };
 
   const handleAddReport = () => {
@@ -237,7 +157,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
       text: reportText,
       colorCode: reportColorCode,
       timestamp: new Date().toLocaleString('de-DE'),
-      author: 'Aktuelle Pflegekraft', // TODO: Get from auth context
+      author: 'Aktuelle Pflegekraft',
       type: 'Pflegebericht'
     };
     
@@ -257,27 +177,11 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
 
   const handleEditMedication = (medicationId: string) => {
     console.log('Editing medication:', medicationId);
-    // TODO: Implement edit functionality
   };
 
   const handleDeleteMedication = (medicationId: string) => {
     setMedications(prev => prev.filter(med => med.id !== medicationId));
     console.log('Deleting medication:', medicationId);
-  };
-
-  const handleCareDeviationChange = (value: string, colorCode?: string) => {
-    onUpdate({ 
-      care_deviations: value,
-      // Store color code in a separate field for highlighting
-      care_deviations_color: colorCode 
-    });
-  };
-
-  const handleMedicationDeviationChange = (value: string, colorCode?: string) => {
-    onUpdate({ 
-      medication_deviations: value,
-      medication_deviations_color: colorCode 
-    });
   };
 
   return (
@@ -346,264 +250,31 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
       </div>
 
       {/* Daily Medication Plan */}
-      <Card className="border-2 border-blue-200">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-blue-700">
-            <Calendar className="w-5 h-5" />
-            Tagesplan Medikamente - {new Date().toLocaleDateString('de-DE')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {getDayPlan().map((timeSlot) => (
-              <div key={timeSlot.key} className="space-y-3">
-                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                  {getTimeSlotIcon(timeSlot.key)}
-                  <div>
-                    <h4 className="font-semibold text-sm">{getTimeSlotLabel(timeSlot.key)}</h4>
-                    <p className="text-xs text-gray-600">{timeSlot.time}</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  {timeSlot.medications.length === 0 ? (
-                    <p className="text-xs text-gray-500 italic">Keine Medikamente</p>
-                  ) : (
-                    timeSlot.medications.map((med) => {
-                      const dosageCount = med.schedule[timeSlot.key as keyof typeof med.schedule];
-                      const todayLogs = getTodayLogs(med.id);
-                      const timeLog = todayLogs.find(log => log.scheduledTime === timeSlot.time);
-                      
-                      return (
-                        <div key={med.id} className="bg-white border rounded p-2 space-y-1">
-                          <div className="flex items-center gap-2">
-                            <Checkbox 
-                              id={`med-${med.id}-${timeSlot.key}`}
-                              checked={timeLog?.completed || false}
-                              onCheckedChange={() => handleMarkCompleted(med.id, timeSlot.time)}
-                              className="data-[state=checked]:bg-green-600"
-                            />
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">{med.name}</p>
-                              <p className="text-xs text-gray-600">
-                                {dosageCount}x {med.dosage}
-                              </p>
-                              <Badge variant="outline" className="text-xs font-mono mt-1">
-                                {formatSchedule(med.schedule)}
-                              </Badge>
-                            </div>
-                          </div>
-                          {timeLog?.completed && timeLog.actualTime && (
-                            <p className="text-xs text-green-600">
-                              Gegeben um {timeLog.actualTime}
-                            </p>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <MedicationSchedule 
+        medications={medications}
+        logs={mockLogs}
+        onMarkCompleted={handleMarkCompleted}
+      />
 
       {/* Detailed Medication List */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Pill className="w-5 h-5 text-blue-500" />
-            Medikamentenplan (Detailansicht)
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {medications.map((medication) => {
-              const todayLogs = getTodayLogs(medication.id);
-              const stockStatus = getStockStatus(medication.stockCount, medication.reorderLevel);
-
-              return (
-                <div key={medication.id} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h4 className="font-semibold text-gray-800">{medication.name}</h4>
-                        <Badge variant="outline" className="text-xs">
-                          {medication.dosage}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs font-mono">
-                          {formatSchedule(medication.schedule)}
-                        </Badge>
-                        <Badge 
-                          variant="outline" 
-                          className={`text-xs ${stockStatus.color}`}
-                        >
-                          {stockStatus.text}: {medication.stockCount}
-                        </Badge>
-                      </div>
-                      
-                      {medication.instructions && (
-                        <p className="text-sm text-gray-600 mb-2">{medication.instructions}</p>
-                      )}
-
-                      {/* Schedule breakdown */}
-                      <div className="flex gap-4 text-xs text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <Sunrise className="w-3 h-3" />
-                          <span>Morgens: {medication.schedule.morning}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Sun className="w-3 h-3" />
-                          <span>Mittags: {medication.schedule.midday}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <CloudSun className="w-3 h-3" />
-                          <span>Abends: {medication.schedule.evening}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Moon className="w-3 h-3" />
-                          <span>Nachts: {medication.schedule.night}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {stockStatus.status === 'critical' && (
-                        <AlertTriangle className="w-5 h-5 text-red-500" />
-                      )}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditMedication(medication.id)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDeleteMedication(medication.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Notes from logs */}
-                  {todayLogs.some(log => log.notes) && (
-                    <div className="bg-blue-50 p-2 rounded text-sm">
-                      <strong>Notizen:</strong>
-                      {todayLogs.filter(log => log.notes).map((log, idx) => (
-                        <div key={idx} className="text-blue-800">
-                          {log.scheduledTime}: {log.notes}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      <MedicationList 
+        medications={medications}
+        logs={mockLogs}
+        onEditMedication={handleEditMedication}
+        onDeleteMedication={handleDeleteMedication}
+      />
 
       {/* Deviations with Auto Color Coding */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-orange-500" />
-              Abweichungen bei Maßnahmen
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <Label htmlFor="care_deviations">Dokumentation von Abweichungen</Label>
-              <ColorCodedEditor
-                value={resident.care_deviations || ''}
-                onChange={handleCareDeviationChange}
-                placeholder="Dokumentation von Abweichungen bei geplanten Pflegemaßnahmen..."
-                rows={6}
-                autoColorCode={true}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Pill className="w-5 h-5 text-red-500" />
-              Abweichungen bei der Medikation
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <Label htmlFor="medication_deviations">Dokumentation von Medikationsabweichungen</Label>
-              <ColorCodedEditor
-                value={resident.medication_deviations || ''}
-                onChange={handleMedicationDeviationChange}
-                placeholder="Dokumentation von Medikationsabweichungen..."
-                rows={6}
-                autoColorCode={true}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <DeviationsSection 
+        resident={resident}
+        onUpdate={onUpdate}
+      />
 
       {/* Recent Care Reports with Color Coding */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-green-500" />
-            Aktuelle Pflegeberichte
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {careReports.map((report) => (
-              <div key={report.id} className={`border-l-4 pl-4 py-2 ${getReportColorStyle(report.colorCode)}`}>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">{report.text}</p>
-                    <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
-                      <span>{report.timestamp}</span>
-                      <span>von {report.author}</span>
-                      <Badge variant="outline" className="text-xs">
-                        {report.type}
-                      </Badge>
-                      {report.colorCode && (
-                        <Badge 
-                          variant="outline" 
-                          className={`text-xs ${
-                            report.colorCode === 'red' ? 'bg-red-100 text-red-800' :
-                            report.colorCode === 'green' ? 'bg-green-100 text-green-800' :
-                            report.colorCode === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {report.colorCode === 'red' ? 'Wichtig' :
-                           report.colorCode === 'green' ? 'Positiv' :
-                           report.colorCode === 'yellow' ? 'Achtung' : 'Normal'}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            <div className="text-center py-4">
-              <Button variant="outline" size="sm" onClick={() => setShowAddReport(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Weiteren Pflegebericht hinzufügen
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <CareReports 
+        reports={careReports}
+        onAddReport={() => setShowAddReport(true)}
+      />
 
       {/* Add Medication Dialog */}
       <AddMedicationDialog
