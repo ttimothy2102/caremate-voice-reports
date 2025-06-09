@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, Users, Calendar, Heart } from 'lucide-react';
+import { ArrowRight, BarChart3, Users, Calendar, Heart, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function DashboardPreview() {
