@@ -9,6 +9,7 @@ import { ResidentVitalSigns } from './tabs/ResidentVitalSigns';
 import { ResidentCareInfo } from './tabs/ResidentCareInfo';
 import { ResidentDocumentationModules } from './tabs/ResidentDocumentationModules';
 import { ResidentSchedule } from './tabs/ResidentSchedule';
+import { ResidentMedications } from './tabs/ResidentMedications';
 import { Save, X } from 'lucide-react';
 
 interface ResidentDetailModalProps {
@@ -36,7 +37,7 @@ export function ResidentDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-semibold">
@@ -55,14 +56,22 @@ export function ResidentDetailModal({
           </div>
         </DialogHeader>
 
-        <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+        <Tabs defaultValue="medications" className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="medications">Medikamente</TabsTrigger>
             <TabsTrigger value="basic">Basisdaten</TabsTrigger>
             <TabsTrigger value="vitals">Vitalwerte</TabsTrigger>
             <TabsTrigger value="care">Pflege</TabsTrigger>
             <TabsTrigger value="docs">Dokumentation</TabsTrigger>
             <TabsTrigger value="schedule">Termine</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="medications" className="mt-6">
+            <ResidentMedications 
+              resident={editedResident}
+              onUpdate={updateResident}
+            />
+          </TabsContent>
 
           <TabsContent value="basic" className="mt-6">
             <ResidentBasicInfo 
