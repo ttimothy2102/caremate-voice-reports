@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
-import { Loader2, Heart, CheckCircle, AlertCircle } from "lucide-react";
+import { Loader2, Heart, CheckCircle, AlertCircle, CreditCard } from "lucide-react";
 
 interface AuthFormData {
   email: string;
@@ -150,6 +150,19 @@ export function Auth() {
             {isSignUp ? 'Der CareMate Plattform beitreten' : 'Melden Sie sich in Ihr Konto an'}
           </p>
         </div>
+
+        {/* Trial Information */}
+        {isSignUp && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <CreditCard className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-blue-800">
+                <p className="font-medium">14-Tage kostenlose Testversion</p>
+                <p>Eine Kreditkarte ist für die Testversion erforderlich. Sie können jederzeit kündigen.</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Email verification notice */}
         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">

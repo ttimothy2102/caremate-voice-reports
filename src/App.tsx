@@ -12,6 +12,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Schedule } from "./pages/Schedule";
 import { Residents } from "./pages/Residents";
 import { Auth } from "./pages/Auth";
+import Demo from "./pages/Demo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/demo" element={<Demo />} />
             <Route path="/mobile-home" element={<MobileHome />} />
             <Route path="/voice-input" element={<VoiceInput />} />
             <Route path="/dashboard" element={<Dashboard />} />
