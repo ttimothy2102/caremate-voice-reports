@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Package, Plus, AlertTriangle, Calendar } from 'lucide-react';
+import { Package, Plus, AlertTriangle, Calendar, Clock } from 'lucide-react';
 import { useDrugOrders } from '@/hooks/useDrugOrders';
 import { useMedications } from '@/hooks/useMedications';
 
@@ -17,6 +17,10 @@ export function DrugOrdering() {
 
   const lowStockMedications = medications.filter(med => 
     (med.stock_count || 0) <= (med.reorder_level || 5)
+  );
+
+  const pendingOrders = orders.filter(order => 
+    order.status === 'pending' || order.status === 'ordered'
   );
 
   const getStatusColor = (status: string) => {
@@ -63,13 +67,29 @@ export function DrugOrdering() {
             <Package className="w-5 h-5 text-blue-600" />
             Drug Orders
           </h3>
-          <Button 
-            onClick={() => setShowOrderForm(!showOrderForm)}
-            className="bg-caremate-gradient"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            New Order
-          </Button>
+          <div className="flex items-center gap-3">
+            {/* Upcoming Orders Info */}
+            {pendingOrders.length > 0 && (
+              <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-full">
+                <Clock className="w-4 h-4" />
+                <span>{pendingOrders.length} pending order{pendingOrders.length > 1 ? 's' : ''}</span>
+              </div>
+            )}
+            {lowStockMedications.length > 0 && (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-1 rounded-full">
+                <AlertTriangle className="w-4 h-4" />
+                <span>{lowStockMedications.length} low stock alert{lowStockMedications.length > 1 ? 's' : ''}</span>
+              </div>
+            )}
+            <Button 
+              size="sm"
+              onClick={() => setShowOrderForm(!showOrderForm)}
+              className="bg-caremate-gradient"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              New Order
+            </Button>
+          </div>
         </div>
 
         {showOrderForm && <OrderForm onClose={() => setShowOrderForm(false)} />}
