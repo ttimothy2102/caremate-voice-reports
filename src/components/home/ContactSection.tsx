@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 
 export function ContactSection() {
   const [formData, setFormData] = useState({
@@ -24,7 +24,6 @@ export function ContactSection() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the form data to your backend
     console.log('Contact form submitted:', formData);
     toast({
       title: "Message sent!",
@@ -45,7 +44,6 @@ export function ContactSection() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Contact Information */}
         <div className="space-y-8">
           <Card className="p-8 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
             <h4 className="text-2xl font-bold text-gray-900 mb-6">Let's discuss your needs</h4>
@@ -57,7 +55,7 @@ export function ContactSection() {
                 </div>
                 <div>
                   <h5 className="font-semibold text-gray-900">Email</h5>
-                  <p className="text-gray-600">contact@caremate.com</p>
+                  <p className="text-gray-600">contact@caremate.at</p>
                 </div>
               </div>
               
@@ -67,7 +65,7 @@ export function ContactSection() {
                 </div>
                 <div>
                   <h5 className="font-semibold text-gray-900">Phone</h5>
-                  <p className="text-gray-600">+1 (555) 123-4567</p>
+                  <p className="text-gray-600">+43 660 7906521</p>
                 </div>
               </div>
               
@@ -77,7 +75,7 @@ export function ContactSection() {
                 </div>
                 <div>
                   <h5 className="font-semibold text-gray-900">Office</h5>
-                  <p className="text-gray-600">San Francisco, CA</p>
+                  <p className="text-gray-600">Parkring 12, 1010 Vienna, Austria</p>
                 </div>
               </div>
             </div>
@@ -92,7 +90,6 @@ export function ContactSection() {
           </Card>
         </div>
 
-        {/* Contact Form */}
         <Card className="p-8 bg-white/90 backdrop-blur-sm border-0 shadow-lg">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -155,7 +152,7 @@ export function ContactSection() {
             
             <Button 
               type="submit"
-              className="w-full liquid-gradient-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg"
+              className="w-full cursor-tracking-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg"
             >
               Send Message
               <Send className="w-4 h-4 ml-2" />

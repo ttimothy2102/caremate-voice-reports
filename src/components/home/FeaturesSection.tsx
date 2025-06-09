@@ -37,8 +37,8 @@ export function FeaturesSection() {
     },
     {
       icon: Shield,
-      title: "HIPAA Compliant",
-      description: "Enterprise-grade security with full HIPAA compliance and data encryption",
+      title: "GDPR Compliant",
+      description: "Enterprise-grade security with full GDPR compliance and EU data protection",
       benefit: "Complete data protection"
     }
   ];
@@ -57,10 +57,12 @@ export function FeaturesSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {features.map((feature, index) => (
-          <Card key={index} className="p-8 hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm group hover:-translate-y-2">
-            <div className="space-y-4">
-              <div className="w-14 h-14 bg-caremate-gradient rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <feature.icon className="w-7 h-7 text-white" />
+          <Card key={index} className="p-8 hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm group hover:-translate-y-2 cursor-pointer relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="space-y-4 relative z-10">
+              <div className="w-14 h-14 bg-caremate-gradient rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 relative overflow-hidden">
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <feature.icon className="w-7 h-7 text-white relative z-10" />
               </div>
               <div className="space-y-2">
                 <h4 className="text-xl font-semibold text-gray-900">{feature.title}</h4>

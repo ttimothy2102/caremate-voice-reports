@@ -30,7 +30,7 @@ export function HeroSection() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button 
             size="lg" 
-            className="liquid-gradient-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-lg px-8 py-6"
+            className="cursor-tracking-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-lg px-8 py-6"
             onClick={() => navigate('/auth')}
           >
             Start Free Trial
@@ -40,7 +40,7 @@ export function HeroSection() {
             size="lg" 
             variant="outline" 
             className="text-lg px-8 py-6 group"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/demo')}
           >
             <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
             View Demo

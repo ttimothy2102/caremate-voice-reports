@@ -34,7 +34,7 @@ export function CTASection() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button 
             size="lg" 
-            className="liquid-gradient-button-inverse text-primary border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-lg px-8 py-6"
+            className="cursor-tracking-button-inverse text-primary border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-lg px-8 py-6"
             onClick={() => navigate('/auth')}
           >
             Start Your Free Trial
@@ -43,15 +43,15 @@ export function CTASection() {
           <Button 
             size="lg" 
             variant="outline"
-            className="text-white border-white hover:bg-white hover:text-gray-900 text-lg px-8 py-6"
-            onClick={() => navigate('/dashboard')}
+            className="bg-white/10 text-white border-white/30 hover:bg-white/20 hover:text-white text-lg px-8 py-6"
+            onClick={() => navigate('/demo')}
           >
             View Demo
           </Button>
         </div>
         
         <div className="mt-8 text-blue-100 text-sm">
-          ✓ 14-day free trial  ✓ No credit card required  ✓ HIPAA compliant
+          ✓ 14-day free trial  ✓ Credit card required  ✓ GDPR compliant
         </div>
       </div>
     </section>

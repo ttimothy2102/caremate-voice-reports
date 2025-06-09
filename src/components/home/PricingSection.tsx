@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Star } from 'lucide-react';
@@ -7,11 +7,30 @@ import { useNavigate } from 'react-router-dom';
 
 export function PricingSection() {
   const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const plans = [
     {
       name: "Starter",
-      price: "$49",
+      price: "€49",
       period: "per month",
       description: "Perfect for small care facilities",
       features: [
@@ -25,7 +44,7 @@ export function PricingSection() {
     },
     {
       name: "Professional",
-      price: "$99",
+      price: "€99",
       period: "per month",
       description: "Ideal for growing care facilities",
       features: [
@@ -58,19 +77,19 @@ export function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="max-w-7xl mx-auto px-6 py-20">
+    <section ref={sectionRef} id="pricing" className={`max-w-7xl mx-auto px-6 py-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
       <div className="text-center mb-16">
         <h3 className="text-4xl font-bold text-gray-900 mb-4">
           Simple, transparent pricing
         </h3>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Choose the perfect plan for your care facility. All plans include a 14-day free trial.
+          Choose the perfect plan for your care facility. All plans include a 14-day free trial with credit card required.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {plans.map((plan, index) => (
-          <Card key={index} className={`relative p-8 ${plan.popular ? 'border-2 border-blue-500 shadow-xl scale-105' : 'border-0'} bg-white/90 backdrop-blur-sm hover:shadow-lg transition-all duration-300`}>
+          <Card key={index} className={`relative p-8 ${plan.popular ? 'border-2 border-blue-500 shadow-xl scale-105' : 'border-0'} bg-white/90 backdrop-blur-sm hover:shadow-lg transition-all duration-300 ${isVisible ? 'animate-fade-in' : ''}`} style={{ animationDelay: `${index * 0.2}s` }}>
             {plan.popular && (
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <div className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2">
@@ -111,12 +130,16 @@ export function PricingSection() {
 
       <div className="text-center mt-12">
         <p className="text-gray-600 mb-4">
-          All plans include a 14-day free trial. No credit card required.
+          All plans include a 14-day free trial. Credit card required for subscription.
         </p>
         <div className="flex flex-wrap justify-center items-center gap-6 text-sm text-gray-500">
           <div className="flex items-center gap-2">
             <Check className="w-4 h-4 text-green-500" />
-            HIPAA Compliant
+            GDPR Compliant
+          </div>
+          <div className="flex items-center gap-2">
+            <Check className="w-4 h-4 text-green-500" />
+            EU Data Protection
           </div>
           <div className="flex items-center gap-2">
             <Check className="w-4 h-4 text-green-500" />
