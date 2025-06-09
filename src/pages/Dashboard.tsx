@@ -19,6 +19,7 @@ import { Logo } from '@/components/layout/Logo';
 import { getPersonalizedGreeting } from '@/utils/greetingUtils';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AccountManagement } from "@/components/account/AccountManagement";
+
 function DashboardContent() {
   const {
     data: residents = [],
@@ -40,6 +41,7 @@ function DashboardContent() {
   const userName = user?.user_metadata?.full_name;
   const greeting = getPersonalizedGreeting(userName);
   const userInitials = user?.user_metadata?.full_name ? user.user_metadata.full_name.split(' ').map((name: string) => name[0]).join('').toUpperCase() : user?.email?.[0]?.toUpperCase() || 'U';
+  
   const handleSignOut = async () => {
     await signOut();
     toast({
@@ -47,27 +49,36 @@ function DashboardContent() {
       description: "Sie wurden erfolgreich abgemeldet."
     });
   };
-  const overviewStats = [{
-    title: "Berichte heute",
-    value: careReports.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString()).length.toString(),
-    icon: FileText,
-    color: "text-blue-600"
-  }, {
-    title: "Aktive Bewohner",
-    value: residents.length.toString(),
-    icon: Users,
-    color: "text-green-600"
-  }, {
-    title: "Vital-Alarme",
-    value: "3",
-    icon: AlertTriangle,
-    color: "text-red-600"
-  }, {
-    title: "Gerätesync",
-    value: "98%",
-    icon: Heart,
-    color: "text-purple-600"
-  }];
+
+  // Reordered stats with functional navigation
+  const overviewStats = [
+    {
+      title: "Aktive Bewohner",
+      value: residents.length.toString(),
+      icon: Users,
+      color: "text-green-600",
+      onClick: () => navigate('/residents')
+    },
+    {
+      title: "Berichte heute",
+      value: careReports.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString()).length.toString(),
+      icon: FileText,
+      color: "text-blue-600"
+    },
+    {
+      title: "Vital-Alarme",
+      value: "3",
+      icon: AlertTriangle,
+      color: "text-red-600"
+    },
+    {
+      title: "Gerätesync",
+      value: "98%",
+      icon: Heart,
+      color: "text-purple-600"
+    }
+  ];
+
   if (residentsLoading) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -76,6 +87,7 @@ function DashboardContent() {
         </div>
       </div>;
   }
+
   return <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b px-6 py-4">
@@ -109,9 +121,14 @@ function DashboardContent() {
       </header>
 
       <div className="p-6 space-y-6">
-        {/* Overview Stats */}
+        {/* Overview Stats - Now with functional buttons */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {overviewStats.map((stat, index) => <Card key={index} className="p-4">
+          {overviewStats.map((stat, index) => (
+            <Card 
+              key={index} 
+              className={`p-4 ${stat.onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+              onClick={stat.onClick}
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">{stat.title}</p>
@@ -119,7 +136,8 @@ function DashboardContent() {
                 </div>
                 <stat.icon className={`w-8 h-8 ${stat.color}`} />
               </div>
-            </Card>)}
+            </Card>
+          ))}
         </div>
 
         {/* Residents List - New comprehensive section */}
@@ -149,6 +167,7 @@ function DashboardContent() {
       <AddResidentDialog isOpen={showAddResidentDialog} onClose={() => setShowAddResidentDialog(false)} />
     </div>;
 }
+
 export function Dashboard() {
   return <ProtectedRoute>
       <DashboardContent />
