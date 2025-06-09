@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,13 @@ interface ScheduleEvent {
   description: string;
 }
 
+interface QuickAction {
+  id: string;
+  title: string;
+  type: 'medical' | 'therapy' | 'social' | 'hygiene' | 'meal';
+  defaultDuration: number; // in minutes
+}
+
 export function ResidentSchedule({ resident, onUpdate }: ResidentScheduleProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newEvent, setNewEvent] = useState<Partial<ScheduleEvent>>({
@@ -33,6 +41,15 @@ export function ResidentSchedule({ resident, onUpdate }: ResidentScheduleProps) 
     recurring: 'none',
     description: ''
   });
+
+  const [draggedAction, setDraggedAction] = useState<QuickAction | null>(null);
+
+  const quickActions: QuickAction[] = [
+    { id: '1', title: 'Arzttermin', type: 'medical', defaultDuration: 60 },
+    { id: '2', title: 'Therapie', type: 'therapy', defaultDuration: 45 },
+    { id: '3', title: 'Medikation', type: 'medical', defaultDuration: 15 },
+    { id: '4', title: 'Aktivität', type: 'social', defaultDuration: 90 }
+  ];
 
   // Mock events for demonstration
   const [events, setEvents] = useState<ScheduleEvent[]>([
@@ -108,6 +125,52 @@ export function ResidentSchedule({ resident, onUpdate }: ResidentScheduleProps) 
       });
       setShowAddForm(false);
     }
+  };
+
+  const handleQuickActionClick = (action: QuickAction) => {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    setNewEvent({
+      title: action.title,
+      date: tomorrow.toISOString().split('T')[0],
+      time: '09:00',
+      type: action.type,
+      recurring: 'none',
+      description: `Automatisch erstellt: ${action.title}`
+    });
+    setShowAddForm(true);
+  };
+
+  const handleDragStart = (action: QuickAction) => {
+    setDraggedAction(action);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedAction(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetDate: string) => {
+    e.preventDefault();
+    if (draggedAction) {
+      const event: ScheduleEvent = {
+        id: Date.now().toString(),
+        title: draggedAction.title,
+        date: targetDate,
+        time: '09:00',
+        type: draggedAction.type,
+        recurring: 'none',
+        description: `Per Drag & Drop erstellt: ${draggedAction.title}`
+      };
+      
+      setEvents([...events, event]);
+      setDraggedAction(null);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
   };
 
   // Get next 14 days
@@ -240,9 +303,17 @@ export function ResidentSchedule({ resident, onUpdate }: ResidentScheduleProps) 
         </CardHeader>
         <CardContent>
           {eventsInNext14Days.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">
-              Keine Termine in den nächsten 14 Tagen geplant.
-            </p>
+            <div 
+              className="text-gray-500 text-center py-8 border-2 border-dashed border-gray-300 rounded-lg"
+              onDrop={(e) => {
+                const today = new Date().toISOString().split('T')[0];
+                handleDrop(e, today);
+              }}
+              onDragOver={handleDragOver}
+            >
+              <p className="mb-2">Keine Termine in den nächsten 14 Tagen geplant.</p>
+              <p className="text-sm">Ziehen Sie eine Schnellaktion hierher, um einen Termin zu erstellen.</p>
+            </div>
           ) : (
             <div className="space-y-3">
               {eventsInNext14Days
@@ -252,6 +323,8 @@ export function ResidentSchedule({ resident, onUpdate }: ResidentScheduleProps) 
                   key={event.id}
                   className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-grab"
                   draggable
+                  onDrop={(e) => handleDrop(e, event.date)}
+                  onDragOver={handleDragOver}
                 >
                   <div className="flex items-center gap-3">
                     <GripVertical className="w-4 h-4 text-gray-400" />
@@ -287,21 +360,24 @@ export function ResidentSchedule({ resident, onUpdate }: ResidentScheduleProps) 
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Schnellaktionen</CardTitle>
+          <p className="text-sm text-gray-600">Klicken Sie auf eine Aktion oder ziehen Sie sie in den Kalender</p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <Button variant="outline" size="sm">
-              Arzttermin
-            </Button>
-            <Button variant="outline" size="sm">
-              Therapie
-            </Button>
-            <Button variant="outline" size="sm">
-              Medikation
-            </Button>
-            <Button variant="outline" size="sm">
-              Aktivität
-            </Button>
+            {quickActions.map((action) => (
+              <Button 
+                key={action.id}
+                variant="outline" 
+                size="sm"
+                className="cursor-grab active:cursor-grabbing"
+                draggable
+                onClick={() => handleQuickActionClick(action)}
+                onDragStart={() => handleDragStart(action)}
+                onDragEnd={handleDragEnd}
+              >
+                {action.title}
+              </Button>
+            ))}
           </div>
         </CardContent>
       </Card>
