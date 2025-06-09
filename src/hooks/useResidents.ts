@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -64,6 +63,16 @@ export interface Resident {
   nutrition_plan?: string;
   billing_carrier?: string;
   profile_image_url?: string;
+  // Color coding fields for important notes
+  shift_notes?: string;
+  shift_notes_color?: string;
+  care_deviations?: string;
+  care_deviations_color?: string;
+  medication_deviations?: string;
+  medication_deviations_color?: string;
+  emergency_medication?: string;
+  care_situation?: string;
+  hygiene_data?: string;
 }
 
 export function useResidents() {

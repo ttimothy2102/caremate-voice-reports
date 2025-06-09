@@ -20,8 +20,11 @@ export interface ExtendedResident extends Resident {
   bmi?: string;
   care_situation?: string;
   shift_notes?: string;
+  shift_notes_color?: string;
   medication_deviations?: string;
+  medication_deviations_color?: string;
   care_deviations?: string;
+  care_deviations_color?: string;
   emergency_medication?: string;
   energy_consumption?: number;
   energy_requirement?: number;
