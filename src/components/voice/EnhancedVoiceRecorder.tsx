@@ -32,39 +32,48 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
     processAudioWithAI
   } = useVoiceRecording();
 
-  const toggleRecording = async () => {
+  const handleToggleRecording = async () => {
     if (isRecording) {
-      const audioBlob = await stopRecording();
-      if (audioBlob) {
-        try {
-          const result = await processAudioWithAI(audioBlob, residentId) as any;
-          setTranscript(result.transcript);
-          setDetectedMedications(result.structuredReport.detected_medications || []);
-          setDetectedVitals(result.structuredReport.detected_vitals || {});
-          
-          if (residentId && user) {
-            createCareReport({
-              resident_id: residentId,
-              caregiver_id: user.id,
-              ...result.structuredReport
-            });
-          }
-
-          onTranscriptionComplete(result.structuredReport);
-        } catch (error) {
-          console.error('Processing failed:', error);
-          toast({
-            title: "Verarbeitungsfehler",
-            description: error instanceof Error ? error.message : "Unbekannter Fehler",
-            variant: "destructive"
-          });
-        }
-      }
+      await handleStopRecording();
     } else {
-      setTranscript('');
-      setDetectedMedications([]);
-      setDetectedVitals({});
-      await startRecording();
+      await handleStartRecording();
+    }
+  };
+
+  const handleStartRecording = async () => {
+    setTranscript('');
+    setDetectedMedications([]);
+    setDetectedVitals({});
+    await startRecording();
+  };
+
+  const handleStopRecording = async () => {
+    const audioBlob = await stopRecording();
+    if (!audioBlob) return;
+
+    try {
+      const result = await processAudioWithAI(audioBlob, residentId) as any;
+      
+      setTranscript(result.transcript);
+      setDetectedMedications(result.structuredReport.detected_medications || []);
+      setDetectedVitals(result.structuredReport.detected_vitals || {});
+      
+      if (residentId && user) {
+        createCareReport({
+          resident_id: residentId,
+          caregiver_id: user.id,
+          ...result.structuredReport
+        });
+      }
+
+      onTranscriptionComplete(result.structuredReport);
+    } catch (error) {
+      console.error('Processing failed:', error);
+      toast({
+        title: "Processing Error",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive"
+      });
     }
   };
 
@@ -72,11 +81,11 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
     setTranscript(updatedTranscript);
     
     const updatedReport = {
-      physical_condition: "Bearbeitet",
-      mood: "Bearbeitet", 
-      food_water_intake: "Bearbeitet",
-      medication_given: "Bearbeitet",
-      special_notes: "Bearbeitet",
+      physical_condition: "Edited",
+      mood: "Edited", 
+      food_water_intake: "Edited",
+      medication_given: "Edited",
+      special_notes: "Edited",
       voice_transcript: updatedTranscript
     };
     
@@ -84,29 +93,27 @@ export function EnhancedVoiceRecorder({ onTranscriptionComplete, residentId }: E
   };
 
   const handleMedicationConfirmed = (medication: string) => {
-    console.log('Medikament bestätigt:', medication);
-    // Here you would integrate with the medication system
-    // to mark the medication as given in the medication logs
+    console.log('Medication confirmed:', medication);
+    // Integration with medication system would go here
   };
 
   const handleVitalConfirmed = (vital: any) => {
-    console.log('Vitalwert bestätigt:', vital);
-    // Here you would integrate with the vital signs system
-    // to save the vital sign measurement
+    console.log('Vital sign confirmed:', vital);
+    // Integration with vital signs system would go here
   };
 
   return (
     <div className="p-6 space-y-6">
       <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">Sprachtranskription</h2>
-        <p className="text-gray-600 text-sm">Nehmen Sie Pflegeberichte mit KI-Unterstützung auf</p>
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">Voice Transcription</h2>
+        <p className="text-gray-600 text-sm">Record care reports with AI assistance</p>
       </div>
 
       <div className="flex flex-col items-center gap-4">
         <VoiceRecorderButton
           isRecording={isRecording}
           isProcessing={isProcessing}
-          onToggleRecording={toggleRecording}
+          onToggleRecording={handleToggleRecording}
         />
 
         <RecordingTimer

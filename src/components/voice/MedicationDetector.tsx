@@ -1,17 +1,10 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, AlertCircle, Pill } from 'lucide-react';
+import { CheckCircle, AlertCircle, Pill, Activity } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-
-interface DetectedMedication {
-  name: string;
-  confidence: number;
-  time?: string;
-  dosage?: string;
-}
 
 interface DetectedVital {
   type: string;
@@ -37,18 +30,15 @@ export function MedicationDetector({
   const [confirmedMeds, setConfirmedMeds] = React.useState<string[]>([]);
   const [confirmedVitals, setConfirmedVitals] = React.useState<string[]>([]);
 
-  // Auto-detect common medication patterns
   const processMedications = (medications: string[]) => {
     return medications.map(med => ({
       name: med,
-      confidence: 0.8, // We could implement actual confidence scoring
+      confidence: 0.8,
       matched: checkMedicationMatch(med)
     }));
   };
 
-  // Check if detected medication matches known medications for this resident
   const checkMedicationMatch = (medicationName: string) => {
-    // This would normally check against the resident's medication list
     const commonMedications = [
       'Aspirin', 'Metformin', 'Lisinopril', 'Ibuprofen', 
       'Paracetamol', 'Omeprazol', 'Simvastatin'
@@ -60,37 +50,36 @@ export function MedicationDetector({
     );
   };
 
-  // Process detected vital signs
-  const processVitals = (vitals: Record<string, any>) => {
+  const processVitals = (vitals: Record<string, any>): DetectedVital[] => {
     const processedVitals: DetectedVital[] = [];
     
     Object.entries(vitals).forEach(([key, value]) => {
-      if (typeof value === 'string' && value !== 'Nicht erwähnt') {
+      if (typeof value === 'string' && value !== 'Not mentioned') {
         // Extract blood pressure
         const bpMatch = value.match(/(\d+)\/(\d+)/);
         if (bpMatch) {
           processedVitals.push({
-            type: 'Blutdruck',
+            type: 'Blood Pressure',
             value: `${bpMatch[1]}/${bpMatch[2]}`,
             unit: 'mmHg'
           });
         }
         
         // Extract pulse
-        const pulseMatch = value.match(/Puls\s*:?\s*(\d+)/i);
+        const pulseMatch = value.match(/Pulse\s*:?\s*(\d+)/i);
         if (pulseMatch) {
           processedVitals.push({
-            type: 'Puls',
+            type: 'Pulse',
             value: pulseMatch[1],
             unit: 'bpm'
           });
         }
         
         // Extract temperature
-        const tempMatch = value.match(/Temperatur\s*:?\s*(\d+(?:,|\.)\d+)/i);
+        const tempMatch = value.match(/Temperature\s*:?\s*(\d+(?:,|\.)\d+)/i);
         if (tempMatch) {
           processedVitals.push({
-            type: 'Temperatur',
+            type: 'Temperature',
             value: tempMatch[1].replace(',', '.'),
             unit: '°C'
           });
@@ -109,8 +98,8 @@ export function MedicationDetector({
     onMedicationConfirmed(medication);
     
     toast({
-      title: "Medikament bestätigt",
-      description: `${medication} wurde als verabreicht markiert`,
+      title: "Medication Confirmed",
+      description: `${medication} has been marked as administered`,
     });
   };
 
@@ -120,8 +109,8 @@ export function MedicationDetector({
     onVitalConfirmed(vital);
     
     toast({
-      title: "Vitalwert erfasst",
-      description: `${vital.type}: ${vital.value} ${vital.unit || ''} wurde gespeichert`,
+      title: "Vital Sign Recorded",
+      description: `${vital.type}: ${vital.value} ${vital.unit || ''} has been saved`,
     });
   };
 
@@ -133,29 +122,28 @@ export function MedicationDetector({
     <Card className="p-4 bg-green-50 border-green-200">
       <div className="flex items-center gap-2 mb-3">
         <CheckCircle className="w-5 h-5 text-green-600" />
-        <h3 className="font-medium text-green-800">Automatische Erkennung</h3>
+        <h3 className="font-medium text-green-800">AI Detection Results</h3>
       </div>
 
       {processedMedications.length > 0 && (
         <div className="mb-4">
           <h4 className="text-sm font-medium text-green-700 mb-2 flex items-center gap-1">
             <Pill className="w-4 h-4" />
-            Erkannte Medikamente:
+            Detected Medications:
           </h4>
           <div className="space-y-2">
             {processedMedications.map((med, index) => (
               <div key={index} className="flex items-center justify-between bg-white rounded-md p-2 border">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{med.name}</span>
-                  {med.matched && (
+                  {med.matched ? (
                     <Badge variant="outline" className="text-green-700 border-green-300">
-                      Bekanntes Medikament
+                      Known Medication
                     </Badge>
-                  )}
-                  {!med.matched && (
+                  ) : (
                     <Badge variant="outline" className="text-yellow-700 border-yellow-300">
                       <AlertCircle className="w-3 h-3 mr-1" />
-                      Unbekannt
+                      Unknown
                     </Badge>
                   )}
                 </div>
@@ -165,7 +153,7 @@ export function MedicationDetector({
                   disabled={confirmedMeds.includes(med.name)}
                   className="bg-green-600 hover:bg-green-700"
                 >
-                  {confirmedMeds.includes(med.name) ? 'Bestätigt' : 'Bestätigen'}
+                  {confirmedMeds.includes(med.name) ? 'Confirmed' : 'Confirm'}
                 </Button>
               </div>
             ))}
@@ -175,7 +163,10 @@ export function MedicationDetector({
 
       {processedVitals.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-green-700 mb-2">Erkannte Vitalwerte:</h4>
+          <h4 className="text-sm font-medium text-green-700 mb-2 flex items-center gap-1">
+            <Activity className="w-4 h-4" />
+            Detected Vital Signs:
+          </h4>
           <div className="space-y-2">
             {processedVitals.map((vital, index) => {
               const vitalKey = `${vital.type}-${vital.value}`;
@@ -191,7 +182,7 @@ export function MedicationDetector({
                     disabled={confirmedVitals.includes(vitalKey)}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
-                    {confirmedVitals.includes(vitalKey) ? 'Gespeichert' : 'Speichern'}
+                    {confirmedVitals.includes(vitalKey) ? 'Saved' : 'Save'}
                   </Button>
                 </div>
               );
