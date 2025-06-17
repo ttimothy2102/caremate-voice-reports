@@ -6,6 +6,7 @@ import { HomeHeader } from '@/components/home/HomeHeader';
 import { HeroSection } from '@/components/home/HeroSection';
 import { FeaturesSection } from '@/components/home/FeaturesSection';
 import { DashboardPreview } from '@/components/home/DashboardPreview';
+import { WaitlistForm } from '@/components/home/WaitlistForm';
 import { PricingSection } from '@/components/home/PricingSection';
 import { ContactSection } from '@/components/home/ContactSection';
 import { CTASection } from '@/components/home/CTASection';
@@ -52,6 +53,9 @@ const Index = () => {
       </div>
       <div data-scroll-animation>
         <DashboardPreview />
+      </div>
+      <div data-scroll-animation id="waitlist-form" className="max-w-4xl mx-auto px-6 py-12">
+        <WaitlistForm />
       </div>
       <div data-scroll-animation>
         <PricingSection />
