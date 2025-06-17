@@ -1,14 +1,13 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ColorCodedEditor } from "@/components/ui/color-coded-editor";
 import { AddMedicationDialog } from "@/components/medications/AddMedicationDialog";
 import { MedicationSchedule } from "@/components/medications/MedicationSchedule";
 import { MedicationList } from "@/components/medications/MedicationList";
 import { CareReports } from "@/components/care/CareReports";
 import { DeviationsSection } from "@/components/care/DeviationsSection";
+import { CareReportForm } from "./medication-components/CareReportForm";
 import { ExtendedResident } from '../ResidentsList';
 import { Plus, FileText } from 'lucide-react';
 import { useMedications } from '@/hooks/useMedications';
@@ -28,33 +27,25 @@ interface CareReport {
   type: string;
 }
 
-// Interface for MedicationList component
-interface MedicationListItem {
-  id: string;
-  name: string;
-  dosage: string;
-  schedule: string;
-  stockCount: number;
-  reorderLevel: number;
-  times: string[];
-}
-
 export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsProps) {
   const [showAddReport, setShowAddReport] = useState(false);
   const [showAddMedication, setShowAddMedication] = useState(false);
-  const [reportText, setReportText] = useState('');
-  const [reportColorCode, setReportColorCode] = useState<string>();
-  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   
   const { data: medicationsData = [] } = useMedications(resident.id);
   const { data: medicationLogs = [] } = useMedicationLogs();
 
   // Transform medications from database format to MedicationList format
-  const medications: MedicationListItem[] = medicationsData.map(med => ({
+  const medications = medicationsData.map(med => ({
     id: med.id,
     name: med.drug_name,
     dosage: med.dosage,
-    schedule: med.frequency,
+    schedule: {
+      morning: 1,
+      midday: 0,
+      evening: 1,
+      night: 0
+    },
+    instructions: med.instructions || '',
     stockCount: med.stock_count || 0,
     reorderLevel: med.reorder_level || 5,
     times: med.frequency.toLowerCase().includes('daily') 
@@ -91,7 +82,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
     console.log(`Marking medication ${medicationId} as completed for ${timeSlot}`);
   };
 
-  const handleAddReport = () => {
+  const handleAddReport = (reportText: string, reportColorCode?: string, selectedFiles?: FileList | null) => {
     const newReport: CareReport = {
       id: Date.now().toString(),
       text: reportText,
@@ -103,10 +94,6 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
     
     setCareReports(prev => [newReport, ...prev]);
     console.log('Adding care report:', newReport);
-    
-    setReportText('');
-    setReportColorCode(undefined);
-    setSelectedFiles(null);
     setShowAddReport(false);
   };
 
@@ -139,44 +126,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
               <DialogHeader>
                 <DialogTitle>Pflegebericht für {resident.name}</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="report-text">Pflegebericht</Label>
-                  <ColorCodedEditor
-                    value={reportText}
-                    onChange={(value, colorCode) => {
-                      setReportText(value);
-                      setReportColorCode(colorCode);
-                    }}
-                    placeholder="Beschreiben Sie die Pflegemaßnahmen, Beobachtungen und besondere Ereignisse..."
-                    rows={8}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="file-upload">Dateien anhängen (optional)</Label>
-                  <input
-                    id="file-upload"
-                    type="file"
-                    multiple
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                    onChange={(e) => setSelectedFiles(e.target.files)}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Unterstützte Formate: PDF, DOC, DOCX, JPG, PNG
-                  </p>
-                </div>
-
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setShowAddReport(false)}>
-                    Abbrechen
-                  </Button>
-                  <Button onClick={handleAddReport}>
-                    Bericht speichern
-                  </Button>
-                </div>
-              </div>
+              <CareReportForm onSave={handleAddReport} />
             </DialogContent>
           </Dialog>
           
