@@ -11,37 +11,12 @@ import { CareReports } from "@/components/care/CareReports";
 import { DeviationsSection } from "@/components/care/DeviationsSection";
 import { ExtendedResident } from '../ResidentsList';
 import { Plus, FileText } from 'lucide-react';
+import { useMedications } from '@/hooks/useMedications';
+import { useMedicationLogs } from '@/hooks/useMedicationLogs';
 
 interface ResidentMedicationsProps {
   resident: ExtendedResident;
   onUpdate: (updates: Partial<ExtendedResident>) => void;
-}
-
-interface Medication {
-  id: string;
-  name: string;
-  dosage: string;
-  schedule: {
-    morning: number;
-    midday: number;
-    evening: number;
-    night: number;
-  };
-  instructions: string;
-  stockCount: number;
-  reorderLevel: number;
-  lastTaken?: string;
-  times: string[];
-}
-
-interface MedicationLog {
-  id: string;
-  medication_id: string;
-  scheduled_time: string;
-  actual_time?: string;
-  completed: boolean;
-  notes?: string;
-  administered_by: string;
 }
 
 interface CareReport {
@@ -60,50 +35,8 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
   const [reportColorCode, setReportColorCode] = useState<string>();
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   
-  const [medications, setMedications] = useState<Medication[]>([
-    {
-      id: '1',
-      name: 'Aspirin 100mg',
-      dosage: '1 Tablette',
-      schedule: { morning: 1, midday: 0, evening: 0, night: 0 },
-      instructions: 'Nach dem Frühstück einnehmen',
-      stockCount: 28,
-      reorderLevel: 7,
-      times: ['08:00']
-    },
-    {
-      id: '2',
-      name: 'Metformin 500mg',
-      dosage: '1 Tablette',
-      schedule: { morning: 1, midday: 0, evening: 1, night: 0 },
-      instructions: 'Zu den Mahlzeiten',
-      stockCount: 15,
-      reorderLevel: 10,
-      times: ['08:00', '20:00']
-    },
-    {
-      id: '3',
-      name: 'Lisinopril 10mg',
-      dosage: '1 Tablette',
-      schedule: { morning: 1, midday: 0, evening: 0, night: 0 },
-      instructions: 'Morgens nüchtern',
-      stockCount: 5,
-      reorderLevel: 7,
-      times: ['08:00']
-    },
-    {
-      id: '4',
-      name: 'Ibuprofen 400mg',
-      dosage: '1 Tablette',
-      schedule: { morning: 1, midday: 1, evening: 1, night: 0 },
-      instructions: 'Bei Bedarf gegen Schmerzen',
-      stockCount: 20,
-      reorderLevel: 5,
-      times: ['08:00', '13:00', '20:00']
-    }
-  ]);
-
-  const [medicationLogs, setMedicationLogs] = useState<MedicationLog[]>([]);
+  const { data: medications = [] } = useMedications(resident.id);
+  const { data: medicationLogs = [] } = useMedicationLogs();
 
   const [careReports, setCareReports] = useState<CareReport[]>([
     {
@@ -153,8 +86,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
     setShowAddReport(false);
   };
 
-  const handleAddMedication = (medication: Medication) => {
-    setMedications(prev => [...prev, medication]);
+  const handleAddMedication = (medication: any) => {
     console.log('Adding medication:', medication);
   };
 
@@ -163,7 +95,6 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
   };
 
   const handleDeleteMedication = (medicationId: string) => {
-    setMedications(prev => prev.filter(med => med.id !== medicationId));
     console.log('Deleting medication:', medicationId);
   };
 
@@ -234,7 +165,7 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
 
       {/* Daily Medication Plan */}
       <MedicationSchedule 
-        medications={medications}
+        residentId={resident.id}
         onMarkCompleted={handleMarkCompleted}
       />
 
