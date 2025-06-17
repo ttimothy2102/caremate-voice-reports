@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,6 @@ import { useNavigate } from 'react-router-dom';
 import { getPersonalizedGreeting } from '@/utils/greetingUtils';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AccountManagement } from "@/components/account/AccountManagement";
-
 function DashboardContent() {
   const {
     data: residents = [],
@@ -37,7 +35,6 @@ function DashboardContent() {
   const userName = user?.user_metadata?.full_name;
   const greeting = getPersonalizedGreeting(userName);
   const userInitials = user?.user_metadata?.full_name ? user.user_metadata.full_name.split(' ').map((name: string) => name[0]).join('').toUpperCase() : user?.email?.[0]?.toUpperCase() || 'U';
-  
   const handleSignOut = async () => {
     await signOut();
     toast({
@@ -45,45 +42,37 @@ function DashboardContent() {
       description: "Sie wurden erfolgreich abgemeldet."
     });
   };
-
   const handleContactDoctor = () => {
     toast({
       title: "Arzt kontaktieren",
       description: "Weiterleitung zur Arztkontakt-Funktion..."
     });
   };
-
-  const overviewStats = [
-    {
-      title: "Berichte heute",
-      value: careReports.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString()).length.toString(),
-      icon: FileText,
-      color: "text-blue-600",
-      onClick: () => navigate('/todays-reports')
-    },
-    {
-      title: "Aktive Bewohner",
-      value: residents.length.toString(),
-      icon: Users,
-      color: "text-green-600",
-      onClick: () => navigate('/residents')
-    },
-    {
-      title: "Vital-Alarme",
-      value: "3",
-      icon: AlertTriangle,
-      color: "text-red-600",
-      onClick: () => navigate('/vitals')
-    },
-    {
-      title: "Terminierte Aufgaben",
-      value: "5",
-      icon: Calendar,
-      color: "text-purple-600",
-      onClick: () => navigate('/schedule')
-    }
-  ];
-
+  const overviewStats = [{
+    title: "Berichte heute",
+    value: careReports.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString()).length.toString(),
+    icon: FileText,
+    color: "text-blue-600",
+    onClick: () => navigate('/todays-reports')
+  }, {
+    title: "Aktive Bewohner",
+    value: residents.length.toString(),
+    icon: Users,
+    color: "text-green-600",
+    onClick: () => navigate('/residents')
+  }, {
+    title: "Vital-Alarme",
+    value: "3",
+    icon: AlertTriangle,
+    color: "text-red-600",
+    onClick: () => navigate('/vitals')
+  }, {
+    title: "Terminierte Aufgaben",
+    value: "5",
+    icon: Calendar,
+    color: "text-purple-600",
+    onClick: () => navigate('/schedule')
+  }];
   if (residentsLoading) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center bg-white p-8 rounded-xl shadow-sm">
@@ -92,7 +81,6 @@ function DashboardContent() {
         </div>
       </div>;
   }
-
   return <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b px-6 py-4">
@@ -111,29 +99,17 @@ function DashboardContent() {
               {greeting}
             </span>
             
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleContactDoctor}
-              className="text-green-600 border-green-300 hover:bg-green-50"
-            >
+            <Button variant="outline" size="sm" onClick={handleContactDoctor} className="text-green-600 border-green-300 hover:bg-green-50">
               <Phone className="w-4 h-4 mr-2" />
               Arzt kontaktieren
             </Button>
             
-            <Button 
-              size="sm" 
-              onClick={() => setShowAddResidentDialog(true)}
-              className="bg-caremate-gradient"
-            >
+            <Button size="sm" onClick={() => setShowAddResidentDialog(true)} className="bg-caremate-gradient">
               <Plus className="w-4 h-4 mr-2" />
               Bewohner hinzufügen
             </Button>
             
-            <Button variant="outline" size="sm" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Abmelden
-            </Button>
+            
             <Avatar className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setShowAccountManagement(true)}>
               <AvatarImage src={user?.user_metadata?.avatar_url} />
               <AvatarFallback>{userInitials}</AvatarFallback>
@@ -145,12 +121,7 @@ function DashboardContent() {
       <div className="p-6 space-y-6">
         {/* Overview Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {overviewStats.map((stat, index) => (
-            <Card 
-              key={index} 
-              className={`p-4 ${stat.onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
-              onClick={stat.onClick}
-            >
+          {overviewStats.map((stat, index) => <Card key={index} className={`p-4 ${stat.onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`} onClick={stat.onClick}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">{stat.title}</p>
@@ -158,8 +129,7 @@ function DashboardContent() {
                 </div>
                 <stat.icon className={`w-8 h-8 ${stat.color}`} />
               </div>
-            </Card>
-          ))}
+            </Card>)}
         </div>
 
         {/* Residents List */}
@@ -196,7 +166,6 @@ function DashboardContent() {
       <AddResidentDialog isOpen={showAddResidentDialog} onClose={() => setShowAddResidentDialog(false)} />
     </div>;
 }
-
 export function Dashboard() {
   return <ProtectedRoute>
       <DashboardContent />
