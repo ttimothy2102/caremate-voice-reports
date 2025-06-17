@@ -28,6 +28,17 @@ interface CareReport {
   type: string;
 }
 
+// Interface for MedicationList component
+interface MedicationListItem {
+  id: string;
+  name: string;
+  dosage: string;
+  schedule: string;
+  stockCount: number;
+  reorderLevel: number;
+  times: string[];
+}
+
 export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsProps) {
   const [showAddReport, setShowAddReport] = useState(false);
   const [showAddMedication, setShowAddMedication] = useState(false);
@@ -35,8 +46,21 @@ export function ResidentMedications({ resident, onUpdate }: ResidentMedicationsP
   const [reportColorCode, setReportColorCode] = useState<string>();
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   
-  const { data: medications = [] } = useMedications(resident.id);
+  const { data: medicationsData = [] } = useMedications(resident.id);
   const { data: medicationLogs = [] } = useMedicationLogs();
+
+  // Transform medications from database format to MedicationList format
+  const medications: MedicationListItem[] = medicationsData.map(med => ({
+    id: med.id,
+    name: med.drug_name,
+    dosage: med.dosage,
+    schedule: med.frequency,
+    stockCount: med.stock_count || 0,
+    reorderLevel: med.reorder_level || 5,
+    times: med.frequency.toLowerCase().includes('daily') 
+      ? ['morning'] 
+      : med.frequency.toLowerCase().split(/[,\s]+/).filter(Boolean)
+  }));
 
   const [careReports, setCareReports] = useState<CareReport[]>([
     {
