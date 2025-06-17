@@ -4,8 +4,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ResidentsFilters } from './ResidentsFilters';
 import { ResidentCard } from './ResidentCard';
 import { ResidentDetailModal } from './ResidentDetailModal';
-import { useResidents } from '@/hooks/useResidents';
-import { Resident } from '@/hooks/useResidents';
+import { useResidents, Resident } from '@/hooks/useResidents';
+import { toast } from '@/components/ui/use-toast';
 
 export interface ExtendedResident extends Resident {
   health_status?: 'gut' | 'bedenklich' | 'kritisch';
@@ -46,14 +46,14 @@ export function ResidentsList() {
   const extendedResidents: ExtendedResident[] = residents.map(resident => ({
     ...resident,
     health_status: Math.random() > 0.7 ? 'kritisch' : Math.random() > 0.4 ? 'bedenklich' : 'gut',
-    birth_date: `19${Math.floor(Math.random() * 50 + 30)}-${Math.floor(Math.random() * 12 + 1).toString().padStart(2, '0')}-${Math.floor(Math.random() * 28 + 1).toString().padStart(2, '0')}`,
     upcoming_appointments: Math.floor(Math.random() * 5),
-    blood_pressure: `${Math.floor(Math.random() * 40 + 110)}/${Math.floor(Math.random() * 20 + 70)}`,
-    blood_sugar: `${Math.floor(Math.random() * 50 + 80)}`,
-    temperature: `${(36.0 + Math.random() * 2).toFixed(1)}`,
-    pulse: `${Math.floor(Math.random() * 40 + 60)}`,
-    respiratory_rate: `${Math.floor(Math.random() * 8 + 12)}`,
-    bmi: `${(18 + Math.random() * 15).toFixed(1)}`,
+    // Use existing database values or generate mock data
+    blood_pressure: resident.blood_pressure || `${Math.floor(Math.random() * 40 + 110)}/${Math.floor(Math.random() * 20 + 70)}`,
+    blood_sugar: resident.blood_sugar || `${Math.floor(Math.random() * 50 + 80)}`,
+    temperature: resident.temperature || `${(36.0 + Math.random() * 2).toFixed(1)}`,
+    pulse: resident.pulse || `${Math.floor(Math.random() * 40 + 60)}`,
+    respiratory_rate: resident.respiratory_rate || `${Math.floor(Math.random() * 8 + 12)}`,
+    bmi: resident.bmi || `${(18 + Math.random() * 15).toFixed(1)}`,
     care_situation: 'Teilweise mobil, benötigt Unterstützung bei der Körperpflege',
     shift_notes: 'Patient war heute sehr kooperativ, hat gut gegessen.',
     medication_deviations: '',
@@ -72,6 +72,14 @@ export function ResidentsList() {
     
     return matchesName && matchesHealth && matchesAppointments;
   });
+
+  const handleSaveResident = (updatedResident: ExtendedResident) => {
+    toast({
+      title: "Resident Updated",
+      description: `${updatedResident.name} has been successfully updated.`,
+    });
+    console.log('Resident saved successfully:', updatedResident);
+  };
 
   if (isLoading) {
     return (
@@ -112,11 +120,7 @@ export function ResidentsList() {
           resident={selectedResident}
           isOpen={!!selectedResident}
           onClose={() => setSelectedResident(null)}
-          onSave={(updatedResident) => {
-            // Here you would typically update the resident in the database
-            console.log('Saving resident:', updatedResident);
-            setSelectedResident(null);
-          }}
+          onSave={handleSaveResident}
         />
       )}
     </div>

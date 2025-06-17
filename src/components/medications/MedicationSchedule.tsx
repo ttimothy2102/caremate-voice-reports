@@ -4,29 +4,22 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar, Sunrise, Sun, CloudSun, Moon, Clock } from 'lucide-react';
-
-interface SimpleMedication {
-  id: string;
-  name: string;
-  dosage: string;
-  schedule: {
-    morning: number;
-    midday: number;
-    evening: number;
-    night: number;
-  };
-  instructions: string;
-  stockCount: number;
-  reorderLevel: number;
-  times: string[];
-}
+import { useMedications } from '@/hooks/useMedications';
+import { useMedicationLogs, useCreateMedicationLog } from '@/hooks/useMedicationLogs';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from '@/components/ui/use-toast';
 
 interface MedicationScheduleProps {
-  medications?: SimpleMedication[];
+  residentId?: string;
   onMarkCompleted?: (medicationId: string, timeSlot: string) => void;
 }
 
-export function MedicationSchedule({ medications = [], onMarkCompleted }: MedicationScheduleProps) {
+export function MedicationSchedule({ residentId, onMarkCompleted }: MedicationScheduleProps) {
+  const { user } = useAuth();
+  const { data: medications = [] } = useMedications(residentId);
+  const { data: todayLogs = [] } = useMedicationLogs(undefined, new Date().toDateString());
+  const createLogMutation = useCreateMedicationLog();
+
   const getCurrentTimeSlot = () => {
     const now = new Date();
     const hour = now.getHours();
@@ -61,15 +54,71 @@ export function MedicationSchedule({ medications = [], onMarkCompleted }: Medica
 
   const getMedicationsForTimeSlot = (timeSlot: string) => {
     return medications.filter(med => {
-      const schedule = med.schedule;
+      // Parse frequency to determine if medication should be given at this time
+      // This is a simple implementation - you might want to make this more sophisticated
+      const frequency = med.frequency.toLowerCase();
+      
       switch (timeSlot) {
-        case 'morning': return schedule.morning > 0;
-        case 'midday': return schedule.midday > 0;
-        case 'evening': return schedule.evening > 0;
-        case 'night': return schedule.night > 0;
-        default: return false;
+        case 'morning': 
+          return frequency.includes('morning') || frequency.includes('daily') || frequency.includes('morgens');
+        case 'midday': 
+          return frequency.includes('midday') || frequency.includes('mittag');
+        case 'evening': 
+          return frequency.includes('evening') || frequency.includes('abend');
+        case 'night': 
+          return frequency.includes('night') || frequency.includes('nacht');
+        default: 
+          return false;
       }
     });
+  };
+
+  const isCompleted = (medicationId: string, timeSlot: string) => {
+    return todayLogs.some(log => 
+      log.medication_id === medicationId && 
+      log.completed &&
+      log.scheduled_time.includes(timeSlot)
+    );
+  };
+
+  const handleMarkCompleted = async (medicationId: string, timeSlot: string) => {
+    if (!user) return;
+
+    try {
+      const now = new Date();
+      const scheduledTime = new Date();
+      
+      // Set scheduled time based on time slot
+      switch (timeSlot) {
+        case 'morning': scheduledTime.setHours(8, 0, 0, 0); break;
+        case 'midday': scheduledTime.setHours(13, 0, 0, 0); break;
+        case 'evening': scheduledTime.setHours(20, 0, 0, 0); break;
+        case 'night': scheduledTime.setHours(22, 0, 0, 0); break;
+      }
+
+      await createLogMutation.mutateAsync({
+        medication_id: medicationId,
+        administered_by: user.id,
+        scheduled_time: scheduledTime.toISOString(),
+        actual_time: now.toISOString(),
+        completed: true,
+        notes: `Administered during ${timeSlot} time slot`
+      });
+
+      toast({
+        title: "Medication Logged",
+        description: "Medication administration has been recorded.",
+      });
+
+      onMarkCompleted?.(medicationId, timeSlot);
+    } catch (error) {
+      console.error('Error logging medication:', error);
+      toast({
+        title: "Error",
+        description: "Failed to log medication administration.",
+        variant: "destructive"
+      });
+    }
   };
 
   const currentMedications = getMedicationsForTimeSlot(currentTimeSlot);
@@ -104,33 +153,46 @@ export function MedicationSchedule({ medications = [], onMarkCompleted }: Medica
                 Keine Medikamente für die aktuelle Zeit geplant
               </p>
             ) : (
-              currentMedications.map((med) => (
-                <div key={med.id} className="bg-white border rounded-lg p-4 space-y-2">
-                  <div className="flex items-center gap-3">
-                    <Checkbox 
-                      id={`med-${med.id}-${currentTimeSlot}`}
-                      onCheckedChange={() => onMarkCompleted?.(med.id, currentTimeSlot)}
-                      className="data-[state=checked]:bg-green-600"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-medium">{med.name}</p>
-                        <Badge variant="outline" className="text-xs">
-                          {med.dosage}
-                        </Badge>
+              currentMedications.map((med) => {
+                const completed = isCompleted(med.id, currentTimeSlot);
+                
+                return (
+                  <div key={med.id} className="bg-white border rounded-lg p-4 space-y-2">
+                    <div className="flex items-center gap-3">
+                      <Checkbox 
+                        id={`med-${med.id}-${currentTimeSlot}`}
+                        checked={completed}
+                        onCheckedChange={() => handleMarkCompleted(med.id, currentTimeSlot)}
+                        className="data-[state=checked]:bg-green-600"
+                        disabled={completed}
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className={`text-sm font-medium ${completed ? 'line-through text-gray-500' : ''}`}>
+                            {med.drug_name}
+                          </p>
+                          <Badge variant="outline" className="text-xs">
+                            {med.dosage}
+                          </Badge>
+                          {completed && (
+                            <Badge variant="default" className="text-xs bg-green-100 text-green-800">
+                              Verabreicht
+                            </Badge>
+                          )}
+                        </div>
+                        {med.instructions && (
+                          <p className="text-xs text-gray-500 mt-1">{med.instructions}</p>
+                        )}
                       </div>
-                      {med.instructions && (
-                        <p className="text-xs text-gray-500 mt-1">{med.instructions}</p>
+                      {med.stock_count <= med.reorder_level && (
+                        <Badge variant="destructive" className="text-xs">
+                          Wenig Vorrat: {med.stock_count}
+                        </Badge>
                       )}
                     </div>
-                    {med.stockCount <= med.reorderLevel && (
-                      <Badge variant="destructive" className="text-xs">
-                        Wenig Vorrat: {med.stockCount}
-                      </Badge>
-                    )}
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 

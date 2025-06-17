@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { validateMedication, sanitizeInput } from '@/utils/securityValidation';
@@ -87,6 +88,66 @@ export function useCreateMedication() {
         return data;
       } catch (error: any) {
         logDataAccess('CREATE', 'medications', undefined, false, error.message);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['medications'] });
+    },
+  });
+}
+
+export function useUpdateMedication() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Medication> & { id: string }) => {
+      try {
+        const { data, error } = await supabase
+          .from('medications')
+          .update(updates)
+          .eq('id', id)
+          .select()
+          .single();
+        
+        if (error) {
+          logDataAccess('UPDATE', 'medications', id, false, error.message);
+          throw error;
+        }
+        
+        logDataAccess('UPDATE', 'medications', id);
+        return data;
+      } catch (error: any) {
+        logDataAccess('UPDATE', 'medications', id, false, error.message);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['medications'] });
+    },
+  });
+}
+
+export function useDeleteMedication() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      try {
+        const { error } = await supabase
+          .from('medications')
+          .delete()
+          .eq('id', id);
+        
+        if (error) {
+          logDataAccess('DELETE', 'medications', id, false, error.message);
+          throw error;
+        }
+        
+        logDataAccess('DELETE', 'medications', id);
+        return id;
+      } catch (error: any) {
+        logDataAccess('DELETE', 'medications', id, false, error.message);
         throw error;
       }
     },

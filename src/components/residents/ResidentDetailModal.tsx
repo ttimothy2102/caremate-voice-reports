@@ -10,6 +10,8 @@ import { ResidentCareInfo } from './tabs/ResidentCareInfo';
 import { ResidentDocumentationModules } from './tabs/ResidentDocumentationModules';
 import { ResidentSchedule } from './tabs/ResidentSchedule';
 import { ResidentMedications } from './tabs/ResidentMedications';
+import { useUpdateResident } from '@/hooks/useUpdateResident';
+import { toast } from '@/components/ui/use-toast';
 import { Save, X } from 'lucide-react';
 
 interface ResidentDetailModalProps {
@@ -26,9 +28,36 @@ export function ResidentDetailModal({
   onSave 
 }: ResidentDetailModalProps) {
   const [editedResident, setEditedResident] = useState<ExtendedResident>(resident);
+  const [isSaving, setIsSaving] = useState(false);
+  const updateResidentMutation = useUpdateResident();
 
-  const handleSave = () => {
-    onSave(editedResident);
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      
+      // Update resident in database
+      const updatedResident = await updateResidentMutation.mutateAsync({
+        id: editedResident.id,
+        ...editedResident
+      });
+      
+      toast({
+        title: "Resident Updated",
+        description: `${editedResident.name} has been successfully updated.`,
+      });
+      
+      onSave(updatedResident as ExtendedResident);
+      onClose();
+    } catch (error) {
+      console.error('Error saving resident:', error);
+      toast({
+        title: "Save Failed",
+        description: error instanceof Error ? error.message : "Failed to save resident changes",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const updateResident = (updates: Partial<ExtendedResident>) => {
@@ -44,9 +73,13 @@ export function ResidentDetailModal({
               {editedResident.name} - Bewohnerdetails
             </DialogTitle>
             <div className="flex gap-2">
-              <Button onClick={handleSave} size="sm">
+              <Button 
+                onClick={handleSave} 
+                size="sm"
+                disabled={isSaving}
+              >
                 <Save className="w-4 h-4 mr-2" />
-                Speichern
+                {isSaving ? 'Saving...' : 'Speichern'}
               </Button>
               <Button variant="outline" onClick={onClose} size="sm">
                 <X className="w-4 h-4 mr-2" />
