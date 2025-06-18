@@ -4,9 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Plus, Filter } from 'lucide-react';
-import { useSchedules } from '@/hooks/useSchedules';
+import { useSchedules, useUpdateSchedule } from '@/hooks/useSchedules';
 import { useResidents } from '@/hooks/useResidents';
-import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
+import { format, startOfWeek, addDays, addWeeks, subWeeks, setHours, setMinutes } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { AddScheduleDialog } from '@/components/schedule/AddScheduleDialog';
 
@@ -15,12 +15,16 @@ export function WeeklyCalendar() {
   const [selectedResident, setSelectedResident] = useState<string>('all');
   const [selectedEventType, setSelectedEventType] = useState<string>('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<{ date: Date; hour: number } | null>(null);
+  const [draggedEvent, setDraggedEvent] = useState<any>(null);
   
   const { data: schedules = [] } = useSchedules();
   const { data: residents = [] } = useResidents();
+  const updateSchedule = useUpdateSchedule();
 
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  const hours = Array.from({ length: 24 }, (_, i) => i);
 
   const filteredSchedules = schedules.filter(schedule => {
     const matchesResident = selectedResident === 'all' || schedule.resident_id === selectedResident;
@@ -28,11 +32,12 @@ export function WeeklyCalendar() {
     return matchesResident && matchesEventType;
   });
 
-  const getSchedulesForDay = (day: Date) => {
+  const getSchedulesForDayAndHour = (day: Date, hour: number) => {
     return filteredSchedules.filter(schedule => {
       const scheduleDate = new Date(schedule.start_time);
-      return format(scheduleDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd');
-    }).sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+      const scheduleHour = scheduleDate.getHours();
+      return format(scheduleDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd') && scheduleHour === hour;
+    });
   };
 
   const getEventTypeLabel = (eventType: string) => {
@@ -46,6 +51,50 @@ export function WeeklyCalendar() {
       custom: 'Sonst'
     };
     return labels[eventType as keyof typeof labels] || eventType;
+  };
+
+  const handleDoubleClick = (day: Date, hour: number) => {
+    setSelectedSlot({ date: day, hour });
+    setShowAddDialog(true);
+  };
+
+  const handleDragStart = (e: React.DragEvent, schedule: any) => {
+    setDraggedEvent(schedule);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e: React.DragEvent, day: Date, hour: number) => {
+    e.preventDefault();
+    
+    if (!draggedEvent) return;
+
+    const newStartTime = setMinutes(setHours(day, hour), 0);
+    const originalStartTime = new Date(draggedEvent.start_time);
+    const originalEndTime = new Date(draggedEvent.end_time);
+    const duration = originalEndTime.getTime() - originalStartTime.getTime();
+    const newEndTime = new Date(newStartTime.getTime() + duration);
+
+    try {
+      await updateSchedule.mutateAsync({
+        id: draggedEvent.id,
+        start_time: newStartTime.toISOString(),
+        end_time: newEndTime.toISOString()
+      });
+    } catch (error) {
+      console.error('Error updating schedule:', error);
+    }
+
+    setDraggedEvent(null);
+  };
+
+  const handleDialogClose = () => {
+    setShowAddDialog(false);
+    setSelectedSlot(null);
   };
 
   return (
@@ -119,59 +168,80 @@ export function WeeklyCalendar() {
 
       {/* Calendar Grid */}
       <Card className="p-4">
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-8 gap-1 text-xs">
+          {/* Time column header */}
+          <div className="font-semibold text-center p-2 border-b">Zeit</div>
+          
+          {/* Day headers */}
           {weekDays.map((day, index) => (
-            <div key={index} className="min-h-[400px] border-r last:border-r-0 pr-2">
-              <div className="sticky top-0 bg-white pb-3 border-b mb-3">
-                <h3 className="font-semibold text-gray-800 text-sm">
-                  {format(day, 'EEEE', { locale: de })}
-                </h3>
-                <p className="text-xs text-gray-600">
-                  {format(day, 'd. MMM', { locale: de })}
-                </p>
+            <div key={index} className="font-semibold text-center p-2 border-b">
+              <div className="text-sm">{format(day, 'EEEE', { locale: de })}</div>
+              <div className="text-xs text-gray-600">{format(day, 'd. MMM', { locale: de })}</div>
+            </div>
+          ))}
+
+          {/* Time slots and events */}
+          {hours.map(hour => (
+            <React.Fragment key={hour}>
+              {/* Time label */}
+              <div className="text-center p-1 border-r text-xs font-medium text-gray-600 bg-gray-50">
+                {hour.toString().padStart(2, '0')}:00
               </div>
               
-              <div className="space-y-1">
-                {getSchedulesForDay(day).map((schedule) => {
-                  const resident = residents.find(r => r.id === schedule.resident_id);
-                  return (
-                    <div
-                      key={schedule.id}
-                      className="p-2 rounded text-white text-xs cursor-pointer hover:opacity-80 transition-opacity"
-                      style={{ backgroundColor: schedule.color_code }}
-                    >
-                      <div className="font-medium text-xs mb-1">
-                        {format(new Date(schedule.start_time), 'HH:mm')}
-                      </div>
-                      <div className="font-semibold mb-1 leading-tight">
-                        {schedule.title}
-                      </div>
-                      <div className="text-xs opacity-90 mb-1">
-                        {resident?.name} (Zimmer {resident?.room})
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs opacity-75">
-                          {getEventTypeLabel(schedule.event_type)}
-                        </span>
-                        {schedule.recurring_pattern !== 'none' && (
-                          <span className="text-xs opacity-75">
-                            🔄
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+              {/* Day columns for this hour */}
+              {weekDays.map((day, dayIndex) => {
+                const scheduleEvents = getSchedulesForDayAndHour(day, hour);
+                return (
+                  <div
+                    key={`${hour}-${dayIndex}`}
+                    className="min-h-[40px] border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer relative"
+                    onDoubleClick={() => handleDoubleClick(day, hour)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, day, hour)}
+                  >
+                    {scheduleEvents.map((schedule) => {
+                      const resident = residents.find(r => r.id === schedule.resident_id);
+                      return (
+                        <div
+                          key={schedule.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, schedule)}
+                          className="absolute inset-x-0 top-0 p-1 rounded text-white text-xs cursor-move hover:opacity-80 transition-opacity overflow-hidden"
+                          style={{ backgroundColor: schedule.color_code }}
+                        >
+                          <div className="font-medium truncate">
+                            {schedule.title}
+                          </div>
+                          <div className="text-xs opacity-90 truncate">
+                            {resident?.name}
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs opacity-75">
+                              {getEventTypeLabel(schedule.event_type)}
+                            </span>
+                            {schedule.recurring_pattern !== 'none' && (
+                              <span className="text-xs opacity-75">
+                                🔄
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </React.Fragment>
           ))}
         </div>
       </Card>
 
       <AddScheduleDialog 
         isOpen={showAddDialog}
-        onClose={() => setShowAddDialog(false)}
+        onClose={handleDialogClose}
         residents={residents}
+        initialDate={selectedSlot?.date}
+        initialTime={selectedSlot?.hour}
       />
     </div>
   );
