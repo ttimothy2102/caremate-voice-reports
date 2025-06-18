@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateSchedule } from '@/hooks/useSchedules';
-import { format, addDays, addWeeks, addMonths, setHours, setMinutes } from 'date-fns';
+import { toast } from '@/components/ui/use-toast';
+import { format } from 'date-fns';
 
 interface AddScheduleDialogProps {
   isOpen: boolean;
@@ -15,124 +16,121 @@ interface AddScheduleDialogProps {
   residents: any[];
   initialDate?: Date;
   initialTime?: number;
+  preSelectedResident?: string;
 }
 
-const colorOptions = [
-  { value: '#3B82F6', label: 'Blau' },
-  { value: '#EF4444', label: 'Rot' },
-  { value: '#10B981', label: 'Grün' },
-  { value: '#F59E0B', label: 'Orange' },
-  { value: '#8B5CF6', label: 'Lila' },
-  { value: '#EC4899', label: 'Pink' },
-  { value: '#14B8A6', label: 'Türkis' },
-  { value: '#F97316', label: 'Dunkelorange' }
-];
-
-export function AddScheduleDialog({ isOpen, onClose, residents, initialDate, initialTime }: AddScheduleDialogProps) {
+export function AddScheduleDialog({ 
+  isOpen, 
+  onClose, 
+  residents, 
+  initialDate, 
+  initialTime,
+  preSelectedResident 
+}: AddScheduleDialogProps) {
   const [formData, setFormData] = useState({
-    resident_id: '',
     title: '',
+    resident_id: preSelectedResident || '',
     event_type: 'medical' as const,
     start_time: '',
     end_time: '',
     recurring_pattern: 'none' as const,
-    color_code: '#3B82F6',
     description: '',
     assigned_staff: '',
-    completed: false
+    color_code: '#3B82F6'
   });
 
   const createSchedule = useCreateSchedule();
 
-  // Set initial date and time when dialog opens
+  // Set initial date and time when provided
   useEffect(() => {
-    if (isOpen && initialDate && initialTime !== undefined) {
-      const startDateTime = setMinutes(setHours(initialDate, initialTime), 0);
-      const endDateTime = setMinutes(setHours(initialDate, initialTime + 1), 0);
+    if (initialDate && initialTime !== undefined) {
+      const startDate = new Date(initialDate);
+      startDate.setHours(initialTime, 0, 0, 0);
       
+      const endDate = new Date(startDate);
+      endDate.setHours(initialTime + 1, 0, 0, 0);
+
       setFormData(prev => ({
         ...prev,
-        start_time: format(startDateTime, "yyyy-MM-dd'T'HH:mm"),
-        end_time: format(endDateTime, "yyyy-MM-dd'T'HH:mm")
+        start_time: startDate.toISOString().slice(0, 16),
+        end_time: endDate.toISOString().slice(0, 16)
       }));
     }
-  }, [isOpen, initialDate, initialTime]);
+  }, [initialDate, initialTime]);
+
+  // Set pre-selected resident
+  useEffect(() => {
+    if (preSelectedResident) {
+      setFormData(prev => ({
+        ...prev,
+        resident_id: preSelectedResident
+      }));
+    }
+  }, [preSelectedResident]);
+
+  const eventTypeColors = {
+    medical: '#EF4444',
+    therapy: '#3B82F6', 
+    social: '#10B981',
+    hygiene: '#8B5CF6',
+    meal: '#F59E0B',
+    rest: '#6B7280',
+    custom: '#EC4899'
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.resident_id || !formData.title || !formData.start_time || !formData.end_time) {
+    if (!formData.title || !formData.resident_id || !formData.start_time || !formData.end_time) {
+      toast({
+        title: "Fehler",
+        description: "Bitte füllen Sie alle Pflichtfelder aus.",
+        variant: "destructive"
+      });
       return;
     }
 
     try {
-      const baseSchedule = {
+      await createSchedule.mutateAsync({
         ...formData,
-        start_time: new Date(formData.start_time).toISOString(),
-        end_time: new Date(formData.end_time).toISOString()
-      };
+        color_code: eventTypeColors[formData.event_type],
+        completed: false
+      });
 
-      // Create the initial schedule
-      await createSchedule.mutateAsync(baseSchedule);
+      toast({
+        title: "Termin erstellt",
+        description: "Der Termin wurde erfolgreich hinzugefügt.",
+      });
 
-      // If recurring, create additional schedules
-      if (formData.recurring_pattern !== 'none') {
-        const schedulesToCreate = [];
-        const startDate = new Date(formData.start_time);
-        const endDate = new Date(formData.end_time);
-
-        for (let i = 1; i <= 12; i++) {
-          let nextStartDate: Date;
-          let nextEndDate: Date;
-
-          switch (formData.recurring_pattern) {
-            case 'daily':
-              nextStartDate = addDays(startDate, i);
-              nextEndDate = addDays(endDate, i);
-              break;
-            case 'weekly':
-              nextStartDate = addWeeks(startDate, i);
-              nextEndDate = addWeeks(endDate, i);
-              break;
-            case 'monthly':
-              nextStartDate = addMonths(startDate, i);
-              nextEndDate = addMonths(endDate, i);
-              break;
-            default:
-              continue;
-          }
-
-          schedulesToCreate.push({
-            ...baseSchedule,
-            start_time: nextStartDate.toISOString(),
-            end_time: nextEndDate.toISOString()
-          });
-        }
-
-        // Create all recurring schedules
-        for (const schedule of schedulesToCreate) {
-          await createSchedule.mutateAsync(schedule);
-        }
-      }
-
-      // Reset form and close dialog
+      // Reset form
       setFormData({
-        resident_id: '',
         title: '',
+        resident_id: preSelectedResident || '',
         event_type: 'medical',
         start_time: '',
         end_time: '',
         recurring_pattern: 'none',
-        color_code: '#3B82F6',
         description: '',
         assigned_staff: '',
-        completed: false
+        color_code: '#3B82F6'
       });
-      
+
       onClose();
     } catch (error) {
-      console.error('Error creating schedule:', error);
+      toast({
+        title: "Fehler",
+        description: "Beim Erstellen des Termins ist ein Fehler aufgetreten.",
+        variant: "destructive"
+      });
     }
+  };
+
+  const handleEventTypeChange = (eventType: keyof typeof eventTypeColors) => {
+    setFormData(prev => ({
+      ...prev,
+      event_type: eventType,
+      color_code: eventTypeColors[eventType]
+    }));
   };
 
   return (
@@ -141,18 +139,33 @@ export function AddScheduleDialog({ isOpen, onClose, residents, initialDate, ini
         <DialogHeader>
           <DialogTitle>Neuen Termin hinzufügen</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="resident">Bewohner</Label>
-            <Select value={formData.resident_id} onValueChange={(value) => setFormData({ ...formData, resident_id: value })}>
+            <Label htmlFor="title">Titel *</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="Terminbezeichnung"
+              required
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="resident">Bewohner *</Label>
+            <Select
+              value={formData.resident_id}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, resident_id: value }))}
+              disabled={!!preSelectedResident}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Bewohner auswählen" />
               </SelectTrigger>
               <SelectContent>
                 {residents.map(resident => (
                   <SelectItem key={resident.id} value={resident.id}>
-                    {resident.name} (Zimmer {resident.room})
+                    {resident.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -160,26 +173,18 @@ export function AddScheduleDialog({ isOpen, onClose, residents, initialDate, ini
           </div>
 
           <div>
-            <Label htmlFor="title">Titel</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Terminbezeichnung"
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="event_type">Termintyp</Label>
-            <Select value={formData.event_type} onValueChange={(value: any) => setFormData({ ...formData, event_type: value })}>
+            <Label htmlFor="event_type">Termintyp *</Label>
+            <Select
+              value={formData.event_type}
+              onValueChange={handleEventTypeChange}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="medical">Medizinisch</SelectItem>
                 <SelectItem value="therapy">Therapie</SelectItem>
-                <SelectItem value="social">Sozial</SelectItem>
+                <SelectItem value="social">Soziale Aktivität</SelectItem>
                 <SelectItem value="hygiene">Hygiene</SelectItem>
                 <SelectItem value="meal">Mahlzeit</SelectItem>
                 <SelectItem value="rest">Ruhe</SelectItem>
@@ -190,35 +195,38 @@ export function AddScheduleDialog({ isOpen, onClose, residents, initialDate, ini
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="start_time">Startzeit</Label>
+              <Label htmlFor="start_time">Startzeit *</Label>
               <Input
                 id="start_time"
                 type="datetime-local"
                 value={formData.start_time}
-                onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
                 required
               />
             </div>
             <div>
-              <Label htmlFor="end_time">Endzeit</Label>
+              <Label htmlFor="end_time">Endzeit *</Label>
               <Input
                 id="end_time"
                 type="datetime-local"
                 value={formData.end_time}
-                onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
                 required
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="recurring">Wiederholung</Label>
-            <Select value={formData.recurring_pattern} onValueChange={(value: any) => setFormData({ ...formData, recurring_pattern: value })}>
+            <Label htmlFor="recurring_pattern">Wiederholung</Label>
+            <Select
+              value={formData.recurring_pattern}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, recurring_pattern: value as any }))}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Keine Wiederholung</SelectItem>
+                <SelectItem value="none">Einmalig</SelectItem>
                 <SelectItem value="daily">Täglich</SelectItem>
                 <SelectItem value="weekly">Wöchentlich</SelectItem>
                 <SelectItem value="monthly">Monatlich</SelectItem>
@@ -227,32 +235,12 @@ export function AddScheduleDialog({ isOpen, onClose, residents, initialDate, ini
           </div>
 
           <div>
-            <Label htmlFor="color">Farbe</Label>
-            <div className="flex gap-2 flex-wrap mt-2">
-              {colorOptions.map((color) => (
-                <button
-                  key={color.value}
-                  type="button"
-                  className={`w-8 h-8 rounded-full border-2 transition-all ${
-                    formData.color_code === color.value 
-                      ? 'border-gray-800 scale-110' 
-                      : 'border-gray-300 hover:border-gray-500'
-                  }`}
-                  style={{ backgroundColor: color.value }}
-                  onClick={() => setFormData({ ...formData, color_code: color.value })}
-                  title={color.label}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="assigned_staff">Zuständiges Personal</Label>
+            <Label htmlFor="assigned_staff">Zugewiesenes Personal</Label>
             <Input
               id="assigned_staff"
               value={formData.assigned_staff}
-              onChange={(e) => setFormData({ ...formData, assigned_staff: e.target.value })}
-              placeholder="Name des zuständigen Personals"
+              onChange={(e) => setFormData(prev => ({ ...prev, assigned_staff: e.target.value }))}
+              placeholder="Name des Personals"
             />
           </div>
 
@@ -261,9 +249,8 @@ export function AddScheduleDialog({ isOpen, onClose, residents, initialDate, ini
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Zusätzliche Informationen"
-              className="resize-none"
               rows={3}
             />
           </div>
@@ -273,7 +260,7 @@ export function AddScheduleDialog({ isOpen, onClose, residents, initialDate, ini
               Abbrechen
             </Button>
             <Button type="submit" disabled={createSchedule.isPending}>
-              {createSchedule.isPending ? 'Wird gespeichert...' : 'Termin speichern'}
+              {createSchedule.isPending ? 'Erstellen...' : 'Termin erstellen'}
             </Button>
           </div>
         </form>
