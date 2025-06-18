@@ -459,9 +459,10 @@ export type Database = {
           color_code: string | null
           completed: boolean | null
           created_at: string | null
+          created_by: string | null
           description: string | null
-          end_time: string | null
-          event_type: string | null
+          end_time: string
+          event_type: string
           id: string
           recurring_pattern: string | null
           resident_id: string | null
@@ -473,9 +474,10 @@ export type Database = {
           color_code?: string | null
           completed?: boolean | null
           created_at?: string | null
+          created_by?: string | null
           description?: string | null
-          end_time?: string | null
-          event_type?: string | null
+          end_time: string
+          event_type: string
           id?: string
           recurring_pattern?: string | null
           resident_id?: string | null
@@ -487,9 +489,10 @@ export type Database = {
           color_code?: string | null
           completed?: boolean | null
           created_at?: string | null
+          created_by?: string | null
           description?: string | null
-          end_time?: string | null
-          event_type?: string | null
+          end_time?: string
+          event_type?: string
           id?: string
           recurring_pattern?: string | null
           resident_id?: string | null
@@ -497,13 +500,6 @@ export type Database = {
           title?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "schedules_assigned_staff_fkey"
-            columns: ["assigned_staff"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "schedules_resident_id_fkey"
             columns: ["resident_id"]

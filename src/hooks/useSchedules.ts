@@ -1,6 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface Schedule {
   id: string;
@@ -14,6 +15,7 @@ export interface Schedule {
   description: string;
   assigned_staff: string;
   completed: boolean;
+  created_by: string;
   created_at: string;
 }
 
@@ -49,13 +51,23 @@ export function useSchedules(residentId?: string) {
 
 export function useCreateSchedule() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   
   return useMutation({
-    mutationFn: async (schedule: Omit<Schedule, 'id' | 'created_at'>) => {
+    mutationFn: async (schedule: Omit<Schedule, 'id' | 'created_at' | 'created_by'>) => {
       try {
+        if (!user) {
+          throw new Error('User must be authenticated to create schedules');
+        }
+
+        const scheduleData = {
+          ...schedule,
+          created_by: user.id
+        };
+
         const { data, error } = await supabase
           .from('schedules')
-          .insert([schedule])
+          .insert([scheduleData])
           .select()
           .single();
         
@@ -82,9 +94,12 @@ export function useUpdateSchedule() {
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<Schedule> & { id: string }) => {
       try {
+        // Remove created_by from updates to prevent unauthorized changes
+        const { created_by, ...allowedUpdates } = updates;
+        
         const { data, error } = await supabase
           .from('schedules')
-          .update(updates)
+          .update(allowedUpdates)
           .eq('id', id)
           .select()
           .single();

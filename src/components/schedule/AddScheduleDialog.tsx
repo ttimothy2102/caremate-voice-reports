@@ -87,10 +87,11 @@ export function AddScheduleDialog({ isOpen, onClose, residents }: AddScheduleDia
         setResidentSearch('');
         setSelectedResident(null);
       },
-      onError: () => {
+      onError: (error) => {
+        console.error('Error creating schedule:', error);
         toast({
           title: "Fehler",
-          description: "Termin konnte nicht erstellt werden.",
+          description: "Termin konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
           variant: "destructive"
         });
       }
