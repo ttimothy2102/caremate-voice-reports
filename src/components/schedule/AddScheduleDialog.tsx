@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,9 @@ interface AddScheduleDialogProps {
   preSelectedResident?: string;
 }
 
+type EventType = 'medical' | 'therapy' | 'social' | 'hygiene' | 'meal' | 'rest' | 'custom';
+type RecurringPattern = 'none' | 'daily' | 'weekly' | 'monthly';
+
 export function AddScheduleDialog({ 
   isOpen, 
   onClose, 
@@ -30,10 +32,10 @@ export function AddScheduleDialog({
   const [formData, setFormData] = useState({
     title: '',
     resident_id: preSelectedResident || '',
-    event_type: 'medical' as const,
+    event_type: 'medical' as EventType,
     start_time: '',
     end_time: '',
-    recurring_pattern: 'none' as const,
+    recurring_pattern: 'none' as RecurringPattern,
     description: '',
     assigned_staff: '',
     color_code: '#3B82F6'
@@ -125,7 +127,7 @@ export function AddScheduleDialog({
     }
   };
 
-  const handleEventTypeChange = (eventType: keyof typeof eventTypeColors) => {
+  const handleEventTypeChange = (eventType: EventType) => {
     setFormData(prev => ({
       ...prev,
       event_type: eventType,
