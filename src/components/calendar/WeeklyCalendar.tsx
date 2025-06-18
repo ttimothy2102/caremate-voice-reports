@@ -10,16 +10,6 @@ import { format, startOfWeek, addDays, addWeeks, subWeeks } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { AddScheduleDialog } from '@/components/schedule/AddScheduleDialog';
 
-const eventTypeColors = {
-  medical: 'bg-red-100 text-red-800 border-red-300',
-  therapy: 'bg-blue-100 text-blue-800 border-blue-300',
-  social: 'bg-green-100 text-green-800 border-green-300',
-  hygiene: 'bg-purple-100 text-purple-800 border-purple-300',
-  meal: 'bg-orange-100 text-orange-800 border-orange-300',
-  rest: 'bg-gray-100 text-gray-800 border-gray-300',
-  custom: 'bg-yellow-100 text-yellow-800 border-yellow-300'
-};
-
 export function WeeklyCalendar() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [selectedResident, setSelectedResident] = useState<string>('all');
@@ -42,14 +32,27 @@ export function WeeklyCalendar() {
     return filteredSchedules.filter(schedule => {
       const scheduleDate = new Date(schedule.start_time);
       return format(scheduleDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd');
-    });
+    }).sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+  };
+
+  const getEventTypeLabel = (eventType: string) => {
+    const labels = {
+      medical: 'Med',
+      therapy: 'Ther',
+      social: 'Soz',
+      hygiene: 'Hyg',
+      meal: 'Essen',
+      rest: 'Ruhe',
+      custom: 'Sonst'
+    };
+    return labels[eventType as keyof typeof labels] || eventType;
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-800">Wöchentlicher Terminplan</h2>
+        <h2 className="text-xl font-semibold text-gray-800">Terminübersicht</h2>
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
@@ -58,7 +61,7 @@ export function WeeklyCalendar() {
           >
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          <span className="text-sm font-medium">
+          <span className="text-sm font-medium min-w-[200px] text-center">
             {format(weekStart, 'd. MMM', { locale: de })} - {format(addDays(weekStart, 6), 'd. MMM yyyy', { locale: de })}
           </span>
           <Button
@@ -73,7 +76,7 @@ export function WeeklyCalendar() {
 
       {/* Filters */}
       <Card className="p-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-gray-500" />
             <span className="text-sm font-medium">Filter:</span>
@@ -82,7 +85,7 @@ export function WeeklyCalendar() {
           <select 
             value={selectedResident}
             onChange={(e) => setSelectedResident(e.target.value)}
-            className="px-3 py-1 border rounded-md text-sm"
+            className="px-3 py-1 border rounded-md text-sm min-w-[120px]"
           >
             <option value="all">Alle Bewohner</option>
             {residents.map(resident => (
@@ -95,16 +98,16 @@ export function WeeklyCalendar() {
           <select 
             value={selectedEventType}
             onChange={(e) => setSelectedEventType(e.target.value)}
-            className="px-3 py-1 border rounded-md text-sm"
+            className="px-3 py-1 border rounded-md text-sm min-w-[120px]"
           >
             <option value="all">Alle Termine</option>
-            <option value="medical">Medizinische Termine</option>
-            <option value="therapy">Therapie-Termine</option>
-            <option value="social">Soziale Aktivitäten</option>
-            <option value="hygiene">Hygiene-Termine</option>
-            <option value="meal">Mahlzeiten</option>
-            <option value="rest">Ruhezeiten</option>
-            <option value="custom">Sonstige Termine</option>
+            <option value="medical">Medizinisch</option>
+            <option value="therapy">Therapie</option>
+            <option value="social">Sozial</option>
+            <option value="hygiene">Hygiene</option>
+            <option value="meal">Mahlzeit</option>
+            <option value="rest">Ruhe</option>
+            <option value="custom">Sonstige</option>
           </select>
 
           <Button size="sm" className="ml-auto" onClick={() => setShowAddDialog(true)}>
@@ -116,50 +119,49 @@ export function WeeklyCalendar() {
 
       {/* Calendar Grid */}
       <Card className="p-4">
-        <div className="grid grid-cols-7 gap-4">
+        <div className="grid grid-cols-7 gap-2">
           {weekDays.map((day, index) => (
-            <div key={index} className="min-h-[300px]">
-              <div className="sticky top-0 bg-white pb-2 border-b mb-3">
-                <h3 className="font-medium text-gray-800">
+            <div key={index} className="min-h-[400px] border-r last:border-r-0 pr-2">
+              <div className="sticky top-0 bg-white pb-3 border-b mb-3">
+                <h3 className="font-semibold text-gray-800 text-sm">
                   {format(day, 'EEEE', { locale: de })}
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs text-gray-600">
                   {format(day, 'd. MMM', { locale: de })}
                 </p>
               </div>
               
-              <div className="space-y-2">
-                {getSchedulesForDay(day).map((schedule) => (
-                  <div
-                    key={schedule.id}
-                    className="p-2 rounded-lg border cursor-pointer hover:shadow-sm transition-shadow"
-                    style={{ backgroundColor: schedule.color_code + '20', borderColor: schedule.color_code }}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-medium">
+              <div className="space-y-1">
+                {getSchedulesForDay(day).map((schedule) => {
+                  const resident = residents.find(r => r.id === schedule.resident_id);
+                  return (
+                    <div
+                      key={schedule.id}
+                      className="p-2 rounded text-white text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                      style={{ backgroundColor: schedule.color_code }}
+                    >
+                      <div className="font-medium text-xs mb-1">
                         {format(new Date(schedule.start_time), 'HH:mm')}
-                      </span>
-                      <Badge 
-                        variant="outline" 
-                        className={`text-xs ${eventTypeColors[schedule.event_type as keyof typeof eventTypeColors]}`}
-                      >
-                        {schedule.event_type === 'medical' && 'Medizinisch'}
-                        {schedule.event_type === 'therapy' && 'Therapie'}
-                        {schedule.event_type === 'social' && 'Sozial'}
-                        {schedule.event_type === 'hygiene' && 'Hygiene'}
-                        {schedule.event_type === 'meal' && 'Mahlzeit'}
-                        {schedule.event_type === 'rest' && 'Ruhe'}
-                        {schedule.event_type === 'custom' && 'Sonstige'}
-                      </Badge>
+                      </div>
+                      <div className="font-semibold mb-1 leading-tight">
+                        {schedule.title}
+                      </div>
+                      <div className="text-xs opacity-90 mb-1">
+                        {resident?.name} (Zimmer {resident?.room})
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs opacity-75">
+                          {getEventTypeLabel(schedule.event_type)}
+                        </span>
+                        {schedule.recurring_pattern !== 'none' && (
+                          <span className="text-xs opacity-75">
+                            🔄
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-sm font-medium text-gray-800 mb-1">
-                      {schedule.title}
-                    </p>
-                    <p className="text-xs text-gray-600">
-                      {residents.find(r => r.id === schedule.resident_id)?.name}
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}

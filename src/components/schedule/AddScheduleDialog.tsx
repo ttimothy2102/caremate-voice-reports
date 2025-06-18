@@ -16,6 +16,29 @@ interface AddScheduleDialogProps {
   residents: Resident[];
 }
 
+const eventTypeColors = {
+  medical: '#EF4444',
+  therapy: '#3B82F6', 
+  social: '#10B981',
+  hygiene: '#8B5CF6',
+  meal: '#F97316',
+  rest: '#6B7280',
+  custom: '#EAB308'
+};
+
+const colorOptions = [
+  { value: '#EF4444', label: 'Rot (Medizinisch)', bg: 'bg-red-500' },
+  { value: '#3B82F6', label: 'Blau (Therapie)', bg: 'bg-blue-500' },
+  { value: '#10B981', label: 'Grün (Sozial)', bg: 'bg-green-500' },
+  { value: '#8B5CF6', label: 'Lila (Hygiene)', bg: 'bg-purple-500' },
+  { value: '#F97316', label: 'Orange (Mahlzeit)', bg: 'bg-orange-500' },
+  { value: '#6B7280', label: 'Grau (Ruhe)', bg: 'bg-gray-500' },
+  { value: '#EAB308', label: 'Gelb (Sonstige)', bg: 'bg-yellow-500' },
+  { value: '#EC4899', label: 'Pink', bg: 'bg-pink-500' },
+  { value: '#06B6D4', label: 'Cyan', bg: 'bg-cyan-500' },
+  { value: '#84CC16', label: 'Lime', bg: 'bg-lime-500' }
+];
+
 export function AddScheduleDialog({ isOpen, onClose, residents }: AddScheduleDialogProps) {
   const [formData, setFormData] = useState({
     title: '',
@@ -44,6 +67,46 @@ export function AddScheduleDialog({ isOpen, onClose, residents }: AddScheduleDia
     setShowSuggestions(false);
   };
 
+  const generateRecurringEvents = (baseEvent: any) => {
+    const events = [baseEvent];
+    
+    if (formData.recurring_pattern === 'none') {
+      return events;
+    }
+
+    const startDate = new Date(formData.start_time);
+    const endDate = new Date(formData.end_time);
+    
+    // Generate next 12 occurrences for recurring events
+    for (let i = 1; i <= 12; i++) {
+      const nextStart = new Date(startDate);
+      const nextEnd = new Date(endDate);
+      
+      switch (formData.recurring_pattern) {
+        case 'daily':
+          nextStart.setDate(startDate.getDate() + i);
+          nextEnd.setDate(endDate.getDate() + i);
+          break;
+        case 'weekly':
+          nextStart.setDate(startDate.getDate() + (i * 7));
+          nextEnd.setDate(endDate.getDate() + (i * 7));
+          break;
+        case 'monthly':
+          nextStart.setMonth(startDate.getMonth() + i);
+          nextEnd.setMonth(endDate.getMonth() + i);
+          break;
+      }
+      
+      events.push({
+        ...baseEvent,
+        start_time: nextStart.toISOString(),
+        end_time: nextEnd.toISOString()
+      });
+    }
+    
+    return events;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -56,56 +119,61 @@ export function AddScheduleDialog({ isOpen, onClose, residents }: AddScheduleDia
       return;
     }
 
-    // Convert datetime-local to ISO format
     const startTime = new Date(formData.start_time).toISOString();
     const endTime = new Date(formData.end_time).toISOString();
 
-    createSchedule({
+    const baseEvent = {
       ...formData,
       start_time: startTime,
       end_time: endTime,
       resident_id: selectedResident.id,
       completed: false
-    }, {
-      onSuccess: () => {
-        toast({
-          title: "Termin erstellt",
-          description: `Termin für ${selectedResident.name} wurde erfolgreich hinzugefügt.`,
-        });
-        onClose();
-        // Reset form
-        setFormData({
-          title: '',
-          event_type: 'medical',
-          start_time: '',
-          end_time: '',
-          description: '',
-          assigned_staff: '',
-          recurring_pattern: 'none',
-          color_code: '#EF4444'
-        });
-        setResidentSearch('');
-        setSelectedResident(null);
-      },
-      onError: (error) => {
-        console.error('Error creating schedule:', error);
-        toast({
-          title: "Fehler",
-          description: "Termin konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
-          variant: "destructive"
-        });
-      }
-    });
-  };
+    };
 
-  const eventTypeColors = {
-    medical: '#EF4444',
-    therapy: '#3B82F6',
-    social: '#10B981',
-    hygiene: '#8B5CF6',
-    meal: '#F97316',
-    rest: '#6B7280',
-    custom: '#EAB308'
+    const eventsToCreate = generateRecurringEvents(baseEvent);
+    
+    // Create all events
+    let completedCount = 0;
+    eventsToCreate.forEach((event, index) => {
+      createSchedule(event, {
+        onSuccess: () => {
+          completedCount++;
+          if (completedCount === eventsToCreate.length) {
+            const eventCount = eventsToCreate.length;
+            const message = eventCount > 1 
+              ? `${eventCount} wiederkehrende Termine für ${selectedResident.name} wurden erfolgreich erstellt.`
+              : `Termin für ${selectedResident.name} wurde erfolgreich hinzugefügt.`;
+            
+            toast({
+              title: "Termine erstellt",
+              description: message,
+            });
+            onClose();
+            // Reset form
+            setFormData({
+              title: '',
+              event_type: 'medical',
+              start_time: '',
+              end_time: '',
+              description: '',
+              assigned_staff: '',
+              recurring_pattern: 'none',
+              color_code: '#EF4444'
+            });
+            setResidentSearch('');
+            setSelectedResident(null);
+          }
+        },
+        onError: (error) => {
+          console.error('Error creating schedule:', error);
+          toast({
+            title: "Fehler",
+            description: `Termin ${index + 1} konnte nicht erstellt werden.`,
+            variant: "destructive"
+          });
+        }
+      });
+    });
   };
 
   return (
@@ -184,6 +252,26 @@ export function AddScheduleDialog({ isOpen, onClose, residents }: AddScheduleDia
             </Select>
           </div>
 
+          <div>
+            <Label htmlFor="color">Farbe</Label>
+            <div className="grid grid-cols-5 gap-2 mt-2">
+              {colorOptions.map((color) => (
+                <button
+                  key={color.value}
+                  type="button"
+                  className={`w-8 h-8 rounded-full border-2 transition-all ${color.bg} ${
+                    formData.color_code === color.value ? 'border-gray-800 scale-110' : 'border-gray-300'
+                  }`}
+                  onClick={() => setFormData(prev => ({ ...prev, color_code: color.value }))}
+                  title={color.label}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Ausgewählt: {colorOptions.find(c => c.value === formData.color_code)?.label}
+            </p>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label htmlFor="start_time">Startzeit *</Label>
@@ -231,6 +319,11 @@ export function AddScheduleDialog({ isOpen, onClose, residents }: AddScheduleDia
                 <SelectItem value="monthly">Monatlich</SelectItem>
               </SelectContent>
             </Select>
+            {formData.recurring_pattern !== 'none' && (
+              <p className="text-xs text-gray-500 mt-1">
+                Es werden automatisch 12 weitere Termine erstellt
+              </p>
+            )}
           </div>
 
           <div>
