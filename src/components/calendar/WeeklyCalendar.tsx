@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronLeft, ChevronRight, Plus, Filter } from 'lucide-react';
 import { useSchedules, useUpdateSchedule } from '@/hooks/useSchedules';
 import { useResidents } from '@/hooks/useResidents';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, setHours, setMinutes } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { AddScheduleDialog } from '@/components/schedule/AddScheduleDialog';
+import { EventPreview } from './EventPreview';
 
 export function WeeklyCalendar() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
@@ -17,6 +19,8 @@ export function WeeklyCalendar() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ date: Date; hour: number } | null>(null);
   const [draggedEvent, setDraggedEvent] = useState<any>(null);
+  const [previewEvent, setPreviewEvent] = useState<any>(null);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   
   const { data: schedules = [] } = useSchedules();
   const { data: residents = [] } = useResidents();
@@ -56,6 +60,12 @@ export function WeeklyCalendar() {
   const handleDoubleClick = (day: Date, hour: number) => {
     setSelectedSlot({ date: day, hour });
     setShowAddDialog(true);
+  };
+
+  const handleEventClick = (e: React.MouseEvent, schedule: any) => {
+    e.stopPropagation();
+    setPreviewEvent(schedule);
+    setPopoverOpen(true);
   };
 
   const handleDragStart = (e: React.DragEvent, schedule: any) => {
@@ -167,14 +177,14 @@ export function WeeklyCalendar() {
       </Card>
 
       {/* Calendar Grid */}
-      <Card className="p-4">
-        <div className="grid grid-cols-8 gap-1 text-xs">
+      <Card className="overflow-hidden">
+        <div className="grid grid-cols-8 text-xs border-collapse">
           {/* Time column header */}
-          <div className="font-semibold text-center p-2 border-b">Zeit</div>
+          <div className="font-semibold text-center p-3 border-b border-r bg-gray-50">Zeit</div>
           
           {/* Day headers */}
           {weekDays.map((day, index) => (
-            <div key={index} className="font-semibold text-center p-2 border-b">
+            <div key={index} className="font-semibold text-center p-3 border-b border-r last:border-r-0 bg-gray-50">
               <div className="text-sm">{format(day, 'EEEE', { locale: de })}</div>
               <div className="text-xs text-gray-600">{format(day, 'd. MMM', { locale: de })}</div>
             </div>
@@ -184,7 +194,7 @@ export function WeeklyCalendar() {
           {hours.map(hour => (
             <React.Fragment key={hour}>
               {/* Time label */}
-              <div className="text-center p-1 border-r text-xs font-medium text-gray-600 bg-gray-50">
+              <div className="text-center py-3 px-2 border-r border-b text-xs font-medium text-gray-600 bg-gray-50 min-h-[60px] flex items-center justify-center">
                 {hour.toString().padStart(2, '0')}:00
               </div>
               
@@ -194,7 +204,7 @@ export function WeeklyCalendar() {
                 return (
                   <div
                     key={`${hour}-${dayIndex}`}
-                    className="min-h-[40px] border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer relative"
+                    className="min-h-[60px] border-b border-r last:border-r-0 hover:bg-blue-50 transition-colors cursor-pointer relative p-1"
                     onDoubleClick={() => handleDoubleClick(day, hour)}
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, day, hour)}
@@ -202,30 +212,41 @@ export function WeeklyCalendar() {
                     {scheduleEvents.map((schedule) => {
                       const resident = residents.find(r => r.id === schedule.resident_id);
                       return (
-                        <div
-                          key={schedule.id}
-                          draggable
-                          onDragStart={(e) => handleDragStart(e, schedule)}
-                          className="absolute inset-x-0 top-0 p-1 rounded text-white text-xs cursor-move hover:opacity-80 transition-opacity overflow-hidden"
-                          style={{ backgroundColor: schedule.color_code }}
-                        >
-                          <div className="font-medium truncate">
-                            {schedule.title}
-                          </div>
-                          <div className="text-xs opacity-90 truncate">
-                            {resident?.name}
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs opacity-75">
-                              {getEventTypeLabel(schedule.event_type)}
-                            </span>
-                            {schedule.recurring_pattern !== 'none' && (
-                              <span className="text-xs opacity-75">
-                                🔄
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                        <Popover key={schedule.id} open={popoverOpen && previewEvent?.id === schedule.id} onOpenChange={setPopoverOpen}>
+                          <PopoverTrigger asChild>
+                            <div
+                              draggable
+                              onDragStart={(e) => handleDragStart(e, schedule)}
+                              onClick={(e) => handleEventClick(e, schedule)}
+                              className="w-full h-full rounded-md text-white text-xs cursor-pointer hover:opacity-90 transition-all overflow-hidden p-2 border border-white/20"
+                              style={{ backgroundColor: schedule.color_code }}
+                            >
+                              <div className="font-medium truncate text-xs leading-tight">
+                                {schedule.title}
+                              </div>
+                              <div className="text-xs opacity-90 truncate mt-0.5">
+                                {resident?.name}
+                              </div>
+                              <div className="flex items-center justify-between mt-1">
+                                <span className="text-xs opacity-75">
+                                  {getEventTypeLabel(schedule.event_type)}
+                                </span>
+                                {schedule.recurring_pattern !== 'none' && (
+                                  <span className="text-xs opacity-75">
+                                    🔄
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </PopoverTrigger>
+                          <PopoverContent side="right" className="p-0 border-0 shadow-lg">
+                            <EventPreview 
+                              schedule={schedule}
+                              resident={resident}
+                              onClose={() => setPopoverOpen(false)}
+                            />
+                          </PopoverContent>
+                        </Popover>
                       );
                     })}
                   </div>
