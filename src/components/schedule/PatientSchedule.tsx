@@ -94,7 +94,7 @@ export function PatientSchedule({ residentId, residentName }: PatientSchedulePro
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-medium text-gray-800">{schedule.title}</h4>
                     {schedule.recurring_pattern !== 'none' && (
-                      <Repeat className="w-4 h-4 text-gray-500" title="Wiederkehrender Termin" />
+                      <Repeat className="w-4 h-4 text-gray-500" />
                     )}
                   </div>
                   {schedule.description && (
