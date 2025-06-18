@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { Mail, Building, User, CheckCircle } from 'lucide-react';
+import { useWaitlist } from '@/hooks/useWaitlist';
 
 export function WaitlistForm() {
   const [formData, setFormData] = useState({
@@ -16,30 +16,15 @@ export function WaitlistForm() {
     phoneNumber: ''
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const { submitToWaitlist, isLoading } = useWaitlist();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      // Simulate API call - replace with actual implementation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+    
+    const result = await submitToWaitlist(formData);
+    
+    if (result.success) {
       setIsSubmitted(true);
-      toast({
-        title: "Welcome to the waitlist!",
-        description: "We'll be in touch soon with early access details.",
-      });
-    } catch (error) {
-      toast({
-        title: "Something went wrong",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
     }
   };
 
