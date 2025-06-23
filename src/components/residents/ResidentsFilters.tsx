@@ -3,8 +3,9 @@ import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Search, Filter, Calendar, Heart } from 'lucide-react';
+import { Search, Filter, Calendar, Heart, ArrowUpDown } from 'lucide-react';
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface FiltersProps {
   filters: {
@@ -12,6 +13,7 @@ interface FiltersProps {
     healthStatus: string;
     birthDate: string;
     upcomingAppointments: boolean;
+    sortByAppointments: boolean;
   };
   onFiltersChange: (filters: any) => void;
 }
@@ -28,7 +30,7 @@ export function ResidentsFilters({ filters, onFiltersChange }: FiltersProps) {
         Filteroptionen
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Name Filter */}
         <div className="space-y-2">
           <Label htmlFor="name-filter">Name</Label>
@@ -97,6 +99,20 @@ export function ResidentsFilters({ filters, onFiltersChange }: FiltersProps) {
               Nur mit Terminen
             </Label>
           </div>
+        </div>
+
+        {/* Sort by Appointments */}
+        <div className="space-y-2">
+          <Label>Sortierung</Label>
+          <Button
+            variant={filters.sortByAppointments ? "default" : "outline"}
+            size="sm"
+            onClick={() => updateFilter('sortByAppointments', !filters.sortByAppointments)}
+            className="w-full justify-start"
+          >
+            <ArrowUpDown className="w-4 h-4 mr-2" />
+            {filters.sortByAppointments ? 'Nach Terminen sortiert' : 'Nach Terminen sortieren'}
+          </Button>
         </div>
       </div>
     </div>

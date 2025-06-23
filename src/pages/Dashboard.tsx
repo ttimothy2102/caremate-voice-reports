@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { getPersonalizedGreeting } from '@/utils/greetingUtils';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AccountManagement } from "@/components/account/AccountManagement";
+
 function DashboardContent() {
   const {
     data: residents = [],
@@ -35,6 +37,7 @@ function DashboardContent() {
   const userName = user?.user_metadata?.full_name;
   const greeting = getPersonalizedGreeting(userName);
   const userInitials = user?.user_metadata?.full_name ? user.user_metadata.full_name.split(' ').map((name: string) => name[0]).join('').toUpperCase() : user?.email?.[0]?.toUpperCase() || 'U';
+  
   const handleSignOut = async () => {
     await signOut();
     toast({
@@ -42,12 +45,14 @@ function DashboardContent() {
       description: "Sie wurden erfolgreich abgemeldet."
     });
   };
+  
   const handleContactDoctor = () => {
     toast({
       title: "Arzt kontaktieren",
       description: "Weiterleitung zur Arztkontakt-Funktion..."
     });
   };
+  
   const overviewStats = [{
     title: "Berichte heute",
     value: careReports.filter(r => new Date(r.created_at).toDateString() === new Date().toDateString()).length.toString(),
@@ -73,6 +78,7 @@ function DashboardContent() {
     color: "text-purple-600",
     onClick: () => navigate('/schedule')
   }];
+  
   if (residentsLoading) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center bg-white p-8 rounded-xl shadow-sm">
@@ -81,6 +87,7 @@ function DashboardContent() {
         </div>
       </div>;
   }
+  
   return <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b px-6 py-4">
@@ -99,12 +106,12 @@ function DashboardContent() {
               {greeting}
             </span>
             
-            <Button variant="outline" size="sm" onClick={handleContactDoctor} className="text-green-600 border-green-300 hover:bg-green-50">
+            <Button variant="outline" size="sm" onClick={handleContactDoctor} className="text-green-600 border-green-300 hover:bg-green-50 h-10 px-4">
               <Phone className="w-4 h-4 mr-2" />
               Arzt kontaktieren
             </Button>
             
-            <Button size="sm" onClick={() => setShowAddResidentDialog(true)} className="bg-caremate-gradient">
+            <Button size="sm" onClick={() => setShowAddResidentDialog(true)} className="bg-caremate-gradient h-10 px-4">
               <Plus className="w-4 h-4 mr-2" />
               Bewohner hinzufügen
             </Button>
@@ -166,6 +173,7 @@ function DashboardContent() {
       <AddResidentDialog isOpen={showAddResidentDialog} onClose={() => setShowAddResidentDialog(false)} />
     </div>;
 }
+
 export function Dashboard() {
   return <ProtectedRoute>
       <DashboardContent />
