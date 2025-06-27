@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { getPersonalizedGreeting } from '@/utils/greetingUtils';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AccountManagement } from "@/components/account/AccountManagement";
+import { CareMateLogoSvg } from "@/components/ui/CareMateLogoSvg";
 
 function DashboardContent() {
   const {
@@ -94,9 +95,8 @@ function DashboardContent() {
         <div className="flex items-center justify-between">
           <div className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/dashboard')}>
             <div className="flex items-center gap-2">
-              <Heart className="w-6 h-6 text-primary" />
-              <div>
-                <h1 className="text-2xl font-bold text-primary">CareMate</h1>
+              <CareMateLogoSvg width={100} height={28} />
+              <div className="ml-2">
                 <p className="text-sm text-gray-600">Management Dashboard</p>
               </div>
             </div>

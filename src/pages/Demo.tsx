@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Play, Users, FileText, BarChart3, Heart } from 'lucide-react';
+import { CareMateLogoSvg } from "@/components/ui/CareMateLogoSvg";
 
 const Demo = () => {
   const navigate = useNavigate();
@@ -46,12 +46,8 @@ const Demo = () => {
               <ArrowLeft className="w-4 h-4" />
               Back to Home
             </Button>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-caremate-gradient rounded-full"></div>
-              <h1 className="text-2xl font-bold text-primary">
-                CareMate Demo
-              </h1>
-            </div>
+            <CareMateLogoSvg />
+            <span className="text-lg font-semibold text-gray-700">Demo</span>
           </div>
           <Button 
             onClick={() => navigate('/auth')}
