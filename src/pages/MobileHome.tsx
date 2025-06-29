@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MobileHeader } from "@/components/layout/MobileHeader";
+import { MobileHeroSection } from "@/components/mobile/MobileHeroSection";
 import { Mic, Users, FileText, Heart, Calendar, BarChart3, ClipboardList, Clock, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -60,6 +61,9 @@ function MobileHomeContent() {
         title="CareMate" 
         onTitleClick={() => navigate('/mobile-home')}
       />
+      
+      {/* New Hero Section */}
+      <MobileHeroSection />
       
       <div className="p-6 space-y-6">
         {/* Welcome Section */}
