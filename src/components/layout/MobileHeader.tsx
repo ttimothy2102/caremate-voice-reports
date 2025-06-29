@@ -6,7 +6,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AccountManagement } from "@/components/account/AccountManagement";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from 'react-router-dom';
-import { CareMateLogoSvg } from "@/components/ui/CareMateLogoSvg";
 
 interface MobileHeaderProps {
   title: string;
@@ -57,15 +56,12 @@ export function MobileHeader({ title, showBack, onBack, onTitleClick }: MobileHe
                 <ArrowLeft className="w-4 h-4" />
               </Button>
             )}
-            <div 
-              className="cursor-pointer hover:opacity-80 transition-opacity"
+            <h1 
+              className="text-xl font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity"
               onClick={handleTitleClick}
             >
-              <CareMateLogoSvg width={90} height={24} />
-            </div>
-            {title !== "CareMate" && (
-              <span className="text-sm text-gray-600 ml-2">| {title}</span>
-            )}
+              {title}
+            </h1>
           </div>
           
           {user && (

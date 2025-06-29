@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { CareMateLogoSvg } from "@/components/ui/CareMateLogoSvg";
+import { Heart } from 'lucide-react';
 
 export function HomeHeader() {
   const navigate = useNavigate();
@@ -16,11 +17,14 @@ export function HomeHeader() {
   return (
     <header className="bg-white/80 backdrop-blur-sm border-b px-6 py-4 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div 
-          className="cursor-pointer hover:opacity-80 transition-opacity"
-          onClick={() => navigate('/')}
-        >
-          <CareMateLogoSvg />
+        <div className="flex items-center gap-3">
+          <Heart className="w-8 h-8 text-primary" />
+          <h1 
+            className="text-2xl font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/')}
+          >
+            CareMate
+          </h1>
         </div>
         <nav className="hidden md:flex items-center gap-6">
           <button 

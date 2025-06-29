@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Phone, MapPin } from 'lucide-react';
-import { CareMateLogoSvg } from "@/components/ui/CareMateLogoSvg";
+import { Mail, Phone, MapPin, Heart } from 'lucide-react';
 
 export function HomeFooter() {
   const navigate = useNavigate();
@@ -21,10 +20,11 @@ export function HomeFooter() {
           {/* Company Info */}
           <div className="space-y-4">
             <div 
-              className="cursor-pointer hover:opacity-80 transition-opacity"
+              className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/')}
             >
-              <CareMateLogoSvg width={140} height={36} />
+              <Heart className="w-8 h-8 text-primary" />
+              <span className="text-2xl font-bold">CareMate</span>
             </div>
             <p className="text-gray-400 leading-relaxed">
               Transforming elderly care with AI-powered documentation and comprehensive facility management.
