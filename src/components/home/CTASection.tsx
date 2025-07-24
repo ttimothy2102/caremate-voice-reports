@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, Users, Clock, Shield } from 'lucide-react';
+import { CelebrationButton } from "@/components/ui/celebration-button";
+import { ArrowRight, Star, Users, Clock, Shield, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 export function CTASection() {
   const navigate = useNavigate();
@@ -36,16 +37,22 @@ export function CTASection() {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
-          <Button size="lg" className="cursor-tracking-button-inverse text-primary border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-sm md:text-lg px-6 py-4 md:px-8 md:py-6 w-full sm:w-auto" onClick={() => {
-          const element = document.getElementById('waitlist-form');
-          element?.scrollIntoView({
-            behavior: 'smooth'
-          });
-        }}>
+          <CelebrationButton 
+            size="lg" 
+            className="cursor-tracking-button-inverse text-primary border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-sm md:text-lg px-6 py-4 md:px-8 md:py-6 w-full sm:w-auto pulse-ring" 
+            onClick={() => {
+              const element = document.getElementById('waitlist-form');
+              element?.scrollIntoView({
+                behavior: 'smooth'
+              });
+            }}
+            celebrationEmoji="🚀"
+          >
+            <Rocket className="w-4 h-4 md:w-5 md:h-5 mr-2" />
             Join Waitlist - Get Early Access
             <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
-          </Button>
-          <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20 hover:text-white text-sm md:text-lg px-6 py-4 md:px-8 md:py-6 w-full sm:w-auto" onClick={() => navigate('/demo')}>
+          </CelebrationButton>
+          <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20 hover:text-white text-sm md:text-lg px-6 py-4 md:px-8 md:py-6 w-full sm:w-auto morph-button" onClick={() => navigate('/demo')}>
             Try Demo First
           </Button>
         </div>

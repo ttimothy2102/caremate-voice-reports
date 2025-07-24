@@ -12,10 +12,22 @@ import { ContactSection } from '@/components/home/ContactSection';
 import { CTASection } from '@/components/home/CTASection';
 import { HomeFooter } from '@/components/home/HomeFooter';
 import { LiquidGradientStyles } from '@/components/ui/liquid-gradient-styles';
+import { EnhancedAnimations } from '@/components/ui/enhanced-animations';
+import { FloatingNavigation } from '@/components/ui/floating-navigation';
+import { ScrollProgress } from '@/components/ui/scroll-progress';
+import { ParticleBackground } from '@/components/ui/particle-background';
 
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  const sections = [
+    { id: 'hero', label: 'Welcome' },
+    { id: 'features', label: 'Features' },
+    { id: 'dashboard-preview', label: 'Demo' },
+    { id: 'waitlist-form', label: 'Waitlist' },
+    { id: 'pricing', label: 'Pricing' }
+  ];
 
   useEffect(() => {
     // Add scroll-based animations
@@ -43,9 +55,13 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 relative">
+      <ParticleBackground />
+      <ScrollProgress />
+      <FloatingNavigation sections={sections} />
+      
       <HomeHeader />
-      <div data-scroll-animation>
+      <div id="hero" data-scroll-animation>
         <HeroSection />
       </div>
       <div data-scroll-animation>
@@ -68,6 +84,7 @@ const Index = () => {
       </div>
       <HomeFooter />
       <LiquidGradientStyles />
+      <EnhancedAnimations />
     </div>
   );
 };

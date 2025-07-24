@@ -57,7 +57,7 @@ export function FeaturesSection() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
         {features.map((feature, index) => (
-          <Card key={index} className="p-3 md:p-6 hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm group hover:-translate-y-2 cursor-pointer relative overflow-hidden">
+          <Card key={index} className="stagger-child p-3 md:p-6 hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm group hover:-translate-y-2 cursor-pointer relative overflow-hidden playful-card interactive-glow">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div className="space-y-2 md:space-y-3 relative z-10">
               <div className="w-8 h-8 md:w-12 md:h-12 bg-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 relative overflow-hidden">

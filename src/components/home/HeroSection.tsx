@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play } from 'lucide-react';
+import { CelebrationButton } from "@/components/ui/celebration-button";
+import { ArrowRight, Play, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 export function HeroSection() {
   const navigate = useNavigate();
@@ -21,11 +22,17 @@ export function HeroSection() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center">
-          <Button size="lg" className="cursor-tracking-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-base md:text-lg px-6 py-4 md:px-8 md:py-6 w-full sm:w-auto" onClick={() => navigate('/auth')}>
+          <CelebrationButton 
+            size="lg" 
+            className="cursor-tracking-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-base md:text-lg px-6 py-4 md:px-8 md:py-6 w-full sm:w-auto pulse-ring interactive-glow" 
+            onClick={() => navigate('/auth')}
+            celebrationEmoji="✨"
+          >
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 mr-2" />
             Start Free Trial
             <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
-          </Button>
-          <Button size="lg" variant="outline" className="text-base md:text-lg px-6 py-4 md:px-8 md:py-6 group w-full sm:w-auto" onClick={() => navigate('/demo')}>
+          </CelebrationButton>
+          <Button size="lg" variant="outline" className="text-base md:text-lg px-6 py-4 md:px-8 md:py-6 group w-full sm:w-auto morph-button playful-card" onClick={() => navigate('/demo')}>
             <Play className="w-4 h-4 md:w-5 md:h-5 mr-2 group-hover:scale-110 transition-transform" />
             View Demo
           </Button>

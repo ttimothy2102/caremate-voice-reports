@@ -2,7 +2,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, Users, Calendar, Heart, Mic, Play, CheckCircle } from 'lucide-react';
+import { CelebrationButton } from "@/components/ui/celebration-button";
+import { InteractiveCounter } from "@/components/ui/interactive-counter";
+import { ArrowRight, BarChart3, Users, Calendar, Heart, Mic, Play, CheckCircle, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const CountUpNumber = ({ end, duration = 2000, isVisible }: { end: number; duration?: number; isVisible: boolean }) => {
@@ -102,14 +104,15 @@ export function DashboardPreview() {
           into simple voice commands and intelligent automation.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8">
-          <Button 
+          <CelebrationButton 
             onClick={() => navigate('/demo')}
-            className="liquid-gradient-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-sm md:text-base px-6 py-3 md:px-8 md:py-4"
+            className="liquid-gradient-button text-white border-0 relative overflow-hidden transition-all duration-300 hover:shadow-lg text-sm md:text-base px-6 py-3 md:px-8 md:py-4 pulse-ring"
+            celebrationEmoji="⚡"
           >
-            <Play className="w-4 h-4 mr-2" />
+            <Zap className="w-4 h-4 mr-2" />
             Try Interactive Demo
             <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          </CelebrationButton>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <CheckCircle className="w-4 h-4 text-green-500" />
             No signup required
@@ -136,11 +139,11 @@ export function DashboardPreview() {
             {/* Enhanced Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {stats.map((stat, index) => (
-                <div key={index} className="bg-gradient-to-br from-gray-50 to-white rounded-lg p-3 md:p-4 hover:shadow-md transition-all duration-300 border border-gray-100">
+                <div key={index} className="stagger-child bg-gradient-to-br from-gray-50 to-white rounded-lg p-3 md:p-4 hover:shadow-md transition-all duration-300 border border-gray-100 playful-card">
                   <div className="flex items-center justify-between mb-1 md:mb-2">
                     <stat.icon className={`w-4 h-4 md:w-6 md:h-6 ${stat.color}`} />
                     <span className="text-lg md:text-2xl font-bold text-gray-800">
-                      <CountUpNumber end={stat.value} isVisible={isVisible} />
+                      <InteractiveCounter end={stat.value} />
                     </span>
                   </div>
                   <p className="text-xs md:text-sm text-gray-600 font-medium">{stat.label}</p>
@@ -171,9 +174,9 @@ export function DashboardPreview() {
               {features.map((feature, index) => (
                 <div 
                   key={feature.id}
-                  className={`text-center p-4 rounded-lg transition-all duration-300 cursor-pointer ${
+                  className={`stagger-child text-center p-4 rounded-lg transition-all duration-300 cursor-pointer playful-card ${
                     activeDemo === feature.id 
-                      ? 'bg-blue-50 border-2 border-blue-200 scale-105' 
+                      ? 'bg-blue-50 border-2 border-blue-200 scale-105 celebration' 
                       : 'hover:bg-gray-50 border border-gray-100'
                   }`}
                   onClick={() => handleFeatureDemo(feature.id)}

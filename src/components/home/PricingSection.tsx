@@ -2,7 +2,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Star } from 'lucide-react';
+import { CelebrationButton } from "@/components/ui/celebration-button";
+import { Check, Star, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function PricingSection() {
@@ -89,7 +90,7 @@ export function PricingSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
         {plans.map((plan, index) => (
-          <Card key={index} className={`relative p-4 md:p-8 ${plan.popular ? 'border-2 border-blue-500 shadow-xl scale-105' : 'border-0'} bg-white/90 backdrop-blur-sm hover:shadow-lg transition-all duration-300 ${isVisible ? 'animate-fade-in' : ''}`} style={{ animationDelay: `${index * 0.2}s` }}>
+          <Card key={index} className={`stagger-child relative p-4 md:p-8 ${plan.popular ? 'border-2 border-blue-500 shadow-xl scale-105 pulse-ring' : 'border-0'} bg-white/90 backdrop-blur-sm hover:shadow-lg transition-all duration-300 playful-card interactive-glow ${isVisible ? 'animate-fade-in' : ''}`} style={{ animationDelay: `${index * 0.2}s` }}>
             {plan.popular && (
               <div className="absolute -top-3 md:-top-4 left-1/2 transform -translate-x-1/2">
                 <div className="bg-blue-500 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium flex items-center gap-2">
@@ -117,13 +118,24 @@ export function PricingSection() {
               ))}
             </div>
 
-            <Button 
-              className={`w-full text-sm md:text-base ${plan.popular ? 'liquid-gradient-button text-white border-0' : 'border-2 border-gray-200 hover:border-blue-500'}`}
-              variant={plan.popular ? 'default' : 'outline'}
-              onClick={() => navigate('/auth')}
-            >
-              {plan.name === 'Enterprise' ? 'Contact Sales' : 'Start Free Trial'}
-            </Button>
+            {plan.popular ? (
+              <CelebrationButton 
+                className="w-full text-sm md:text-base liquid-gradient-button text-white border-0"
+                onClick={() => navigate('/auth')}
+                celebrationEmoji="👑"
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                {plan.name === 'Enterprise' ? 'Contact Sales' : 'Start Free Trial'}
+              </CelebrationButton>
+            ) : (
+              <Button 
+                className="w-full text-sm md:text-base border-2 border-gray-200 hover:border-blue-500 morph-button"
+                variant="outline"
+                onClick={() => navigate('/auth')}
+              >
+                {plan.name === 'Enterprise' ? 'Contact Sales' : 'Start Free Trial'}
+              </Button>
+            )}
           </Card>
         ))}
       </div>
